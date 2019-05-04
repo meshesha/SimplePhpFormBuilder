@@ -1,0 +1,19 @@
+{
+    "name": "meshesha/SimplePhpFormBuilder",
+    "type": "application",
+    "description": "Aplication that is based on a PHP and MySql database , allowing you to build and management simple html forms",
+    "keywords": ["php formbuilder","form"],
+    "homepage": "https://github.com/meshesha/SimplePhpFormBuilder",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tady meshesha",
+            "email": "meshesha1@gmail.com",
+            "homepage": "https://meshesha.js.org",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
