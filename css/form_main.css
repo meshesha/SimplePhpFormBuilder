@@ -1,0 +1,22 @@
+body{
+    margin:0 auto;
+    width: 80%;
+    background-color: #2222
+}
+.form-render-warper{
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: white;
+}
+#form-render-content{
+    padding: 10px;
+}
+.form-control-element-right{
+    text-align: right;
+}
+.form-control-element-left{
+    text-align: left;
+}
+.form-control-element-center{
+    text-align: center;
+}

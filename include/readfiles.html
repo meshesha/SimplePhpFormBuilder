@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>OfficeJs</title>
+    <!--All-->
+    <script src="./Content/jQuery/jquery-1.12.4.min.js"></script>
+    <!--PDF-->
+    <script src="./Content/pdf/pdf.js"></script>
+    <!--Docs-->
+    <script src="./Content/docxjs/jszip-utils.js"></script>
+    <script src="./Content/docxjs/mammoth.browser.min.js"></script>
+    <!--PPTX-->
+    <link rel="stylesheet" href="./Content/pptxjs/css/pptxjs.css">
+    <link rel="stylesheet" href="./Content/pptxjs/css/nv.d3.min.css">
+    <script type="text/javascript" src="./Content/pptxjs/js/jszip.min.js"></script>
+    <script type="text/javascript" src="./Content/pptxjs/js/filereader.js"></script>
+    <script type="text/javascript" src="./Content/pptxjs/js/d3.min.js"></script>
+    <script type="text/javascript" src="./Content/pptxjs/js/nv.d3.min.js"></script>
+    <script type="text/javascript" src="./Content/pptxjs/js/pptxjs.js"></script>
+    <script type="text/javascript" src="./Content/pptxjs/js/divs2slides.js"></script>
+    <!--All Spreadsheet -->
+    <script type="text/javascript" src="Content/sheetjs/assets/vendor/jquery.handsontable.full.js"></script>
+    <script type="text/javascript" src="Content/sheetjs/assets/js/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="Content/sheetjs/assets/vendor/jquery.handsontable.full.css">
+    <!--All-->
+    <script src="officejs.js"></script>
+  </head>
+  <body>
+    <div id="main_warper">
+      <div id="header"></div>
+      <div id="left_warper"></div>
+      <div id="center_warper">
+        <input type="file" id="select_file" />
+        <div id="resolt_content"></div>
+      </div>
+      <div id="right_warper"></div>
+      <div id="footer"></div>
+    </div>
+    <script>
+    //var file_url = "Hyundai Getz.docx"; 
+    //var file_url = "bg.jpg";
+    //var file_url = "pdf_demo.pdf";
+    //file_url = "Sample_12.pptx";
+    //var file_url = "sheetjs.xlsx";
+    </script>
+    <script type="text/javascript">
+      var file_url = "pdf_demo.pdf";
+        $("#resolt_content").cofficejs({
+          url: file_url,
+          inputObjId: "select_file",
+          pdfScale: 3
+        });
+    </script>
+  </body>
+</html>

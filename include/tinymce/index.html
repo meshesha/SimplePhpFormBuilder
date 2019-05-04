@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src='js/tinymce.min.js'></script>
+  <script>
+  tinymce.init({
+	selector: '#mytextarea',
+	language: 'he_IL',
+	directionality: 'rtl',
+	menubar: true,
+	toolbar_items_size: 'small',
+	plugins: [
+	'advlist autolink lists link image charmap print preview anchor',
+	'searchreplace visualblocks code fullscreen',
+	'insertdatetime media table contextmenu paste code textcolor colorpicker imagetools'
+	],
+	toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table | forecolor backcolor',
+	skin: "amir"
+  });
+  </script>
+</head>
+
+<body>
+<h1>TinyMCE Quick Start Guide</h1>
+  <form method="post">
+    <textarea id="mytextarea">Hello, World!</textarea>
+  </form>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<html>
+<head>
+    <title>ApPHP EasyInstaller Pro :: Getting Started</title>
+    <style type='text/css'>
+        BODY { padding:10px 20px 10px 20px; font-family: "Lucida Sans Unicode"; font-size: 14px; }
+        IMG  { border:1px solid #cccccc; }        
+        SPAN.c { font-weight:bold; color:#003300; }
+        SPAN.d { font-weight:normal; color:#444444; }
+        PRE {background-color:#f1f2f3; border:1px solid #ccc; padding:5px;}
+    </style>
+</head>
+<body>    
+
+<!-- last update 10.07.2013 -->
+<div class="box">
+<h2>Getting Started with ApPHP EasyInstaller (for version 3.0.0 or above)</h2>
+<div class="holder">
+<div class="frame-box">
+
+    <div class="blocks-holder blocks-subholder">
+    <div class="block-long">
+    <div class="text-box">
+
+        <ul style="padding-left:1px;list-style:none;font-size:14px;">
+            <li>
+            <span>1.</span> <a href="GettingStarted.html#GettingStarted_with_PHP_EasyInstaller"><span class=toctext>Getting Started with ApPHP EasyInstaller.</span></a> 
+            <ul style="list-style:none;">
+                <li><span>1.1</span> <a href="GettingStarted.html#Step_1._Setting_up_parameters"><span class=toctext>Step 1. Setting up parameters.</span></a>
+                <li><span>1.2</span> <a href="GettingStarted.html#Step_2._Preparing_SQL_dump_file"><span class=toctext>Step 2. Preparing SQL dump file.</span></a>
+                <li><span>1.3</span> <a href="GettingStarted.html#Step_3._Blocking_unexpected_access"><span class=toctext>Step 3. Blocking unexpected access to application.</span></a>
+                <li><span>1.4</span> <a href="GettingStarted.html#Step_4._Start_Installation_Process"><span class=toctext>Step 4. Start installation process.</span></a>
+            </ul>
+            </li>
+        </ul>
+        <br />
+
+        <a name="GettingStarted_with_PHP_EasyInstaller"></a>
+        After ApPHP EasyInstaller was installed, you have to perform following steps:
+        <br /><br />
+        
+
+        <a name="Step_1._Setting_up_parameters"></a>
+        <h3 class="sub-title"><b>Step 1. Setting up parameters in file settings.php.</b></h3>
+        <hr>
+            Open file settings.inc.php in any text editor and change all parameters according to your needs.<br /><br />           
+            
+            There are some important parameters in this file:<br /><br />           
+            
+            <b>1. GLOBAL SETTINGS</b><br />
+            --------------------------------<br />                        
+            <span class='c'>EI_MODE</span><br /><span class='d'>the mode of installation. There are 3 possible modes: demo, debug and production</span><br /><br />
+            <span class='c'>EI_VERSION</span><br /><span class='d'>the current version of EasyInstaller</span><br /><br />
+            <span class='c'>EI_DEFAULT_LANGUAGE</span><br /><span class='d'>specifies a default language, ex.: en - English, es - Spanish, de - German</span><br /><br />
+            <span class='c'>EI_DEFAULT_LANGUAGE_DIRECTION</span><br /><span class='d'>specifies a default language direction: ltr or rtl</span><br /><br />
+            <span class='c'>EI_TEMPLATE</span><br /><span class='d'>specifies template name</span><br /><br />
+
+            <b>2. GENERAL SETTINGS</b><br />
+            --------------------------------<br />                        
+            <span class='c'>EI_CHECK_PHP_MINIMUM_VERSION/EI_PHP_MINIMUM_VERSION</span><br /><span class='d'>checks if minimum required version of PHP runs on a server</span><br /><br />
+            <span class='c'>EI_CHECK_CONFIG_DIR_WRITABILITY</span><br /><span class='d'>specifies whether to check configuration directory for writability or not</span><br /><br />
+            <span class='c'>EI_CONFIG_FILE_DIRECTORY</span><br /><span class='d'>the name of directory where the configuration file is placed For ex.: "../common/" or "common/" - according to directory hierarchy and relatively to start.php file</span><br /><br />
+            <span class='c'>EI_CONFIG_FILE_NAME</span><br /><span class='d'>the name of the file that will be created after installation. This file will include connection parameters to you database: database host, database name, database user and user password</span><br /><br />
+            <span class='c'>EI_CONFIG_FILE_PATH</span><br /><span class='d'>the full path of file that will be created after installation</span><br /><br />
+            <br />
+            <span class='c'>EI_CHECK_MAGIC_QUOTES</span><br /><span class='d'>allows collecting info for magic quotes</span><br /><br />
+            <span class='c'>EI_CHECK_MBSTRING_SUPPORT</span><br /><span class='d'>allows collecting info for mbstring support</span><br /><br />
+            <span class='c'>EI_CHECK_MAIL_SETTINGS</span><br /><span class='d'>allows collecting info for email settings</span><br /><br />
+            <span class='c'>EI_CHECK_EXTENSIONS</span><br /><span class='d'>allows collecting info about PHP extensions</span><br /><br />
+            <span class='c'>EI_CHECK_MODES</span><br /><span class='d'>allows collecting info about PHP modes</span><br /><br />
+            <span class='c'>EI_CHECK_DIRECTORIES_AND_FILES</span><br /><span class='d'>specifies whether to check defined directories and files</span><br /><br />
+            <span class='c'>EI_USE_ADMIN_ACCOUNT</span><br /><span class='d'>specifies whether to accept admin username and password</span><br /><br />            
+            <br />
+            
+            <b>3. DATABASE SETTINGS</b><br />
+            --------------------------------<br />                        
+            <span class='c'>EI_DATABASE_CREATE</span><br /><span class='d'>specifies whether to force database creation</span><br /><br />
+            <span class='c'>EI_DATABASE_TYPE</span><br /><span class='d'>specifies a database type: mysql - MySql, pgsql - PostgreSQL, sqlite/sqlite2 - SQLite etc..</span><br /><br />
+            <span class='c'>EI_CHECK_DB_MINIMUM_VERSION/EI_DB_MINIMUM_VERSION</span><br /><span class='d'>checks if a minimum required version of database engine runs on a server</span><br /><br />
+            <span class='c'>EI_USE_USERNAME_AND_PASWORD</span><br /><span class='d'>specifies whether to accept admin username and password</span><br /><br />
+            <span class='c'>EI_USE_PASSWORD_ENCRYPTION</span><br /><span class='d'>specifies whether to encrypt or not admin password</span><br /><br />
+            <span class='c'>EI_PASSWORD_ENCRYPTION_TYPE</span><br /><span class='d'>type of encryption - AES or MD5</span><br /><br />
+            <span class='c'>EI_PASSWORD_ENCRYPTION_KEY</span><br /><span class='d'>password encryption key for AES encryption</span><br /><br />
+            <br />
+
+            <b>4. CONFIG PARAMETERS</b><br />
+            --------------------------------<br />                        
+            <span class='c'>EI_ALLOW_NEW_INSTALLATION</span><br /><span class='d'>specifies whether to allow new installation</span><br /><br />
+            <span class='c'>EI_ALLOW_UPDATE</span><br /><span class='d'>specifies whether to allow update</span><br /><br />
+            <span class='c'>EI_ALLOW_UN_INSTALLATION</span><br /><span class='d'>specifies whether to allow un-installation</span><br /><br />
+            <span class='c'>EI_ALLOW_START_ALL_OVER</span><br /><span class='d'>specifies whether to allow start all over button</span><br /><br />
+            <br />
+            <span class='c'>EI_SQL_DUMP_FILE_CREATE</span><br /><span class='d'>file that include SQL statements for instalation. Make sure they don't include commented lines, like: -- ## etc.</span><br /><br />
+            <span class='c'>EI_SQL_DUMP_FILE_UPDATE</span><br /><span class='d'>file that include SQL statements for update</span><br /><br />
+            <span class='c'>EI_SQL_DUMP_FILE_UN_INSTALL</span><br /><span class='d'>file that include SQL statements for un-instalation</span><br /><br />
+            <br />
+            <span class='c'>EI_USE_ENCODING/EI_DUMP_FILE_ENCODING/EI_DUMP_FILE_COLLATION</span><br /><span class='d'>defines using of utf-8 encoding and collation for SQL dump file</span><br /><br />
+            <br />
+            <span class='c'>EI_ALLOW_MANUAL_INSTALLATION</span><br /><span class='d'>allow manual installation</span><br /><br />
+            <span class='c'>EI_MANUAL_INSTALLATION_DIR</span><br /><span class='d'>manual installation text directoiry and text files</span><br /><br />
+            <br />
+
+            <b>5. CONFIG TEMPLATE PARAMETERS</b><br />
+            --------------------------------<br />                        
+            <span class='c'>EI_CONFIG_FILE_TEMPLATE</span><br /><span class='d'>template of the configuration file</span><br /><br />
+            <br />
+
+            <b>6. APPLICATION PARAMETERS</b><br />            
+            --------------------------------<br />                        
+            <span class='c'>EI_APPLICATION_NAME</span><br /><span class='d'>the name of your script (program)</span><br /><br />
+            <span class='c'>EI_APPLICATION_VERSION</span><br /><span class='d'>version number of your application</span><br /><br />
+            <span class='c'>EI_APPLICATION_START_FILE</span><br /><span class='d'>the name of the default starting file of your script (application)</span><br /><br />
+            <span class='c'>EI_LICENSE_AGREEMENT_PAGE</span><br /><span class='d'>path to the license agreement page (if exists)</span><br /><br />
+            <span class='c'>EI_POST_INSTALLATION_TEXT</span><br /><span class='d'>additional text after successful installation</span><br /><br />
+            <p>&nbsp;</p>       
+
+
+
+        <a name="Step_2._Preparing_SQL_dump_file"></a>
+        <h4><b>Step 2. Preparing SQL dump file.</b></h4>
+        <hr>
+            Using phpMyAdmin or another tool, create SQL dump file and download the entire SQL dump file to
+            you computer. Replace content of this file with the content of <b>sql_dump/create.sql</b>, <b>sql_dump/update.sql</b> and/or <b>sql_dump/un-install.sql</b> files.
+            In admins table replace username and password values with &lt;USER_NAME&gt; and &lt;PASSWORD&gt; and put before all table names &lt;DB_PREFIX&gt;
+            (for example: `&lt;DB_PREFIX&gt;test`).
+            <p>&nbsp;</p>
+        
+
+
+        <a name="Step_3._Blocking_unexpected_access"></a>
+        <h4><b>Step 3. Blocking unexpected access to your application.</b></h4>
+        <hr>
+            Add these lines of code at the top of the default starting file of your script (application):
+<pre>
+require_once("inc/config.inc.php");
+if(!file_exists(EI_CONFIG_FILE_PATH)){        
+    header('location: install/start.php');
+    exit;
+}
+</pre>
+            <p>&nbsp;</p>
+
+
+        <a name="Step_4._Start_Installation_Process"></a>
+        <h4><b>Step 4. Start Installation Process.</b></h4>
+        <hr>
+            To start installation process just type in your browser<br />
+            <pre>http://{your_site_address}/(your_script_directory)/install/start.php</pre>
+            <p><br /></p>
+
+            <b>NOTE: Remember! For security reasons you need to delete install/ directory after installation is complete.</b>
+        
+
+	</div>
+</div>
+</div>
+
+<div class="frame-box-holder"></div>		
+		
+</div>
+</div>
+</div>
+
+
+</body>
+</html>

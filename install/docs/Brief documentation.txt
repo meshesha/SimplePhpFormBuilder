@@ -1,0 +1,43 @@
+--------------------------------------------------------------
+ApPHP EasyInstaller Pro documentation for version 3.x.x
+--------------------------------------------------------------
+
+
+1. System Requirements
+------------------------------
+ApPHP EasyInstaller Pro is operating system independent. 
+You get it works on both Linux and Windows. 
+You need following components are installed:
+
+- PHP 4.0 script engine or later 
+- mySQL 4.00 or above 
+
+
+2. Licensing
+------------------------------
+GNU LGPL3. See the "GNU Lesser General Public License.txt" file.
+
+
+3. Installation 
+------------------------------
+See more info about installation: 
+https://www.apphp.com/php-easyinstaller/index.php?page=installation
+
+
+4. Getting Started
+------------------------------
+See more info about getting started: 
+https://www.apphp.com/php-easyinstaller/index.php?page=getting-started
+
+
+5. Main Features
+------------------------------
+- Works with SQL dump file (including UTF)
+- Multi-Browser support 
+- Easy for customization 
+- Multi-Language support 
+- Multi-Database support 
+- Database connection test
+- Using database prefix
+- New/Update installation types
+- Using Admin username and password

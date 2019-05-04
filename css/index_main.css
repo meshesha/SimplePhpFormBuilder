@@ -1,0 +1,240 @@
+﻿body{
+    overflow: hidden;
+    height: 100%;
+}
+
+.icons_toolbar {
+    border-radius: 5px;
+    width: 98%;
+    padding: 2px; /*top right bottom left */
+}
+#main-vewer-menu ul{
+    z-index: 100;
+}
+.all_btns {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+    .all_btns:hover {
+        opacity: 1;
+    }
+
+
+#main_warper{
+    height: 100%;
+    /* Disable selection so it doesn't get annoying */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: moz-none;
+    -ms-user-select: none;
+    user-select: none;
+    /*background*/
+    padding: 15px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+
+    position: relative;
+    z-index: 1;
+}
+
+    /*background*/
+#main_warper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #005bea;
+    background: -webkit-linear-gradient(bottom, #005bea, #00c6fb);
+    background: -o-linear-gradient(bottom, #005bea, #00c6fb);
+    background: -moz-linear-gradient(bottom, #005bea, #00c6fb);
+    background: linear-gradient(bottom, #005bea, #00c6fb);
+    opacity: 0.9;
+}
+
+.pop_ctrl {
+    padding-left: 35px;
+}
+
+#viewer_container{
+    border-radius: 5px;
+    width: 98%;
+    height: calc(100vh - 55px);/*90%;*/
+    overflow: hidden;
+    padding: 5px;
+}
+#viewer_container .ui-tabs {
+    /*direction: rtl;*/
+    font-size: 12px;
+}
+
+#viewer_container .ui-tabs .ui-tabs-nav li.ui-tabs-selected,
+#viewer_container .ui-tabs .ui-tabs-nav li.ui-state-default {
+        /*float: right;*/
+    }
+    #viewer_container .ui-tabs .ui-tabs-nav li a {
+        /*float: right;*/
+    }
+#form_list_content{
+    height: calc(85% - 1px);
+    overflow: auto;
+}
+.users_groups_warper,
+.users_groups_data{
+    overflow:auto;
+}
+.dt-buttons{
+    padding: 5px;
+}
+/*///////////////////////////Dialog Forms////////////////////////////////////////////*/
+.dialog_form_container *{
+    box-sizing: border-box;
+}
+.dialog_form_container {
+    width: 100%;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 15px;
+}
+
+.dialog_form_container input[type=text],
+.dialog_form_container input[type=password],
+.dialog_form_container select,
+.dialog_form_container textarea {
+    width: 95%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.dialog_form_container label {
+    padding: 12px 12px 12px 0;
+    display: inline-block;
+}
+
+
+.dialog_form_container .col-25 {
+    float: left;
+    width: 25%;
+    margin-top: 6px;
+    padding-left: 20px;
+}
+
+.dialog_form_container .col-75 {
+  float: left;
+  width: 75%;
+  margin-top: 6px;
+}
+
+/* Clear floats after the columns */
+.dialog_form_container .row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/*///////////////////////////////////////////////////////*/
+/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .dialog_form_container .col-25, .dialog_form_container .col-75 {
+        width: 100%;
+        margin-top: 0;
+  }
+}
+/*///////////////////////////////////////////////////////////////////////////////////*/
+#formbuilder_content {
+  padding: 5px;
+  margin: 10px 0;
+  background: #f2f2f2 url('./images/noise.png');
+}
+.form-builder-dialog.positioned{
+    z-index: 999999;
+}
+.dt-button-background {
+     visibility:hidden ! important;
+}
+.vakata-context { 
+    z-index:999; 
+}
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+    visibility: hidden;
+}
+
+/* /////////////////////////////////////Users and group section/////////////////////////////////*/
+.users_groups_warper * {
+  box-sizing: border-box;
+}
+
+/* Create two unequal columns that floats next to each other */
+.users_groups_column {
+  float: left;
+  padding: 10px;
+  height: calc(100vh - 130px); /* Should be removed. Only for demonstration */
+  border: 1px solid black;
+}
+
+.users_groups_tree {
+  width: 20%;
+}
+
+.users_groups_data {
+  width: 80%;
+}
+
+/* Clear floats after the columns */
+.users_groups_warper:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .users_groups_column {
+    width: 100%;
+  }
+}
+
+/* /////////////////////////////////////Settings section/////////////////////////////////*/
+
+.settings_warper * {
+  box-sizing: border-box;
+}
+
+/* Create two unequal columns that floats next to each other */
+.settings_column {
+  float: left;
+  padding: 10px;
+  height: calc(100vh - 130px); /* Should be removed. Only for demonstration */
+  border: 1px solid black;
+}
+
+.settings_tree {
+  width: 20%;
+}
+
+.settings_data {
+  width: 80%;
+}
+
+/* Clear floats after the columns */
+.settings_warper:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .settings_column {
+    width: 100%;
+  }
+}
+/*///////////////////////////////////////////////////////////////////////////////////*/

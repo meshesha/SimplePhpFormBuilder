@@ -1,0 +1,115 @@
+﻿======================================================================================
+--- Version 3.2.3 [12.06.2013]
+======================================================================================
+1. Feature: [added] check for installed PDO driver
+2. Feature: [added] using of tokens for all form submissions
+3. Feature: [added] check for mb_string support
+4. Feature: [added] possibility to start installation over after finishing
+5. Feature: [added] possibility to define RTL/LTR templates
+
+1. Feature: [improved] different types of checks on 'Server Requirements' step
+
+1. Bug: [fixed] syntax issue with using database class
+2. Bug: [fixed] PHP Core syntax issue  for PHP > 5.3.0
+3. Bug: [fixed] STRICT warnings on using phpinfo() keys
+
+
+======================================================================================
+--- Version 3.1.2 [14.07.2011]
+======================================================================================
+1. Feature: [added] possibility to pre-check the Session Support on install.php page
+2. Feature: [added] possibility to define collecting info for magic quotes and mail settings
+3. Feature: [added] possibility to define minimum DB version required
+4. Feature: [added] possibility to create database during installation process
+5. Feature: [added] possibility to define port in host connection, like: host:port
+6. Feature: [added] multi-database support with using the PDO extension
+7. Feature: [added] translation for javascript messages and errors
+8. Feature: [added] possibility to select language while installation process
+9. Feature: [added] new language - German
+
+1. Feature: [improved] minor changes in tooltips for fields
+2. Feature: [improved] css styles, added rounded corners for textboxes and DIVs (in FireFox and Chrome)
+3. Feature: [improved] language translations for EN and ES
+4. Feature: [improved] SQL dump parser function
+
+1. Bug: [fixed] on installation with magic_quotes_gpc turned 'On'
+2. Bug: [fixed] on detecting minimum PHP version
+
+
+======================================================================================
+--- Version 3.0.4 [15.11.2010]
+======================================================================================
+1. Feature: [added] software version parameter in settings
+2. Feature: [added] new parameter EI_POST_INSTALLATION_TEXT in settings
+3. Feature: [added] possibility to pre-check the System Architecture on install.php page
+4. Feature: [added] new parameters on installation page about SMTP
+5. Feature: [added] possibility to prepare manual installation text: EI_ALLOW_MANUAL_INSTALLATION
+6. Feature: [added] possibility to prepare update/un-installation after installation was completed
+7. Feature: [added] multi-database support: MySQL and PostgreSQL
+8. Feature: [added] multi-language support: currently English and Spanish
+
+1. Feature: [improved] minor changes for checking while installation on Windows 
+2. Feature: [improved] minor changes in preparing system settings info
+3. Feature: [improved] check procedure for installation directory writability
+4. Feature: [improved] css changes in tooltips on focus fields
+5. Feature: [improved] automatic focus on first empty field
+
+1. Bug: [fixed] in checking installation directory for writability
+2. Bug: [fixed] chmod("include/") replaced with EI_CONFIG_FILE_DIRECTORY
+3. Bug: [fixed] with unlink() function on database creating error
+4. Bug: [fixed] in password encryption (AES|MD5)
+
+======================================================================================
+--- Version 2.0.5 [09.01.2010]
+======================================================================================
+1. Feature: [added] blocked autocomplete for textboxes by autocomplete='off'
+2. Feature: [added] possibility to allow encoding for SQL dump files and type of
+                       encodding and collation in settings.inc.php
+3. Feature: [added] possibility to define password encryption (AES|MD5)
+
+4. Feature: [improved] minor changes in constants definitions in settings.inc.php file
+
+
+======================================================================================
+--- Version 2.0.4 [28.09.2009]
+======================================================================================
+1. Feature: [added] short_open_tag checking while installation
+2. Feature: [added] checking for writability of config file directory
+
+1. Bug: [fixed] error on installation of UTF-8 codded dump files
+
+
+======================================================================================
+--- Version 2.0.3 [17.07.2009]
+======================================================================================
+1. Feature: [added] possibility to pre-check the current version of PHP
+2. Feature: [added] possibility to define demo|debug and production modes for
+                       installation process
+
+1. Feature: [improved] apphp_db_install() function - now PHP EI can handle UTF encoded SQL dump files
+               
+
+======================================================================================
+--- Version 2.0.2 [14.06.2009]
+======================================================================================
+1. Feature: [added] additional system info on start page
+2. Feature: [added] possibility to define table prefixes with <DB_PREFIX>
+3. Feature: [added] possibility to define New or Update installation type
+4. Feature: [added] possibility to define Admin username and password
+
+1. Feature: [improved] all *.inc files renamed in *.inc.php
+2. Feature: [improved] all <? changed on <?php
+3. Feature: [improved] minor changes in CSS styles
+
+1. Bug: [fixed] on using -- (comments)
+
+
+======================================================================================
+--- Version 2.0.1 [29.12.2008]
+======================================================================================
+
+1. Feature: [added] new graphics
+2. Feature: [added] new image buttons with WinXP style
+
+1. Feature: [improved] all database functions included in functions.inc.php
+

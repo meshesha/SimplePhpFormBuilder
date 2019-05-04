@@ -1,0 +1,11 @@
+https://polyfill.io/v3/polyfill.min.js?features=Object.assign%2CObject.entries%2CPromise%2CArray.prototype.find%2CObject.values%2CArray.prototype.includes%2CString.prototype.includes%2CString.prototype.startsWith
+
+
+Object.assign - V
+Object.entries - V
+Promise - V
+Array.prototype.find - V
+Object.values- V
+Array.prototype.includes - V
+String.prototype.includes - V
+String.prototype.startsWith - V
