@@ -14,11 +14,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+        "meshesha/simple-php-formbuilder":"dev-master@dev"
     },
-    "autoload": {
-        "psr-0": {
-            "simple-php-formbuilder": "src"
+    "repositories": [
+        {
+           "type": "vcs",
+           "url": "https://github.com/meshesha/SimplePhpFormBuilder" 
         }
-    }
+      ]
 }
