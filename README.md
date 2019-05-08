@@ -6,10 +6,10 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
   * php > 5.5
   * MySql database
   * supported browser:
-   - IE11
-   - Edge
-   - Chrome
-   - Firefox
+    - IE11
+    - Edge
+    - Chrome
+    - Firefox
 ## Installation
 * download [SimplePhpFormBuilder](https://github.com/meshesha/SimplePhpFormBuilder/releases).
 * Add SimplePhpFormBuilder folder at the root of your web server (http://localhost).
