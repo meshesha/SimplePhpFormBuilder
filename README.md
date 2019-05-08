@@ -4,7 +4,7 @@ SimplePhpFormBuilder is a Aplication that based on a jQuery.formbuilder, PHP and
 ## Requirements
   * web server ( like iis)
   * php > 5.5
-  * MySql
+  * MySql database
 ## Installation
 * download SimplePhpFormBuilder.
 * Add SimplePhpFormBuilder folder at the root of your web server.
