@@ -5,6 +5,11 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
   * web server ( like iis)
   * php > 5.5
   * MySql database
+  * supported browser:
+   - IE11
+   - Edge
+   - Chrome
+   - Firefox
 ## Installation
 * download [SimplePhpFormBuilder](https://github.com/meshesha/SimplePhpFormBuilder/releases).
 * Add SimplePhpFormBuilder folder at the root of your web server (http://localhost).
@@ -12,3 +17,6 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 * start installation process.
 * for more details in [wiki](https://github.com/meshesha/SimplePhpFormBuilder/wiki/Installation) (soon..)
 
+## License
+    - Copyright © 2017 Meshesha
+    - MIT
