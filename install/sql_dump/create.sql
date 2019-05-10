@@ -189,7 +189,3 @@ INSERT INTO `users_gropes` (`indx`, `group_name`, `group_status`, `admin_ids`) V
 (1, 'administrator', '1', '1'),
 (2, 'managers', '1', '1');
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
