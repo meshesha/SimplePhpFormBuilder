@@ -16,7 +16,7 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 * enter to your MySql database server and create database called 'formbuilder'.
 * enter to application link (http://localhost/SimplePhpFormBuilder).
 * start installation process.
-* for more details in [wiki](https://github.com/meshesha/SimplePhpFormBuilder/wiki/Installation) (soon..)
+* for more details in [wiki](https://github.com/meshesha/SimplePhpFormBuilder/wiki/Installation).
 
 ## License
     - Copyright © 2017 Meshesha
