@@ -462,17 +462,21 @@ function satNewGroup($conn,$data_ary){
     $grp_name = $data_ary["group_name"];
     $grp_status = $data_ary["group_status"];
     $mngrs = $data_ary["users_managers"];
-    $mngrs = impode(",",$mngrs);
+    if(is_array($mngrs) && count($mngrs) > 1){
+        $mngrstr = impode(",",$mngrs);
+    }else{
+        $mngrstr = $mngrs[0];
+    }
     $grp_name = mysqli_real_escape_string($conn, $grp_name);
     $grp_status = mysqli_real_escape_string($conn, $grp_status);
-    $mngrs = mysqli_real_escape_string($conn, $mngrs);
+    $mngrstr = mysqli_real_escape_string($conn, $mngrstr);
     $sql = "INSERT INTO users_gropes (
         group_name,
         group_status,
         admin_ids)  VALUES (
             '{$grp_name}',
             '{$grp_status}',
-            '{$mngrs}')";
+            '{$mngrstr}')";
     if($result = $conn->query($sql)) {
         $rtrn_stt = "success";
     }else{
