@@ -400,7 +400,7 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
                         <label for="form_name">Form name</label>
                     </div>
                     <div class="col-75">
-                        <input type="text" id="form_name" name="form_name" />
+                        <input type="text" id="form_name" name="form_name" title="Form name" required/>
                     </div>
                 </div>
                 <div class="row">
@@ -408,7 +408,7 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
                         <label for="form_title">Form title</label>
                     </div>
                     <div class="col-75">
-                        <input type="text" id="form_title" name="form_title" >
+                        <input type="text" id="form_title" name="form_title" title="Form title"  required/>
                     </div>
                 </div>
                 <div class="row">
@@ -1004,6 +1004,31 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
         }
         //////////////////////////////////////
         function setFormbuilderData(dialogBox){
+            //check requered fields 
+            //validate fields
+            var fail = false;
+            var fail_log = '';
+            var name;
+            $('#formbuilder_form').find('select, textarea, input').each(function(){
+                if(!$(this).prop('required')){
+                    //
+                } else {
+                    if (!$(this).val()) {
+                        fail = true;
+                        name = $(this).attr('title');
+                        if(name == "" || name === null || name == undefined){
+                            name = $(this).attr('name');
+                        }
+                        fail_log += name + " is required \n";
+                    }
+
+                }
+            });
+
+            if (fail) {
+                alert(fail_log);
+                return false;
+            }
             var action_type = $("#form_action").val(); //new,updte
             if(action_type == "update"){
                 if(!confirm("Are you sure you want to update?")){

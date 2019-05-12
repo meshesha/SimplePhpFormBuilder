@@ -47,7 +47,7 @@ if(isset($_POST['data'])){
     if($actionType == "new"){
         $data_ary = get_object_vars($frm_data);
         if($data_table == "form"){
-            $set_new_frm_stt = satNewForm($conn,$data_ary);
+            $set_new_frm_stt = satNewForm($conn,$data_ary,$setAdministratorUsersAsDefaultFormManager);
             echo $set_new_frm_stt;
         }else if($data_table == "formTemplate"){
             $set_new_tpl_stt = satNewTemplate($conn,$data_ary);
@@ -237,7 +237,7 @@ if(isset($_POST['data'])){
     echo "somthing wrong";
 }
 
-function satNewForm($conn, $data_ary){
+function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
     $rtrn_stt = "";
     $frm_name = $data_ary["form_name"];
     $frm_title = $data_ary["form_title"];
@@ -250,7 +250,7 @@ function satNewForm($conn, $data_ary){
     if($data_ary["form_managers"] != ""){
         $frm_mngrs = implode(",",$data_ary["form_managers"]);
     }else{
-        if($setAdministratorUsersAsDefaultFormManager == "1"){
+        if($setAdminUsersAsDefaultFormManager == "1"){
             $frm_mngrs = getAdminUsrs($conn);//get administrator users
         }else{
             $frm_mngrs = "";
