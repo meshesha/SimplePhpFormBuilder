@@ -850,7 +850,8 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
                     'access'
                 ],
                 disabledSubtypes: {
-                    file: ['fineuploader']
+                    file: ['fineuploader'],
+                    textarea: ['quill']
                 },
                 stickyControls: {
                     enable: true
