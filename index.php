@@ -126,6 +126,9 @@ $isEditForm = false;
 if(!empty($user) && ($isAdmin || $editForm == "1")){
     $isEditForm = true;
 }
+
+include "settings/about.php";
+$about_html = ABOUT_APP_AUTHOR;
 ?>
 
 <!DOCTYPE html>
@@ -339,6 +342,19 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
         .columns.adjust();
             
     }
+    function openLinkInNewTab(url) {
+        var win = window.open(url, '_blank');
+        $("#main-vewer-menu ul").hide();
+        win.focus();
+    }
+    function showAbout(){
+        var aboutHtml = "<?=$about_html ?>";
+        $("#formbuilder_general_content").html(aboutHtml);
+        general_dialog.dialog("option","height",0.65*$(window).height());
+        general_dialog.dialog("option","title","About");
+        general_dialog.dialog("open");
+        $("#main-vewer-menu ul").hide();
+    }
     </script>
 </head>
 <body>
@@ -349,7 +365,9 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
                 <span class="pop_ctrl"><i class="all_btns fa fa-bars"></i></span>
                 <ul>
                     <li onclick="addUpdateUser('update','<?=$user ?>','true')" title="User info"><div><i class="fa fa-user"></i></div><div class="menu-icons-text">info</div></li>
-                    <li onclick="avascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Logout</div></li>
+                    <li onclick="openLinkInNewTab('https://github.com/meshesha/SimplePhpFormBuilder/wiki')" title="Help"><i class="fa fa-question-circle"></i><div class="menu-icons-text">Help</div></li>
+                    <li onclick="showAbout()" title="About"><i class="fa fa-info-circle"></i><div class="menu-icons-text">About</div></li>
+                    <li onclick="javascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Logout</div></li>
                 </ul>
             </span>
         </div>
@@ -363,22 +381,12 @@ if(!empty($user) && ($isAdmin || $editForm == "1")){
                     <?php endif; ?>
                 </ul>
                 <div id="form_list_tab" style="overflow:auto; height:calc(100vh - 1px);">
-                    <!--
-                    <div class="btn-toolbar justify-content-between ui-widget-content" role="toolbar" style="padding:5px; border-radius:5px">
-                        <button type="button" class="btn btn-primary btn-lg" onclick="addNew()">New</button>
-                    </div>
-                    -->
                     <div id="form_list_content" class="ui-widget-content">
                         <table id="form_list_content_table" class="display" style="width:100%"></table>
                     </div>
                 </div>
                  <?php if($isAdmin): ?>
                 <div id="users_tab"  style="overflow:auto; height: 90%;">
-                    <!--
-                    <div class="btn-toolbar justify-content-between ui-widget-content" role="toolbar" style="padding:5px; border-radius:5px">
-                        <button type="button" class="btn btn-primary btn-lg" onclick="addNewUser()">New</button>
-                    </div>
-                    -->
                     <?php include "users_and_groups.php"; ?>
                 </div>
                 <div id="settings_tab" style="overflow:auto; height: 100%;">

@@ -51,34 +51,7 @@ if(isset($_SESSION['user_id'])){
         $message = $init_data_ary[1];
         $col_names = $init_data_ary[2];
     }
-}/*else{
-    if(!empty($_POST['username']) && !empty($_POST['password'])){
-        
-        $records = $conn->prepare('SELECT id,username,password FROM users WHERE status="1" AND  username = :username');
-        $records->bindParam(':username', $_POST['username']);
-        $records->execute();
-        $results = $records->fetch(PDO::FETCH_ASSOC);
-
-        if(count($results) > 0 && password_verify($_POST['password'], $results['password']) ){
-            $_SESSION['user_id'] = $results['id'];
-            $user = $results['id'];
-            if($formType == "" && $formStatus == "" && $formAmins == "" && $formTitle == ""){
-                $isAdmin = false;
-                $message = '<label class="text-danger">Sorry, form not exist</label>';
-                $col_names = "";
-            }else{
-                $init_data_ary = init($conn, $formId, $user,$formAmins);
-                $isAdmin = (($init_data_ary[0] == "adminuser")?true:false);
-                $message = $init_data_ary[1];
-                $col_names = $init_data_ary[2];
-            }
-        } else {
-            $message = '<label class="text-danger">Sorry, those credentials do not match 
-            or Username does not exist or is suspended</label>';
-        }
-    }
 }
-*/
 if($isAdmin && (isset($col_names) && $col_names == "")){
     $message .= '<label class="text-danger">Sorry, There are no records for this form</label><br>';
 }
@@ -161,6 +134,9 @@ if($appMode == "0"){
 }
 
 //echo "isRegistrationEnabled: ".$isRegistrationEnabled;
+
+include "settings/about.php";
+$about_html = ABOUT_APP_AUTHOR;
 ?>
 
 <!DOCTYPE html>
@@ -242,6 +218,20 @@ if($appMode == "0"){
                 height: 0.5*$(window).height()
             });
         });
+
+        function openLinkInNewTab(url) {
+            var win = window.open(url, '_blank');
+            $("#main-vewer-menu ul").hide();
+            win.focus();
+        }
+        function showAbout(){
+            var aboutHtml = "<?=$about_html ?>";
+            $("#formbuilder_general_content").html(aboutHtml);
+            general_dialog.dialog("option","height",0.65*$(window).height());
+            general_dialog.dialog("option","title","About");
+            general_dialog.dialog("open");
+            $("#main-vewer-menu ul").hide();
+        }
     </script>
 </head>
 <body>
@@ -249,6 +239,8 @@ if($appMode == "0"){
         <span class="pop_ctrl"><i class="all_btns fa fa-bars"></i></span>
         <ul>
             <li onclick="addUpdateUser('update','<?= $user ?>')" title="User info"><div><i class="fa fa-user"></i></div><div class="menu-icons-text">info</div></li>
+                    <li onclick="openLinkInNewTab('https://github.com/meshesha/SimplePhpFormBuilder/wiki')" title="Help"><i class="fa fa-question-circle"></i><div class="menu-icons-text">Help</div></li>
+                    <li onclick="showAbout()" title="About"><i class="fa fa-info-circle"></i><div class="menu-icons-text">About</div></li>
             <li onclick="avascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Exit</div></li>
         </ul>
     </span>
