@@ -16,8 +16,8 @@
         "php": ">=5.6"
     },
     "autoload": {
-        "psr-4": {
-            "meshesha\\SimplePhpFormBuilder\\": ""
+        "psr-0": {
+            "SimplePhpFormBuilder": ""
         }
     }
 }
