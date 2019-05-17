@@ -1,5 +1,5 @@
 {
-    "name": "SimplePhpFormBuilder",
+    "name": "meshesha/SimplePhpFormBuilder",
     "type": "app",
     "description": "Aplication that is based on a PHP and MySql database , allowing you to build and management simple html forms",
     "keywords": ["php formbuilder","form"],
