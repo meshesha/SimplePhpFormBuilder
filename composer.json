@@ -15,5 +15,5 @@
     "require": {
         "php": ">=5.5.0"
     },
-    "minimum-stability": "RC"
+    "minimum-stability": "v1.0.0-RC1"
 }
