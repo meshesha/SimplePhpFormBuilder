@@ -15,6 +15,5 @@
     "require": {
         "php": ">=5.5.0"
     },
-	"prefer-stable": true,
     "minimum-stability": "dev"
 }
