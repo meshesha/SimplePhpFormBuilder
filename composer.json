@@ -16,5 +16,5 @@
         "php": ">=5.5.0"
     },
 	"prefer-stable": true,
-    "minimum-stability": "dev-master"
+    "minimum-stability": "dev"
 }
