@@ -1,6 +1,5 @@
 {
     "name": "meshesha/simple-php-formbuilder",
-    "type": "application",
     "description": "Aplication that is based on a PHP and MySql database , allowing you to build and management simple html forms",
     "keywords": ["php formbuilder","form"],
     "homepage": "https://github.com/meshesha/SimplePhpFormBuilder",
@@ -15,5 +14,5 @@
     "require": {
         "php": ">=5.5.0"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "rc2"
 }
