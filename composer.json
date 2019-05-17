@@ -1,5 +1,5 @@
 {
-    "name": "meshesha/simple-php-formbuilder",
+    "name": "SimplePhpFormBuilder",
     "type": "app",
     "description": "Aplication that is based on a PHP and MySql database , allowing you to build and management simple html forms",
     "keywords": ["php formbuilder","form"],
@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-0": {
-            "SimplePhpFormBuilder": "src/"
+            "SimplePhpFormBuilder": ""
         }
     }
 }
