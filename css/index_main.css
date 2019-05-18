@@ -105,6 +105,7 @@
 
 .dialog_form_container input[type=text],
 .dialog_form_container input[type=password],
+.dialog_form_container input[type=number],
 .dialog_form_container select,
 .dialog_form_container textarea {
     width: 95%;
@@ -140,6 +141,62 @@
     clear: both;
 }
 
+/*///////////////////////////*/
+.dialog_form_style *{
+    box-sizing: border-box;
+}
+.dialog_form_style {
+    width: 100%;
+    border-radius: 5px;
+    /*background-color: #f2f2f2;*/
+    padding: 15px;
+}
+
+.dialog_form_style .column-a2 input[type=text],
+.dialog_form_style .column-a2 input[type=password],
+.dialog_form_style .column-a2 input[type=number],
+.dialog_form_style .column-a2 select,
+.dialog_form_style .column-a2 textarea {
+    width: 60%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.dialog_form_style label {
+    padding: 12px 12px 12px 0;
+    display: inline-block;
+}
+
+
+.dialog_form_style .column-a1 {
+    float: left;
+    width: 30%;
+    margin-top: 6px;
+    padding-left: 20px;
+}
+
+.dialog_form_style .column-a2 {
+  float: left;
+  width: 60%;
+  margin-top: 6px;
+  display:flex;
+  align-items:center;
+}
+
+/* Clear floats after the columns */
+.dialog_form_style .row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.dialog_form_style .row:nth-child(odd){
+  background-color: #e7e6e6;
+}
+.dialog_form_style .row:nth-child(even){
+  background-color: #ffffff;
+}
 /*///////////////////////////////////////////////////////*/
 /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
 @media screen and (max-width: 600px) {
