@@ -125,6 +125,9 @@ if(isset($_POST['data'])){
                         case ("form_note"):
                             $update_stt_ary[] = updateData($conn,$tbl,"form_note", $value,"indx=$idx");
                             break;
+                        case ("form_general_style"):
+                            $update_stt_ary[] = updateData($conn,$tbl,"form_genral_style", $value,"indx=$idx");
+                            break;
                         default:
                             $update_stt_ary[] = "Error: The ver. '$name' is unknown";
                     }
@@ -258,6 +261,8 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
     }
     $frm_status = "2";
     $frm_note = $data_ary["form_note"];
+    $frm_gnrl_style = $data_ary["form_general_style"];
+
     //$fldName = mysqli_real_escape_string($conn, $fldName);
     $sql = "INSERT INTO form_list (
         form_name,
@@ -266,14 +271,16 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
         publish_groups,
         publish_status,
         admin_users,
-        form_note)  VALUES (
+        form_note,
+        form_genral_style)  VALUES (
             '{$frm_name}',
             '{$frm_title}',
             '{$frm_publish_type}',
             '{$frm_grps}',
             '{$frm_status}',
             '{$frm_mngrs}',
-            '{$frm_note}')";
+            '{$frm_note}',
+            '{$frm_gnrl_style}')";
     if($result = $conn->query($sql)) {
         $rtrn_stt = "success";
     }else{

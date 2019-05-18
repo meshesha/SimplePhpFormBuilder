@@ -135,7 +135,7 @@ $about_html = ABOUT_APP_AUTHOR;
 <html>
 <head>
     <title>Form builder</title>
-
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="stylesheet" type="text/css" href="./css/index_main.css">
     <link rel="stylesheet" href="./include/fonts/fontawesome/css/fontawesome-all.min.css">
 
@@ -161,6 +161,12 @@ $about_html = ABOUT_APP_AUTHOR;
 
     <script src="./include/jQueryPopMenu/src/jquery.popmenu.js"></script>
 
+    <!-- color-picker
+    <link rel="stylesheet" href="./include/jquery-minicolors-2.3.4/jquery.minicolors.css">
+    <script src="./include/jquery-minicolors-2.3.4/jquery.minicolors.min.js"></script>-->
+    <link rel="stylesheet" href="./include/spectrum-colorpicker/spectrum.css">
+    <script src="./include/spectrum-colorpicker/spectrum.js"></script>
+
     <!--DataTable-->
     <link rel="stylesheet" href="./include/DataTables/datatables.min.css">
     <link rel="stylesheet" href="./include/DataTables/Styling/css/dataTables.jqueryui.min.css">
@@ -182,7 +188,10 @@ $about_html = ABOUT_APP_AUTHOR;
 
 	<?php if( !empty($user)): ?>
     <script type="text/javascript">
-        var formbuilder_dialog,formbuilder_content_dialog,general_dialog;
+        var formbuilder_dialog,
+            formbuilder_content_dialog,
+            general_dialog,
+            general_style_dialog;
         $(function () {
              formbuilder_dialog = $("#formbuilder_form").dialog({
                 modal: true,
@@ -229,7 +238,12 @@ $about_html = ABOUT_APP_AUTHOR;
                 width: 0.5*$(window).width(),
                 height: 0.5*$(window).height()
             });
-            
+            general_style_dialog = $("#form_general_style").dialog({
+                modal: true,
+                autoOpen: false,
+                width: 0.7*$(window).width(),
+                height: 0.8*$(window).height()
+            });
             var index = 'qpsstats-active-tab';
             //  Define friendly data store name
             var dataStore = window.sessionStorage;
@@ -298,7 +312,24 @@ $about_html = ABOUT_APP_AUTHOR;
                 }
 
             })
-    });
+            /*
+            $(".color_pecker").minicolors({
+                format: 'rgb',
+                opacity: true,
+                theme: 'bootstrap'
+            })
+            */
+            $(".color_pecker").spectrum({
+                preferredFormat: "rgb",
+                showAlpha: true,
+                showInitial: true,
+                showInput: true/*,
+                show: function(color) {
+                    $("#" + $(this)[0].id).change();
+                    //console.log("spectrum: ", $(this)[0].id)
+                }*/
+            })
+        });
     function ajaxAction(action_type, tbl , data, dialogbox){
         var url = "set_data.php";
         var data_obj = {
@@ -448,6 +479,15 @@ $about_html = ABOUT_APP_AUTHOR;
                 </div>
                 <div class="row">
                     <div class="col-25">
+                        <label for="form_general_style">General Form Style</label>
+                    </div>
+                    <div class="col-75">
+                        <button type="button" id="form_general_style" class="btn btn-info btn-lg" onclick="edit_gneral_style()">Edit</button>
+                        <p class="gneral_style_worn"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-25">
                         <label for="status_type">Status</label>
                     </div>
                     <div class="col-75">
@@ -505,6 +545,226 @@ $about_html = ABOUT_APP_AUTHOR;
 
     <div id="formbuilder_general_dialog">
         <div id="formbuilder_general_content"></div>
+    </div>
+
+    <div id="form_general_style" title="General form style settings">
+        <div class="form_general_style_warper ">
+            <h5>Form body background style: </h5>
+            <table>
+                <tr>
+                    <td>
+                        <div class="dialog_form_style">
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_body_bgcolor_1">Body BgColor 1:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="text" class="color_pecker form_style_input" id="form_body_bgcolor_1"  title="Body Background Color 1" value="rgba(255, 255, 255, 1)" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_body_bgcolor_2">Body BgColor 2:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="text" class="color_pecker form_style_input" id="form_body_bgcolor_2"  title="Body Background Color 2" value="rgba(255, 255, 255, 1)" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_body_bgcoloe_angle">Body BgColor Angle:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="number" class="form_style_input" id="form_body_bgcoloe_angle" min="0" max="360" setp="1"  title="Linear gradient color angle"  value="0" />(deg)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_body_bgImage">Body BgImage:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="file" class="form_style_input" id="form_body_bgImage"  accept="image/*" title="Body Background Image" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="form_body_bgImage_attach">Image attachment:</label>
+                                            <select id="form_body_bgImage_attach" class="form_style_input">
+                                                <option value="scroll">scroll</option>
+                                                <option value="fixed">fixed</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="form_body_bgImage_position">Image position:</label>
+                                            <select id="form_body_bgImage_position" class="form_style_input">
+                                                <option value="left top">left top</option>
+                                                <option value="left center">left center</option>
+                                                <option value="left bottom">left bottom</option>
+                                                <option value="right top">right top</option>
+                                                <option value="right center">right center</option>
+                                                <option value="right bottom">right bottom</option>
+                                                <option value="center top">center top</option>
+                                                <option value="center center" selected >center center</option>
+                                                <option value="center bottom">center bottom</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="form_body_bgImage_repet">Image repet:</label>
+                                            <select id="form_body_bgImage_repet" class="form_style_input">
+                                                <option value="no-repeat">no-repeat</option>
+                                                <option value="repeat">repeat both</option>
+                                                <option value="repeat-x">repeat-x</option>
+                                                <option value="repeat-y">repeat-y</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="form_body_bgImage_size">Image size:</label>
+                                            <select id="form_body_bgImage_size" class="form_style_input">
+                                                <option value="auto">Orginal size</option>
+                                                <option value="contain">contain</option>
+                                                <option value="cover">cover</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <style>
+                            .example{
+                                width: 800px;
+                                height: 400px;
+                                top: 0;
+                                border: 1px solid black;
+                                background: linear-gradient(0deg, rgba(255, 255, 255, 1),rgba(255, 255, 255, 1));
+                            }
+                            .example-body{
+                                height: 100%;
+                            }
+                            .example-form-warper-1{
+                                margin:0 auto;
+                                width: 80%;
+                                height: 80%;
+                                border: 1px solid black;
+                                border-radius: 5px;
+                                transform: translateY(10%);
+                                background-color: white;
+                                opacity: 1;
+                            }
+                        </style>
+                        <div class="example">
+                            <div class="example-body">
+                                <div class="example-form-warper-1">
+                                    <div class="example-form-content" style="text-align:center;"><h4>Form example</h4></div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            
+            <h5>Form style: </h5>
+            <table>
+                <tr>
+                    <td>
+                        <div class="dialog_form_style">
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_width">width:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="number" class="form_style_input" id="form_width" min="0" max="100" setp="1"  title="Form width" value="80"/>(px)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_vertical_margin">Vertical margin:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="number" class="form_style_input" id="form_vertical_margin" min="0" max="100" setp="1"  title="Form Vertical margin" value="10" />(%)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_Background_color">Form bgcolor:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="text" class="color_pecker form_style_input" id="form_Background_color"  title="Form Background Color" value="rgba(255, 255, 255, 1)" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_opacity">Opacity:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="number" class="form_style_input" id="form_opacity" min="0" max="100" setp="1"  title="Form Opacity" value="100" />(%)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_border_size">Form border size:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="number" class="form_style_input" id="form_border_size" min="0" setp="1"  title="Form border size" value="1" />(px)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_border_type">Form border type:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <select class="form_style_input" id="form_border_type" min="0" setp="1"  title="Form border type">
+                                        <option value="solid">solid</option>
+                                        <option value="dotted">dotted</option>
+                                        <option value="dashed">dashed</option>
+                                        <option value="double">double</option>
+                                        <option value="groove">groove</option>
+                                        <option value="ridge">ridge</option>
+                                        <option value="outset">outset</option>
+                                        <option value="none">none</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_border_color">Form border color:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="text" class="color_pecker form_style_input" id="form_border_color"  title="Form border color" value="rgba(0, 0, 0, 1)" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column-a1">
+                                    <label for="form_border_radius">Form border radius:</label>
+                                </div>
+                                <div class="column-a2">
+                                    <input type="number" class="form_style_input" id="form_border_radius" min="0" setp="1"  title="Form border radius" value="5" />(px)
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="example">
+                            <div class="example-body">
+                                <div class="example-form-warper-1">
+                                    <div class="example-form-content" style="text-align:center;"><h4>Form example</h4></div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -623,6 +883,8 @@ $about_html = ABOUT_APP_AUTHOR;
             if($("#publish_type").val() == "1"){ //if public
                 $("#groups-row").hide();
             }
+            //form style
+            setDefaultFormStyleObj();
             //groups_list
             setGroupsList();
             //manager_list
@@ -786,6 +1048,9 @@ $about_html = ABOUT_APP_AUTHOR;
                     }
                     $("#form_note").val(mor_data.data.frm_note);
                     $("#previw_btn_toolbar").show();
+                    /////Form style object////////////////////////////
+                    sessionStorage.formStylObj = mor_data.data.frm_style;
+                    //////////////////////////////////////////////////
                     formbuilder_dialog.dialog("open");
                 }
             }
@@ -1044,6 +1309,10 @@ $about_html = ABOUT_APP_AUTHOR;
                     return false;
                 }
             }
+            ///form style settings
+            if(sessionStorage.formStylObj === undefined || sessionStorage.formStylObj === null || sessionStorage.formStylObj == ""){
+                setDefaultFormStyleObj();
+            }
             var frm_id = $("#form_id").val();
             var frm_name = $("#form_name").val();
             var frm_title = $("#form_title").val();
@@ -1060,7 +1329,8 @@ $about_html = ABOUT_APP_AUTHOR;
                 publish_type: frm_pblsh_type,
                 publish_groups: frm_groups,
                 form_managers: frm_mngrs,
-                status_type: frm_pblsh_stt
+                status_type: frm_pblsh_stt,
+                form_general_style: sessionStorage.formStylObj
             };
             var tbl = "form";
             ajaxAction(action_type, tbl , frm_data, dialogBox);
@@ -1184,6 +1454,228 @@ $about_html = ABOUT_APP_AUTHOR;
 
             return row;
         }
+
+        /////////////////////////////Form gneral style//////////////////////////////////////
+        function edit_gneral_style(){
+            //if update get form style and set form preview and sessionStorage.formStylObj
+            //if new set default sessionStorage.formStylObj
+            /**
+            
+            $("#form_body_bgcolor_1").val();
+            $("#form_body_bgcolor_2").val();
+            $("#form_body_bgcoloe_angle").val();
+
+            $("#form_width").val();
+            $("#form_vertical_margin").val();
+            $("#form_Background_color").val();
+            $("#form_opacity").val();
+            $("#form_border_size").val();
+            $("#form_border_type").val();
+            $("#form_border_color").val();
+            $("#form_border_radius").val();
+
+             */
+            var form_id = $("#form_id").val();
+            if(form_id != ""){
+                //update
+                var obj = sessionStorage.formStylObj;
+                if(obj != "null"){
+                    //console.log("update",obj);
+                    var parsedObj = JSON.parse(obj);
+                    $("#form_body_bgcolor_1").spectrum("set", parsedObj.form_body_bgcolor_1);
+                    $("#form_body_bgcolor_2").spectrum("set", parsedObj.form_body_bgcolor_2);
+                    $("#form_body_bgcoloe_angle").val(parsedObj.form_body_bgcoloe_angle).change();
+                    if(parsedObj.form_body_bgImage !== undefined){
+                        $(".example").css("background-image","url('" + parsedObj.form_body_bgImage + "')");
+                    }else{
+                        $(".example").css("background-image","url()");
+                    }
+                    $("#form_width").val(parsedObj.form_width).change();
+                    $("#form_vertical_margin").val(parsedObj.form_vertical_margin).change();
+                    $("#form_Background_color").spectrum("set", parsedObj.form_Background_color);
+                    $("#form_opacity").val(parsedObj.form_opacity).change();
+                    $("#form_border_size").val(parsedObj.form_border_size).change();
+                    $("#form_border_type").val(parsedObj.form_border_type).change();
+                    $("#form_border_color").spectrum("set", parsedObj.form_border_color);
+                    $("#form_border_radius").val(parsedObj.form_border_radius).change();
+                    $("#form_body_bgImage_attach").val(parsedObj.form_body_bgImage_attach).change();
+                    $("#form_body_bgImage_position").val(parsedObj.form_body_bgImage_position).change();
+                    $("#form_body_bgImage_repet").val(parsedObj.form_body_bgImage_repet).change();
+                    $("#form_body_bgImage_size").val(parsedObj.form_body_bgImage_size).change();
+                }else{
+                    //set dafault
+                    setDefaultFormStyleObj();
+                }
+            }else{
+                //new ,set dafault
+                setDefaultFormStyleObj();
+            }
+            general_style_dialog.dialog("open");
+        }
+        function setDefaultFormStyleObj(){
+            //
+            var defaultFormStylObj = {
+                form_body_bgcolor_1: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_1").val(),
+                form_body_bgcolor_2: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_2").val(),
+                form_body_bgcoloe_angle: "0", //$("#form_body_bgcoloe_angle").val(),
+                form_width: "80", //$("#form_width").val(),
+                form_vertical_margin: "5", //$("#form_vertical_margin").val(),
+                form_Background_color: "rgba(255, 255, 255, 1)", //$("#form_Background_color").val(),
+                form_opacity: "100", //$("#form_opacity").val(),
+                form_border_size: "1", //$("#form_border_size").val(),
+                form_border_type: "solid", //$("#form_border_type").val(),
+                form_border_color: "rgb(0, 0, 0, 1)", //$("#form_border_color").val(),
+                form_border_radius: "5", //$("#form_border_radius").val(),
+                form_body_bgImage_attach: "scroll",
+                form_body_bgImage_position: "center center",
+                form_body_bgImage_repet: "repeat",
+                form_body_bgImage_size: "auto"
+            }
+             
+            sessionStorage.formStylObj = JSON.stringify(defaultFormStylObj);
+
+            $("#form_body_bgcolor_1").spectrum("set", defaultFormStylObj.form_body_bgcolor_1);
+            $("#form_body_bgcolor_2").spectrum("set", defaultFormStylObj.form_body_bgcolor_2);
+            $("#form_body_bgcoloe_angle").val(defaultFormStylObj.form_body_bgcoloe_angle).change();
+            $("#form_width").val(defaultFormStylObj.form_width).change();
+            $("#form_vertical_margin").val(defaultFormStylObj.form_vertical_margin).change();
+            $("#form_Background_color").spectrum("set", defaultFormStylObj.form_Background_color);
+            $("#form_opacity").val(defaultFormStylObj.form_opacity).change();
+            $("#form_border_size").val(defaultFormStylObj.form_border_size).change();
+            $("#form_border_type").val(defaultFormStylObj.form_border_type).change();
+            $("#form_border_color").spectrum("set", defaultFormStylObj.form_border_color);
+            $("#form_border_radius").val(defaultFormStylObj.form_border_radius).change();
+            
+            $("#form_body_bgImage_attach").val(defaultFormStylObj.form_body_bgImage_attach).change();
+            $("#form_body_bgImage_position").val(defaultFormStylObj.form_body_bgImage_position).change();
+            $("#form_body_bgImage_repet").val(defaultFormStylObj.form_body_bgImage_repet).change();
+            $("#form_body_bgImage_size").val(defaultFormStylObj.form_body_bgImage_size).change();
+
+        }
+        function getFormStyleObj(name){
+            if (sessionStorage.formStylObj) {
+                var obj = JSON.parse(sessionStorage.formStylObj);
+                if(obj[name] !== undefined && obj[name] !== null){
+                    return obj[name];
+                }else{
+                    return "";
+                }
+            } else {
+                return "";
+            }
+        }
+        function setFormStyleObj(name, val){
+            if (sessionStorage.formStylObj) {
+                var obj = JSON.parse(sessionStorage.formStylObj);
+                obj[name] = val;
+                sessionStorage.formStylObj = JSON.stringify(obj);
+            }else{
+                var obj = {};
+                obj[name] = val;
+                sessionStorage.formStylObj = JSON.stringify(obj);
+            }
+        }
+        /*
+        function rgbToHex(rgbStr) {
+            var rgbNumStr = rgbStr.substring(
+                rgbStr.lastIndexOf("(") + 1, 
+                rgbStr.lastIndexOf(")")
+            );
+            var rgbNumAry = rgbNumStr.split(",");
+            //str = str.replace(/\s+/g, '');
+            var r = Number(rgbNumAry[0]);
+            var g = Number(rgbNumAry[1]);
+            var b = Number(rgbNumAry[2]);
+            //r, g, b
+            //console.log(rgbStr, "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1))
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+        */
+        //preview
+        $(".form_style_input").on("click",function(){
+            $(this).change();
+        });
+        $(".form_style_input").on("change",function(){
+            var el_id = $(this).attr("id");
+            var el_val = $(this).val();
+            //console.log(el_id," ,value: ",el_val);
+            //form_body_bgcolor_1, form_body_bgcolor_2 , form_body_bgcoloe_angle , form_body_bgImage  
+            //form_width, form_vertical_margin, form_Background_color,form_opacity,form_border_size,form_border_type ,
+            //form_border_color,form_border_radius  
+            //form_body_bgImage_attach,form_body_bgImage_position,form_body_bgImage_repet,form_body_bgImage_size
+            if(el_id == "form_body_bgcolor_1"){
+                var color1 = el_val;
+                var color2 = $("#form_body_bgcolor_2").val();
+                var angle = $("#form_body_bgcoloe_angle").val();
+                $(".example-body").css("background","linear-gradient(" + angle + "deg, " + color2 + ", " + color1 + ")");
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgcolor_2"){
+                var color1 = $("#form_body_bgcolor_1").val();
+                var color2 = el_val;
+                var angle = $("#form_body_bgcoloe_angle").val();
+                $(".example-body").css("background","linear-gradient(" + angle + "deg, " + color2 + ", " + color1 + ")");
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgcoloe_angle"){
+                var color1 = $("#form_body_bgcolor_1").val();
+                var color2 = $("#form_body_bgcolor_2").val();
+                var angle = el_val;
+                $(".example-body").css("background","linear-gradient(" + angle + "deg, " + color2 + ", " + color1 + ")");
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgImage"){
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var color1 = $("#form_body_bgcolor_1").val();
+                        var color2 = $("#form_body_bgcolor_2").val();
+                        var angle = $("#form_body_bgcoloe_angle").val();
+                        //var img = new Image();
+                        //img.src = e.target.result
+                        var img = e.target.result.replace(/(\r\n|\n|\r)/gm, "");
+                        $(".example").css("background-image","url('" + img + "')");
+                        $(".example-body").css("background","linear-gradient(" + angle + "deg, " + color2 + ", " + color1 + ")");
+                        //console.log(img);
+                        setFormStyleObj(el_id, img);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            }else if(el_id == "form_body_bgImage_attach"){
+                $(".example").css("background-attachment",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgImage_position"){
+                $(".example").css("background-position",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgImage_repet"){
+                $(".example").css("background-repeat",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgImage_size"){
+                $(".example").css("background-size",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_width"){
+                $(".example-form-warper-1").css("width",el_val + "%");
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_vertical_margin"){
+                $(".example-form-warper-1").css("transform", "translateY(" + el_val + "%)");
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_Background_color"){
+                $(".example-form-warper-1").css("background-color",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_opacity"){
+                $(".example-form-warper-1").css("opacity",(el_val/100));
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_border_size"){
+                $(".example-form-warper-1").css("border-width",el_val + "px");
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_border_type"){
+                $(".example-form-warper-1").css("border-style",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_border_color"){
+                $(".example-form-warper-1").css("border-color",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_border_radius"){
+                $(".example-form-warper-1").css("border-radius",el_val + "px");
+                setFormStyleObj(el_id, el_val);
+            }
+        })
     </script>
 
     <?php else: ?>

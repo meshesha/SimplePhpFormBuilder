@@ -29,7 +29,8 @@ if(isset($_POST['form_id'])){
                 $params_row['publ_grps'] = $row["publish_groups"];//getGroupsObj($conn,$form_id,$row["publish_groups"]);
                 $params_row['publ_status'] = $row["publish_status"];
                 $params_row['admin_users'] = $row["admin_users"];
-                $params_row['frm_note'] = $row["form_note"]; 
+                $params_row['frm_note'] = $row["form_note"];
+                $params_row['frm_style'] = $row["form_genral_style"]; 
             }
             $data_obj = new stdClass();
             $data_obj->status = 1;
