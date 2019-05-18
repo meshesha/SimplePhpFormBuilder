@@ -2,11 +2,10 @@ HTML, BODY {
 	font-size:12px;
 	color:#515151;
 	font-family:arial, helvetica, sans-serif;
-	background: #005bea;
-	background: -webkit-linear-gradient(bottom, #005bea, #00c6fb);
-	background: -o-linear-gradient(bottom, #005bea, #00c6fb);
-	background: -moz-linear-gradient(bottom, #005bea, #00c6fb);
-	background: linear-gradient(bottom, #005bea, #00c6fb);
+	background: -webkit-linear-gradient(bottom, rgba(0, 90, 234, 0.8), rgba(0, 197, 251, 0.8)),url("../../../../images/bg05.jpg");
+	background: -o-linear-gradient(bottom, rgba(0, 90, 234, 0.8), rgba(0, 197, 251, 0.8)),url("../../../../images/bg05.jpg");
+	background: -moz-linear-gradient(bottom, rgba(0, 90, 234, 0.8), rgba(0, 197, 251, 0.8)),url("../../../../images/bg05.jpg");
+	background: linear-gradient(bottom, rgba(0, 90, 234, 0.8), rgba(0, 197, 251, 0.8)),url("../../../../images/bg05.jpg");
 }
  
 TABLE         			{ font-size:12px; color:#515151; font-family:arial, helvetica, sans-serif; }
