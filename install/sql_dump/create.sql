@@ -1,7 +1,6 @@
 --
 -- Database: `formbuilder`
 --
-
 -- --------------------------------------------------------
 
 --
@@ -77,6 +76,7 @@ CREATE TABLE IF NOT EXISTS `form_list` (
   `publish_status` varchar(5) NOT NULL DEFAULT '',
   `admin_users` varchar(255) NOT NULL DEFAULT '1',
   `form_note` text,
+  `form_genral_style` longtext,
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -189,3 +189,4 @@ INSERT INTO `users_gropes` (`indx`, `group_name`, `group_status`, `admin_ids`) V
 (1, 'administrator', '1', '1'),
 (2, 'managers', '1', '1');
 COMMIT;
+

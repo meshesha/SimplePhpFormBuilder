@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `form_list` (
   `form_note` text,
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
+ALTER TABLE `form_list` ADD COLUMN `form_genral_style` longtext;
 
 -- --------------------------------------------------------
 
