@@ -105,7 +105,6 @@
 
 .dialog_form_container input[type=text],
 .dialog_form_container input[type=password],
-.dialog_form_container input[type=number],
 .dialog_form_container select,
 .dialog_form_container textarea {
     width: 95%;
@@ -154,7 +153,6 @@
 
 .dialog_form_style .column-a2 input[type=text],
 .dialog_form_style .column-a2 input[type=password],
-.dialog_form_style .column-a2 input[type=number],
 .dialog_form_style .column-a2 select,
 .dialog_form_style .column-a2 textarea {
     width: 60%;
