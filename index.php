@@ -121,6 +121,11 @@ if($appMode == "0"){
     Debugger::enable();
 }
 
+$defaultFormStyleSettings = getSetting("form_style", "");
+$dFrmSets = json_encode($defaultFormStyleSettings);
+$dFrmMaxBgImgSize = $defaultFormStyleSettings["max_body_bgImg_size"];
+//echo "dFrmMaxBgImgSize: ". $dFrmMaxBgImgSize;
+
 $editForm = getSetting("", "enableFormManagersToEditFormTamplate");
 $isEditForm = false;
 if(!empty($user) && ($isAdmin || $editForm == "1")){
@@ -185,6 +190,13 @@ $about_html = ABOUT_APP_AUTHOR;
         
     <link rel="stylesheet" href="./include/jstree/themes/default/style.min.css" />
     <script src="./include/jstree/jstree.min.js"></script>
+
+
+    <!-- Number fields handler-->
+    <link rel="stylesheet" href="./include/Formstone-1.4.13.1/css/number.css">
+    <link href="./include/Formstone-1.4.13.1/css/themes/light.css" rel="stylesheet">
+    <script src="./include/Formstone-1.4.13.1/js/core.js"></script>
+    <script src="./include/Formstone-1.4.13.1/js/number.js"></script>
 
 	<?php if( !empty($user)): ?>
     <script type="text/javascript">
@@ -328,7 +340,9 @@ $about_html = ABOUT_APP_AUTHOR;
                     $("#" + $(this)[0].id).change();
                     //console.log("spectrum: ", $(this)[0].id)
                 }*/
-            })
+            });
+
+            $("input[type='number']").number();
         });
     function ajaxAction(action_type, tbl , data, dialogbox){
         var url = "set_data.php";
@@ -575,7 +589,7 @@ $about_html = ABOUT_APP_AUTHOR;
                                     <label for="form_body_bgcoloe_angle">Body BgColor Angle:</label>
                                 </div>
                                 <div class="column-a2">
-                                    <input type="number" class="form_style_input" id="form_body_bgcoloe_angle" min="0" max="360" setp="1"  title="Linear gradient color angle"  value="0" />(deg)
+                                    <input type="number" class="form_style_input input_numper_type" id="form_body_bgcoloe_angle" min="0" max="360" setp="1"  title="Linear gradient color angle"  value="0" />(deg)
                                 </div>
                             </div>
                             <div class="row">
@@ -723,13 +737,14 @@ $about_html = ABOUT_APP_AUTHOR;
                                     <label for="form_border_type">Form border type:</label>
                                 </div>
                                 <div class="column-a2">
-                                    <select class="form_style_input" id="form_border_type" min="0" setp="1"  title="Form border type">
+                                    <select class="form_style_input" id="form_border_type"  title="Form border type">
                                         <option value="solid">solid</option>
                                         <option value="dotted">dotted</option>
                                         <option value="dashed">dashed</option>
                                         <option value="double">double</option>
                                         <option value="groove">groove</option>
                                         <option value="ridge">ridge</option>
+                                        <option value="inset">inset</option>
                                         <option value="outset">outset</option>
                                         <option value="none">none</option>
                                     </select>
@@ -1513,24 +1528,30 @@ $about_html = ABOUT_APP_AUTHOR;
             general_style_dialog.dialog("open");
         }
         function setDefaultFormStyleObj(){
-            //
-            var defaultFormStylObj = {
-                form_body_bgcolor_1: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_1").val(),
-                form_body_bgcolor_2: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_2").val(),
-                form_body_bgcoloe_angle: "0", //$("#form_body_bgcoloe_angle").val(),
-                form_width: "80", //$("#form_width").val(),
-                form_vertical_margin: "5", //$("#form_vertical_margin").val(),
-                form_Background_color: "rgba(255, 255, 255, 1)", //$("#form_Background_color").val(),
-                form_opacity: "100", //$("#form_opacity").val(),
-                form_border_size: "1", //$("#form_border_size").val(),
-                form_border_type: "solid", //$("#form_border_type").val(),
-                form_border_color: "rgb(0, 0, 0, 1)", //$("#form_border_color").val(),
-                form_border_radius: "5", //$("#form_border_radius").val(),
-                form_body_bgImage_attach: "scroll",
-                form_body_bgImage_position: "center center",
-                form_body_bgImage_repet: "repeat",
-                form_body_bgImage_size: "auto"
+            var defaultSets = '<?=$dFrmSets ?>';
+            var defaultFormStylObj = {};
+            if(defaultSets != ''){
+                defaultFormStylObj = JSON.parse(defaultSets);
+            }else{
+                defaultFormStylObj = {
+                    form_body_bgcolor_1: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_1").val(),
+                    form_body_bgcolor_2: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_2").val(),
+                    form_body_bgcoloe_angle: "0", //$("#form_body_bgcoloe_angle").val(),
+                    form_width: "80", //$("#form_width").val(),
+                    form_vertical_margin: "5", //$("#form_vertical_margin").val(),
+                    form_Background_color: "rgba(255, 255, 255, 1)", //$("#form_Background_color").val(),
+                    form_opacity: "100", //$("#form_opacity").val(),
+                    form_border_size: "1", //$("#form_border_size").val(),
+                    form_border_type: "solid", //$("#form_border_type").val(),
+                    form_border_color: "rgb(0, 0, 0, 1)", //$("#form_border_color").val(),
+                    form_border_radius: "5", //$("#form_border_radius").val(),
+                    form_body_bgImage_attach: "scroll",
+                    form_body_bgImage_position: "center center",
+                    form_body_bgImage_repet: "repeat",
+                    form_body_bgImage_size: "auto"
+                }
             }
+            //console.log(defaultFormStylObj)
              
             sessionStorage.formStylObj = JSON.stringify(defaultFormStylObj);
 
@@ -1550,6 +1571,7 @@ $about_html = ABOUT_APP_AUTHOR;
             $("#form_body_bgImage_position").val(defaultFormStylObj.form_body_bgImage_position).change();
             $("#form_body_bgImage_repet").val(defaultFormStylObj.form_body_bgImage_repet).change();
             $("#form_body_bgImage_size").val(defaultFormStylObj.form_body_bgImage_size).change();
+            $("#form_body_bgImage").val(null);
 
         }
         function getFormStyleObj(name){
@@ -1591,6 +1613,17 @@ $about_html = ABOUT_APP_AUTHOR;
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
         }
         */
+       function bytesToSize(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
         //preview
         $(".form_style_input").on("click",function(){
             $(this).change();
@@ -1623,6 +1656,21 @@ $about_html = ABOUT_APP_AUTHOR;
                 setFormStyleObj(el_id, el_val);
             }else if(el_id == "form_body_bgImage"){
                 if (this.files && this.files[0]) {
+                    var defaultMaxfileSize = '<?=$dFrmMaxBgImgSize ?>';
+                    if(defaultMaxfileSize == ''){
+                        defaultMaxfileSize = 1048576; //=1MB
+                    }else{
+                        defaultMaxfileSize = Number(defaultMaxfileSize);
+                    }
+                    //console.log("file size: ",this.files[0].size,defaultMaxfileSize,);
+                    if( this.files[0].size > defaultMaxfileSize){
+                        var bToSize = bytesToSize(defaultMaxfileSize, 2);
+                        var cbToSize = bytesToSize(this.files[0].size, 2);
+                        alert("Sorry, the file is too large.\nFile size must be less than " + defaultMaxfileSize + " Bytes (" +bToSize+ "),\n" +
+                            "and your file size is " + this.files[0].size + " Bytes (" +cbToSize+ ").");
+                        $(this).val(null);
+                        return false;
+                    }                 
                     var reader = new FileReader();
                     reader.onload = function(e) {
                         var color1 = $("#form_body_bgcolor_1").val();

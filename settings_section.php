@@ -15,6 +15,8 @@ if(isset($_POST["setting_id"])){
     $settings = getSettings($conn,"general");
   }else if($settingGroup == "email_setting"){
     $settings = getSettings($conn,"email");
+  }else if($settingGroup == "form_style_setting"){
+    $settings = getSettings($conn,"form_style");
   }
   if(!empty($settings)){
     //$echo_data = json_encode($settings);
@@ -71,9 +73,25 @@ function getHrmlSetting($conn,$settingGroup,$settingObj){
     if($optionType == "text"){
       $input = "<input type='text' id='$elId' class='form-control' value='$value' />";
     }else if($optionType == "number"){
-      $input = "<input type='text' id='$elId' class='form-control' value='$value' />";
+      //add min , max , step if exists
+      $num_range = "";
+      if(isset($optionObj->min)){
+        $rMin = $optionObj->min;
+        $num_range .= "min='$rMin' ";
+      }
+      if(isset($optionObj->max)){
+        $rMax = $optionObj->max;
+        $num_range .= "max='$rMax' ";
+      }
+      if(isset($optionObj->step)){
+        $rStep = $optionObj->step;
+        $num_range .= "step='$rStep' ";
+      }
+      $input = "<input type='number' id='$elId' class='form-control input-type-number' $num_range value='$value' />";
     }else if($optionType == "password"){
       $input = "<input type='password' id='$elId' class='form-control' value='$value' />";
+    }else if($optionType == "color"){
+      $input = "<input type='text' id='$elId' class='form-control general-setting-color' value='$value' />";
     }else if($optionType == "select"){
       $input = "<select id='$elId' class='custom-select'>";
       $optionValsAry = $optionObj->values;
@@ -112,7 +130,17 @@ function getHrmlSetting($conn,$settingGroup,$settingObj){
   }
   $htmlStr = "<table class='table table-sm table-striped setting_table'>";
   $htmlStr .= implode("", $htmlAry);
-  $htmlStr .= "</html>";
+  $htmlStr .= "</table>
+    <script>
+      $('.general-setting-color').spectrum({
+          preferredFormat: 'rgb',
+          showAlpha: true,
+          showInitial: true,
+          showInput: true
+      });
+      $('.input-type-number').number();
+    </script>
+  ";
   return $htmlStr;
 }
 
@@ -160,13 +188,20 @@ $('.settings_tree_content').on('changed.jstree', function (e, data) {
                 "id" : "email_setting",
                 "parent" : "#",
                 "text" : "Email",
-                "icon": "far fa-envelope"
+                "icon": "fa fa-envelope"
+            },{
+                "id" : "form_style_setting",
+                "parent" : "#",
+                "text" : "Default form style",
+                "icon": "fa fa-file"
             }]
     } 
 });
 $('.settings_tree_content').on("loaded.jstree", function (e, data) {
     $('.settings_tree_content').jstree('select_node', "#general_setting",true);//on load open users
 });
+
+
 function getSettings(slected_id){
     if(slected_id != ""){
         $.ajax({
