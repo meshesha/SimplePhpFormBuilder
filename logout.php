@@ -12,6 +12,8 @@ if(isset($_SESSION['rederect_url'])){
     }else if($_SESSION['rederect_url'] == "form_admin"){
         $formId = $_SESSION['form_id'];
         header("Location: formadmin.php?id=$formId");
+    }else{
+        header("Location: index.php");
     }
 }else{
     header("Location: index.php");

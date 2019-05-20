@@ -3,7 +3,7 @@
 require 'settings/tracy-2.6.2/src/tracy.php';
 use Tracy\Debugger;
 
-include "chech_restricted.php";
+//include "chech_restricted.php";
 
 require "settings/database.class.php";
 
