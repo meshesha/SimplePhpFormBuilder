@@ -43,6 +43,8 @@ if(isset($_POST['searchTerm'])){
 
         $echo_data = json_encode($data_obj);
         echo $echo_data;
+    }else{
+        echo "";
     }
 
 

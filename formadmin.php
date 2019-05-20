@@ -239,9 +239,11 @@ $about_html = ABOUT_APP_AUTHOR;
         <span class="pop_ctrl"><i class="all_btns fa fa-bars"></i></span>
         <ul>
             <li onclick="addUpdateUser('update','<?= $user ?>')" title="User info"><div><i class="fa fa-user"></i></div><div class="menu-icons-text">info</div></li>
-                    <li onclick="openLinkInNewTab('https://github.com/meshesha/SimplePhpFormBuilder/wiki')" title="Help"><i class="fa fa-question-circle"></i><div class="menu-icons-text">Help</div></li>
-                    <li onclick="showAbout()" title="About"><i class="fa fa-info-circle"></i><div class="menu-icons-text">About</div></li>
-            <li onclick="avascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Exit</div></li>
+            <li onclick="showAboutForm('<?=$formId?>')" title="Form mata-data"><i class="fa fa-file"></i><div class="menu-icons-text">Form</div></li>
+            <li onclick="openLinkInNewTab('https://github.com/meshesha/SimplePhpFormBuilder/wiki')" title="Help"><i class="fa fa-question-circle"></i><div class="menu-icons-text">Help</div></li>
+            <li onclick="showAbout()" title="About"><i class="fa fa-info-circle"></i><div class="menu-icons-text">About</div></li>
+            <li onclick="javascript:location.href='index.php'" title="Exit from system"><i class="fa fa-cog"></i><div class="menu-icons-text">Admin</div></li>
+            <li onclick="javascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Exit</div></li>
         </ul>
     </span>
     <div class="main_warper">
@@ -564,6 +566,7 @@ $about_html = ABOUT_APP_AUTHOR;
             general_dialog.dialog("option","height",0.65*$(window).height());
             general_dialog.dialog("option","title","Update user data");
             general_dialog.dialog("open");
+            $("#main-vewer-menu ul").hide();
         }
         function add_update_user(dialogBox){
             var action = $("#action_type").val(); //new,updte
@@ -683,6 +686,188 @@ $about_html = ABOUT_APP_AUTHOR;
             row.append(col75);
 
             return row;
+        }
+        ///////////////////////////////////////About form /////////////////
+        function showAboutForm(formId){
+            var publishTypeName = {"1":"Public","2":"Users group"};
+            var statusTypeName = {"1":"Published","2":"Unpublished"};
+            var allGroups="" , allFormMngrs = "";
+            var gContent = $("#formbuilder_general_content");
+            gContent.addClass("dialog_form_container");
+            gContent.html("");
+            var form_data = getFormData(formId);
+
+            if(form_data !== null && form_data !== undefined){
+                allGroups = getAllGroups();
+                allFormMngrs = getAllFormMngrs();
+            }
+            formName =  form_data.data.frm_name;
+            formTitle = form_data.data.frm_title;
+            publishTypeId = form_data.data.publ_type;
+            formGroupsIds = form_data.data.publ_grps;
+            var formGroupsNames = "";
+            if(allGroups != "" && formGroupsIds != "" ){
+                var groupsIdsAry = [];
+                var isSingleGrp = false;
+                if(formGroupsIds.indexOf(",") > -1){
+                    groupsIdsAry = formGroupsIds.split(",");
+                }else{
+                    isSingleGrp = true;
+                    groupsIdsAry[0] = formGroupsIds;
+                }
+                var allGroupsObj = JSON.parse(allGroups);
+                var allGroupsObjAry = allGroupsObj.results;
+                //console.log(allGroupsObjAry)
+                $.each(allGroupsObjAry, function(i, grp ) {
+                    if(isSingleGrp){
+                        if(groupsIdsAry[0] == grp.id){
+                            formGroupsNames = grp.text;
+                        }
+                    }else{
+                        $.each(groupsIdsAry, function(i, grpId ) {
+                            if(grpId == grp.id){
+                                formGroupsNames += grp.text + ", ";
+                            }
+                        });
+                    }
+                });
+            }
+            formMngrsIds = form_data.data.admin_users;
+            var formMngrsNames = "";
+            if(allFormMngrs != "" && formMngrsIds != "" ){
+                var mngrsIdsAry = [];
+                var isSingleMngr = false;
+                if(formMngrsIds.indexOf(",") > -1){
+                    mngrsIdsAry = formMngrsIds.split(",");
+                }else{
+                    isSingleMngr = true;
+                    mngrsIdsAry[0] = formMngrsIds;
+                }
+                var allFormMngrsObj = JSON.parse(allFormMngrs);
+                var allFormMngrsObjAry = allFormMngrsObj.results;
+                //console.log(allGroupsObjAry)
+                if(allFormMngrsObjAry.length > 0){
+                    $.each(allFormMngrsObjAry, function(i, mngr ) {
+                        if(isSingleMngr){
+                            if(mngrsIdsAry[0] == mngr.id){
+                                formMngrsNames = mngr.text;
+                            }
+                        }else{
+                            $.each(mngrsIdsAry, function(i, mngrId ) {
+                                if(mngrId == mngr.id){
+                                    formMngrsNames += mngr.text + ", ";
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            statusTypeId = form_data.data.publ_status;
+            formNots = form_data.data.frm_note;
+
+            var uInput = "<input type='text' id='form_name' value = '" + formName + "' disabled />";
+            var uName = addElement("Form name","form_name", uInput);
+            uName.appendTo(gContent);
+
+            var uInput = "<input type='text' id='form_title' value = '" + formTitle + "' disabled />";
+            var uName = addElement("Form title","form_title", uInput);
+            uName.appendTo(gContent);
+
+            var uInput = "<input type='text' id='publish_type' value = '" + publishTypeName[publishTypeId] + "' disabled  />";
+            var uName = addElement("Publish type","publish_type", uInput);
+            uName.appendTo(gContent);
+
+            var uInput = "<input type='text' id='groups_list' value = '" + formGroupsNames + "' disabled  />";
+            var uName = addElement("Groups","groups_list", uInput);
+            uName.appendTo(gContent);
+
+            var uInput = "<input type='text' id='form_managers_list' value = '" + formMngrsNames + "' disabled />";
+            var uName = addElement("Form Managers","form_managers_list", uInput);
+            uName.appendTo(gContent);
+
+            var uInput = "<input type='text' id='status_type' value = '" + statusTypeName[statusTypeId] + "' disabled  />";
+            var uName = addElement("Status","status_type", uInput);
+            uName.appendTo(gContent);
+
+            var uInput = "<textarea id='form_note' disabled>" + formNots + "</textarea>";
+            var uName = addElement("Note","form_note", uInput);
+            uName.appendTo(gContent);
+
+            general_dialog.dialog("option","buttons",
+                [
+                    {
+                        text: "Cancel",
+                        class: "btn btn-primary btn-lg",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            );
+
+            general_dialog.dialog("option","height",0.8*$(window).height());
+            general_dialog.dialog("option","title","Form Data");
+            general_dialog.dialog("open");
+            $("#main-vewer-menu ul").hide();
+        }
+        function getFormData(form_id){
+            var rt_data = "";
+            if(form_id != ""){
+                //ajax
+                $.ajax({
+                    type: "POST",
+                    url: "get_form_data.php",
+                    async:false,
+                    data: {form_id : form_id},
+                    success: function (response) {
+                        response = JSON.parse(response);
+                        rt_data = response;
+                    },
+                    error:function (response) {
+                        console.log("Error:",JSON.stringify(response));
+                        alert(response.responseText)
+                    }
+                });
+            }
+            return rt_data;
+        }
+
+        function getAllGroups(){
+            var rt_data = "";
+                //ajax
+                $.ajax({
+                    type: "POST",
+                    url: "get_all_groups.php",
+                    async:false,
+                    success: function (response) {
+                        //response = JSON.parse(response);
+                        rt_data = response;
+                    },
+                    error:function (response) {
+                        console.log("Error:",JSON.stringify(response));
+                        alert(response.responseText)
+                    }
+                });
+            return rt_data;
+        }
+
+        function getAllFormMngrs(){
+            var rt_data = "";
+                //ajax
+                $.ajax({
+                    type: "POST",
+                    url: "get_all_managers_users.php",
+                    async:false,
+                    success: function (response) {
+                        //response = JSON.parse(response);
+                        rt_data = response;
+                    },
+                    error:function (response) {
+                        console.log("Error:",JSON.stringify(response));
+                        alert(response.responseText)
+                    }
+                });
+            return rt_data;
         }
     </script>
 
