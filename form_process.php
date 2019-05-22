@@ -40,7 +40,7 @@ if(isset($_POST['button-submit-form']) &&  $_SESSION['is_form_reload'] == "0"){
 
     $uid = "";
     if($userId != "" && $userName != "" && $email != ""){
-       $uid = md5($userId.$userName.$email.time()); 
+       $uid = md5(time()); 
     }else{
         $uid = "public-" . md5(time());
     }
@@ -189,6 +189,20 @@ if(empty($errors)){
 }else{
     $msg = implode("<br>", $errors);
     $message = "<label class='text-danger'>$msg</label>";
+}
+
+function getUserIp(){
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    if($ip == "::1"){
+        $ip = "127.0.0.1";
+    }
+    return $ip;
 }
 
 function checkIfFilesUpload($fielName, $isMulti){

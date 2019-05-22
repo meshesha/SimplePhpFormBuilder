@@ -34,7 +34,7 @@ if( isset($_SESSION['user_id']) ){
 
 	$user = "";
 
-	if( count($results) > 0){
+	if($results != "" && count($results) > 0){
 		$myuser = $results["id"];
         $groups = $results["groups"];
         $groups_ary = array();
@@ -286,13 +286,22 @@ $about_html = ABOUT_APP_AUTHOR;
                 'iconSize': '50px' // size of menu's buttons
             });
             $("#publish_type").on("click",function(){
-                //alert($(this).val())
-                if($(this).val() == "1"){ //if publick
+                var publshTyp = $(this).val();
+                if(publshTyp == "1" || publshTyp == "3" ){ //if publick
                     $("#groups-row").hide();
                 }else{
                      $("#groups-row").show();
                 }
             })
+            $("#restrict_multiple_submissions").on("click",function(){
+                var rstrcSubmit = $(this).val();
+                if(rstrcSubmit == "-1"){ 
+                    $("#submit-amoun-row").hide();
+                }else{
+                     $("#submit-amoun-row").show();
+                }
+            })
+
             $("#status_type").on("click",function(){
                 var formId = $("#form_id").val();
                 if(formId == ""){
@@ -464,6 +473,27 @@ $about_html = ABOUT_APP_AUTHOR;
                         <input type="text" id="form_title" name="form_title" title="Form title"  required/>
                     </div>
                 </div>
+                <!-- //////////////Restrict multiple missions/////////////// -->
+                <div class="row">
+                    <div class="col-25">
+                        <label for="restrict_multiple_submissions">Restrict multiple missions</label>
+                    </div>
+                    <div class="col-75">
+                        <select id="restrict_multiple_submissions" name="restrict_multiple_submissions">
+                            <option value="-1">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" id="submit-amoun-row">
+                    <div class="col-25">
+                        <label for="submit_amount_allowed">The amount allowed to submit</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="number" id="submit_amount_allowed" name="submit_amount_allowed" min="1" step="1" value="1" title="The amount allowed to submit"  />
+                    </div>
+                </div>
+                <!-- //////////////////////////////////////////////////////// -->
                 <div class="row">
                     <div class="col-25">
                         <label for="publish_type">Publish type</label>
@@ -471,10 +501,13 @@ $about_html = ABOUT_APP_AUTHOR;
                     <div class="col-75">
                         <select id="publish_type" name="publish_type">
                             <option value="1">Public</option>
-                            <option value="2">Users group</option>
+                            <option value="2">Groups</option>
+                            <option value="3">Public-Anonymously</option>
+                            <option value="4">Groups-Anonymously</option>
                         </select>
                     </div>
                 </div>
+
                 <div class="row" id="groups-row">
                     <div class="col-25">
                         <label for="groups_list">Groups</label>
@@ -887,7 +920,11 @@ $about_html = ABOUT_APP_AUTHOR;
             $("#form_id").val("");
             $("#form_name").val("");
             $("#form_title").val("");
+            $("#restrict_multiple_submissions").val("-1").change();
+            $("#submit_amount_allowed").val("");
+            $("#submit-amoun-row").hide();
             $("#publish_type").val("1").change();
+             $("#groups-row").hide();
             $('#groups_list').val("");
             $('#form_managers_list').val("");
             $("#form_note").val("");
@@ -895,9 +932,6 @@ $about_html = ABOUT_APP_AUTHOR;
             $("#status_type").prop("disabled",true);
             $("#previw_btn_toolbar").hide();
             formbuilder_dialog.dialog("option","title","Add New");
-            if($("#publish_type").val() == "1"){ //if public
-                $("#groups-row").hide();
-            }
             //form style
             setDefaultFormStyleObj();
             //groups_list
@@ -1036,9 +1070,18 @@ $about_html = ABOUT_APP_AUTHOR;
             if(mor_data !== null && mor_data !== undefined){
                 if(mor_data.status == 1){
                     //console.log(mor_data.data)
+                    if(mor_data.data.restrict_submissions == "-1"){
+                        $("#restrict_multiple_submissions").val(mor_data.data.restrict_submissions).change();
+                        $("#submit_amount_allowed").val("");
+                        $("#submit-amoun-row").hide();
+                    }else{
+                        $("#restrict_multiple_submissions").val("1").change();
+                        $("#submit_amount_allowed").val(mor_data.data.restrict_submissions);
+                        $("#submit-amoun-row").show();
+                    }
                     // publ_type: "2", publ_grps: "1,2,3", publ_status: "2", frm_note
                     $("#publish_type").val(mor_data.data.publ_type).change();
-                    if($("#publish_type").val() == "1"){ //if public
+                    if(mor_data.data.publ_type == "1" || mor_data.data.publ_type == "3"){ //if public
                         $("#groups-row").hide();
                     }else{
                         $("#groups-row").show();
@@ -1332,6 +1375,10 @@ $about_html = ABOUT_APP_AUTHOR;
             var frm_name = $("#form_name").val();
             var frm_title = $("#form_title").val();
             var frm_note = $("#form_note").val();
+            var frm_rstrct_submit = $("#restrict_multiple_submissions").val();
+            if(frm_rstrct_submit != "-1"){ 
+                frm_rstrct_submit = $("#submit_amount_allowed").val();
+            }
             var frm_pblsh_type = $("#publish_type").val();
             var frm_groups = $("#groups_list").val();
             var frm_mngrs = $("#form_managers_list").val();
@@ -1341,6 +1388,7 @@ $about_html = ABOUT_APP_AUTHOR;
                 form_name: frm_name,
                 form_title: frm_title,
                 form_note: frm_note,
+                restrict_submit: frm_rstrct_submit,
                 publish_type: frm_pblsh_type,
                 publish_groups: frm_groups,
                 form_managers: frm_mngrs,
@@ -1429,6 +1477,7 @@ $about_html = ABOUT_APP_AUTHOR;
             general_dialog.dialog("option","height",0.65*$(window).height());
             general_dialog.dialog("option","title",dialogTitle);
             general_dialog.dialog("open");
+            $("#main-vewer-menu ul").hide();
         }
                 
         function getUserData(user_id){

@@ -94,6 +94,9 @@ if(isset($_POST['data'])){
                         case ("form_title"):
                             $update_stt_ary[] = updateData($conn,$tbl,"form_title", $value,"indx=$idx");
                             break;
+                        case ("restrict_submit"):
+                            $update_stt_ary[] = updateData($conn,$tbl,"amount_form_submission", $value,"indx=$idx");
+                            break;
                         case ("publish_type"):
                             $update_stt_ary[] = updateData($conn,$tbl,"publish_type", $value,"indx=$idx");
                             break;
@@ -244,6 +247,7 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
     $rtrn_stt = "";
     $frm_name = $data_ary["form_name"];
     $frm_title = $data_ary["form_title"];
+    $frm_restrict_submit = $data_ary["restrict_submit"];
     $frm_publish_type = $data_ary["publish_type"];
     if($data_ary["publish_groups"] != ""){
         $frm_grps = implode(",",$data_ary["publish_groups"]);
@@ -270,6 +274,7 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
         publish_type,
         publish_groups,
         publish_status,
+        amount_form_submission,
         admin_users,
         form_note,
         form_genral_style)  VALUES (
@@ -278,6 +283,7 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
             '{$frm_publish_type}',
             '{$frm_grps}',
             '{$frm_status}',
+            '{$frm_restrict_submit}',
             '{$frm_mngrs}',
             '{$frm_note}',
             '{$frm_gnrl_style}')";

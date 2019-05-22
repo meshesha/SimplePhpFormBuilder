@@ -30,21 +30,6 @@ if($appMode == "0"){
     //Debug mode
     Debugger::enable();
 }
-//is set cookie protection
-$isCookieSet = getSetting("", "enableUsingCookies");
-if($isCookieSet == "1"){
-    $cookieName = md5("form_$formId");
-    $cookieValue = "1";
-    if(!isset($_COOKIE[$cookieName])) {
-        $cookieLifetime = getSetting("", "cookiesLifeTime");
-        setcookie($cookieName, $cookieValue, time() + (86400 * (int)$cookieLifetime), "/"); //cookie will expire in 30 days
-    }else{
-        if($_COOKIE[$cookieName] == "1"){
-            die("You can not fill out the form more than once!");
-        }
-    }
-}
-
 require 'settings/database.login.php';
 
 $formDataAry = getFormData($conn, $formId);
@@ -52,6 +37,32 @@ $formType = $formDataAry[0];
 $formStatus = $formDataAry[1];
 $formTitle = $formDataAry[2];
 $formStyle = $formDataAry[3];
+$rstrcSubmit = $formDataAry[4];
+
+
+//is set cookie protection
+$isCookieSet = getSetting("", "enableUsingCookies");
+if($isCookieSet == "1" && $rstrcSubmit != "-1"){
+    $cookieName = md5("form_$formId");
+    $cookieLifetime = getSetting("", "cookiesLifeTime");
+    //$cookieValue = "1";
+    if(!isset($_COOKIE[$cookieName]) ) {
+        setcookie($cookieName, "1", time() + (86400 * (int)$cookieLifetime), "/"); //cookie will expire in 30 days
+    }else{
+        $cookieValue = (int)$_COOKIE[$cookieName];
+        if($cookieValue > (int)$rstrcSubmit ){
+            if($rstrcSubmit == "1"){
+                die("You can not fill out the form more than once!");
+            }else{
+                die("You can not fill out the form more than $rstrcSubmit times!");
+            }
+        }else{
+            $cookieValue++;
+            setcookie($cookieName, $cookieValue, time() + (86400 * (int)$cookieLifetime), "/");
+        }
+    }
+}
+
 //echo "Typr: ".$formDataAry[0] . ", Status: " .$formDataAry[1]."<br>";
 
 if($formStatus == "2"){
@@ -60,31 +71,43 @@ if($formStatus == "2"){
 $userId = '';
 $email = '';
 $userName = '';
-if($formType != "1" ){
+if($formType == "2" || $formType == "4"){ //geoups not Anonymously, geoups Anonymously
     if(isset($_SESSION['user_id'])){
-        $user = $_SESSION['user_id'];
-        $userId = $_SESSION['user_id'];
+        if($formType == "2"){ //geoups not Anonymously
+            $userId = $_SESSION['user_id'];
+        }
         $records = $conn->prepare('SELECT * FROM users WHERE status="1" AND id = :userid');
         $records->bindParam(':userid', $userId);
         $records->execute();
         $results = $records->fetch(PDO::FETCH_ASSOC);
         $message = '';
-        if(count($results) > 0){
-            $email = $results['email'];
-            $userName = $results['username'];
+        if($results != "" && count($results) > 0){
+            $user = $_SESSION['user_id'];
+            //$email = $results['email'];
+            //$userName = $results['username'];
         }else{
             $message = '<label class="text-danger">Sorry, Username does not exist or is suspended</label>';
         }
     }
+}else if($formType == "1"){ //public not Anonymously
+    $user = getUserIp();
+    $userId = getUserIp();
 }else{
-    $user = "public";
+    $userId = "";
+    $user = "Anonymously";
 }
 function getFormData($conn, $formId){
     $records = $conn->prepare('SELECT * FROM form_list WHERE indx = :formid');
 	$records->bindParam(':formid',$formId);
 	$records->execute();
     $results = $records->fetch(PDO::FETCH_ASSOC);
-    return [$results['publish_type'],$results['publish_status'],$results['form_title'],$results['form_genral_style']];
+    return [
+        $results['publish_type'],
+        $results['publish_status'],
+        $results['form_title'],
+        $results['form_genral_style'],
+        $results['amount_form_submission']
+    ];
 }
 function getUserIp(){
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -107,14 +130,15 @@ if($formStyle != null && $formStyle != ""){
     $formStyleObj = json_decode($formStyle);
     if(isset($formStyleObj->form_body_bgImage)){
         //echo "<script>console.log('{$formStyleObj->form_body_bgImage}')</script>";
-        $formBgImagePath = $formStyleObj->form_body_bgImage;//"images/bg05.jpg";//images/bg05.jpg
+        $formBgImagePath = $formStyleObj->form_body_bgImage;
     }else{
         $formBgImagePath = "";
     }
     $gradientAngle = $formStyleObj->form_body_bgcoloe_angle . "deg";//"0deg"; //45deg
     $gradRGBColor1 = fixRGBtoRGBA($formStyleObj->form_body_bgcolor_1);//"rgba(0,0,255,0.5)";
     $gradRGBColor2 = fixRGBtoRGBA($formStyleObj->form_body_bgcolor_2);//"rgba(0,0,255,0.5)";
-    $formBgImage = "linear-gradient($gradientAngle,$gradRGBColor2,$gradRGBColor1), url($formBgImagePath) repeat center center;";////"url(images/bg05.jpg)";
+    $formBgImage = "linear-gradient($gradientAngle,$gradRGBColor2,$gradRGBColor1),
+                    url($formBgImagePath) no-repeat center center;";////"url(images/bg05.jpg)";
     $bgImgAttachment = $formStyleObj->form_body_bgImage_attach;
     $bgImgPosition = $formStyleObj->form_body_bgImage_position;
     $bgImgRepet = $formStyleObj->form_body_bgImage_repet;
@@ -136,7 +160,7 @@ if($formStyle != null && $formStyle != ""){
     $gradRGBColor1 = "rgba(222, 222, 222, 1)";
     $gradRGBColor2 = "rgba(222, 222, 222, 0.8)";
     $formBgImage = "linear-gradient($gradientAngle,$gradRGBColor2,$gradRGBColor1), 
-                        url($formBgImagePath) no-repeat center center;";//"url(images/bg05.jpg)";
+                    url($formBgImagePath) no-repeat center center;";
     $bgImgAttachment = "scroll";
     $bgImgPosition = "center center";
     $bgImgRepet = "repeat";
@@ -151,7 +175,6 @@ if($formStyle != null && $formStyle != ""){
     $formBorderColor = "black";
     $formBorderRaduse = "5px";
     $formBorder = "$formBorderSize $formBorderType $formBorderColor"; //1px solid black
-
 }
 function fixRGBtoRGBA($rgb){
     if(strpos($rgb,"rgba") === false){
@@ -184,6 +207,13 @@ function fixRGBtoRGBA($rgb){
     </script>
     <!--///////////////////////////////////////////////////////-->
     <script src="./include/formbuilder/form-render.min.js"></script>
+
+        <!-- Number fields handler-->
+    <link rel="stylesheet" href="./include/Formstone-1.4.13.1/css/number.css">
+    <link href="./include/Formstone-1.4.13.1/css/themes/light.css" rel="stylesheet">
+    <script src="./include/Formstone-1.4.13.1/js/core.js"></script>
+    <script src="./include/Formstone-1.4.13.1/js/number.js"></script>
+
     <style>
     html, body {
         height: 100%;
@@ -209,9 +239,11 @@ function fixRGBtoRGBA($rgb){
     <link rel="stylesheet" href="./css/form_main.css">
     <script type="text/javascript">
         //var formbuilder_dialog,formbuilder_content_dialog, add_file_dialog;
-        //$(function () {
-        //    
-        //});
+
+        $(function () {
+            $("input[type='number']").number();
+        });
+
         //prevent a resubmit on refresh and back button
         if ( window.history.replaceState ) {
             window.history.replaceState( null, null, window.location.href );

@@ -37,6 +37,7 @@ if(isset($_POST['data_indx'])){
                     $uid = $row['UID'];
                     $params_cell = array();
                     $params_cell[] = "";
+                    $params_cell[] = $row['user_id']; //user id here
                     $params_cell[] = getFormDatetime($conn, $data_indx, $uid);
                     $chkData = checkData($row['field_name'],$row['field_type'],$row['field_value'],$form_fields_ary);
                     $params_cell[] = $chkData[0];
@@ -49,32 +50,33 @@ if(isset($_POST['data_indx'])){
                         $total = checkTotalUID($conn, $data_indx , $uid); //check total for this UID
                         $params_cell = array();
                         $params_cell[0] = "";
-                        $params_cell[1] = getFormDatetime($conn, $data_indx, $uid);
+                        $params_cell[1] = $row['user_id']; //user id/ip here
+                        $params_cell[2] = getFormDatetime($conn, $data_indx, $uid);
                         $chkData = checkData($row['field_name'],$row['field_type'],$row['field_value'],$form_fields_ary);
-                        $params_cell[2] = $chkData[0];
+                        $params_cell[3] = $chkData[0];
                         $row_indx++;
                     }else if($row_indx < $total){
                         $chkData = checkData($row['field_name'],$row['field_type'],$row['field_value'],$form_fields_ary);
                         if($chkData[0] != ""){
-                            $params_cell[$chkData[1] + 2] = $chkData[0];
+                            $params_cell[$chkData[1] + 3] = $chkData[0];
                         }
                         $row_indx++;
                     }else if($row_indx == $total){
                         $uid = $row['UID'];
                         $chkData = checkData($row['field_name'],$row['field_type'],$row['field_value'],$form_fields_ary);
                         if($chkData[0] != ""){
-                            $params_cell[$chkData[1] + 2] = $chkData[0];
+                            $params_cell[$chkData[1] + 3] = $chkData[0];
                         }
                         
-                        $total_cells = count($params_cell);
-                        for($i=0;$i <= $total_cols; $i++){
+                        $total_cells = (count($form_fields_ary) + 2); //3-1 = 3[index, user id/ip, date] - 1 [buttons]
+                        for($i=0;$i <= $total_cells; $i++){
                             if(!isset($params_cell[$i])){
                                 $params_cell[$i] = "";
                             }
                         }
                         
-                        $params_cell[] = "<button class='btn btn-primary btn-sm'  onclick='getFormDetails(\"$data_indx\",\"$uid\")'  >Datails</buttn>
-                                        <button class='btn btn-danger btn-sm'  onclick='delFormRecord(\"$data_indx\",\"$uid\")'  >Delete</buttn>
+                        $params_cell[] = "<button class='btn btn-primary btn-sm'  onclick='getFormDetails(\"$data_indx\",\"$uid\")'  >Datails</button>
+                                        <button class='btn btn-danger btn-sm'  onclick='delFormRecord(\"$data_indx\",\"$uid\")'  >Delete</button>
                                         <input type='hidden' class='form_id_uid' value='$data_indx,$uid'>";
                         $params_row[] = $params_cell;
                         $row_indx = 1;
@@ -120,7 +122,11 @@ function checkData($fName, $type, $data, $fNamesAry){
             $rData = $data;
         }else{
             if($data != ""){
-            $rData =  implode(",",json_decode($data));
+                //if(strpos($data, ",") !== false){
+                    $rData =  implode(",",json_decode($data));
+                //}else{
+                //    $rData = $data;
+                //}
             }
         }
     }

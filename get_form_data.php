@@ -25,6 +25,7 @@ if(isset($_POST['form_id'])){
                 //$params_row['form_nik'] =  $row['form_id'] ; 
                 $params_row['frm_name'] = $row['form_name']; 
                 $params_row['frm_title'] = $row["form_title"];
+                $params_row['restrict_submissions'] = $row["amount_form_submission"];
                 $params_row['publ_type'] = $row["publish_type"];
                 $params_row['publ_grps'] = $row["publish_groups"];//getGroupsObj($conn,$form_id,$row["publish_groups"]);
                 $params_row['publ_status'] = $row["publish_status"];

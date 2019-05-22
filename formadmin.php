@@ -37,20 +37,35 @@ if($formStatus == "2"){
 }
 
 $isAdmin = true;
+ $user = "";
 if(isset($_SESSION['user_id'])){
-    $user = $_SESSION['user_id'];
-    $init_data_ary = init($conn, $formId, $user,$formAmins);
-    
-    if($formType == "" && $formStatus == "" && $formAmins == "" && $formTitle == ""){
-        $isAdmin = false;
-        $message = '<label class="text-danger">Sorry, form not exist</label>';
-        $col_names = "";
-    }else{
+    $userId = $_SESSION['user_id'];
+    $records = $conn->prepare('SELECT * FROM users WHERE status="1" AND id = :userid');
+    $records->bindParam(':userid', $userId);
+    $records->execute();
+    $results = $records->fetch(PDO::FETCH_ASSOC);
+    $message = '';
+    if($results != "" && count($results) > 0){
+        $user = $_SESSION['user_id'];
+        //$email = $results['email'];
+        //$userName = $results['username'];
         $init_data_ary = init($conn, $formId, $user,$formAmins);
-        $isAdmin = (($init_data_ary[0] == "adminuser")?true:false);
-        $message = $init_data_ary[1];
-        $col_names = $init_data_ary[2];
+        
+        if($formType == "" && $formStatus == "" && $formAmins == "" && $formTitle == ""){
+            $isAdmin = false;
+            $message = '<label class="text-danger">Sorry, form not exist</label>';
+            $col_names = "";
+        }else{
+            $init_data_ary = init($conn, $formId, $user,$formAmins);
+            $isAdmin = (($init_data_ary[0] == "adminuser")?true:false);
+            $message = $init_data_ary[1];
+            $col_names = $init_data_ary[2];
+        }
+    }else{
+        $message = '<label class="text-danger">Sorry, Username does not exist or is suspended</label>';
     }
+
+
 }
 if($isAdmin && (isset($col_names) && $col_names == "")){
     $message .= '<label class="text-danger">Sorry, There are no records for this form</label><br>';
@@ -68,21 +83,29 @@ function init($conn, $formId, $user,$formAmins){
         //echo "formLabelsAry: ".json_encode($formLabelsAry);
         if(!empty($formLabelsAry)){
             $labeld_ary = array();
+            //table index
             $labeldObj0 = new stdClass();
             $labeldObj0->index = 0;
             $labeldObj0->title = "";
             $labeld_ary[] = $labeldObj0;
+
+            $labeldObjUIdIp = new stdClass();
+            $labeldObjUIdIp->index = 1;
+            $labeldObjUIdIp->title = "User ID/IP";
+            $labeld_ary[] = $labeldObjUIdIp;
+
             $labeldObjdatetime = new stdClass();
-            $labeldObjdatetime->index = 0;
+            $labeldObjdatetime->index = 2;
             $labeldObjdatetime->title = "Date-time";
             $labeld_ary[] = $labeldObjdatetime;
+
             $lastIdx = 0;
             foreach($formLabelsAry as $key=>$label){
                 $labeldObj = new stdClass();
-                $labeldObj->index = ($key + 2);
+                $labeldObj->index = ($key + 3);
                 $labeldObj->title = $label;
                 $labeld_ary[] = $labeldObj;
-                $lastIdx = ($key + 2);
+                $lastIdx = ($key + 3);
             }
             $labeldObjz = new stdClass();
             $labeldObjz->index = $lastIdx + 1;
@@ -334,8 +357,12 @@ $about_html = ABOUT_APP_AUTHOR;
                                 var arr = [];
                                 var totalCols = form_data_tbl.columns().nodes().length;
                                 $('.row_checkbox:checked').each(function (val, i) {
-                                    var lastCell = form_data_tbl.row( $(this).parents('tr') ).data()[totalCols-1];
-                                    arr.push($(".form_id_uid", lastCell).val());
+                                    //var lastCell = form_data_tbl.row( $(this).parents('tr') ).data()[totalCols-1];
+                                    //console.log(lastCell)
+                                    //arr.push($(".form_id_uid", lastCell).val());
+                                    var sel = $(this).parents('tr').find($(".form_id_uid")).val();
+                                    //console.log(sel)
+                                    arr.push(sel);
                                 }); 
                                 //console.log(JSON.stringify(arr))
                                 if(arr.length == 0){
@@ -689,7 +716,12 @@ $about_html = ABOUT_APP_AUTHOR;
         }
         ///////////////////////////////////////About form /////////////////
         function showAboutForm(formId){
-            var publishTypeName = {"1":"Public","2":"Users group"};
+            var publishTypeName = {
+                "1":"Public",
+                "2":"Users group",
+                "3":"Public-Anonymously",
+                "4":"Groups-Anonymously"
+            };
             var statusTypeName = {"1":"Published","2":"Unpublished"};
             var allGroups="" , allFormMngrs = "";
             var gContent = $("#formbuilder_general_content");

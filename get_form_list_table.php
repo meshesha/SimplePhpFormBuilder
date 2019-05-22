@@ -90,7 +90,13 @@ function getPublishTypes($publish_type){
             return "public";
             break;
         case "2":
-            return "Users group";
+            return "Group";
+            break;
+        case "3":
+            return "Public-Anonymously";
+            break;
+        case "4":
+            return "Groups-Anonymously";
             break;
         default:
             return "undefined group";

@@ -72,6 +72,24 @@ function setFormValues($conn, $form_id, $uid, $field){
     $fType = $field->type;
     $fname = $field->name;
     $fval = getFieldValue($conn, $form_id, $uid,$fname);
+    //if $fval == "" - TODO
+    /*
+    */
+    if($fval == "-1"){
+        if($fType == "select"){
+            $valsAry = array();
+            $slctValsObj = new stdClass();
+            $slctValsObj->label = "";
+            $slctValsObj->value = "";
+            $slctValsObj->selected = true;
+            $valsAry[] = $slctValsObj;
+            $field->values = $valsAry;
+        }else{
+            $field->value = "";
+            $field->disabled = true;
+            return $field;
+        }
+    }
     if($fType == "checkbox-group"){
         if(isset($field->other) && $field->other == true){
             $field->other = false;
@@ -139,7 +157,7 @@ function setFormValues($conn, $form_id, $uid, $field){
     return $field;
 }
 function getFieldValue($conn, $form_id, $uid,$fname){
-    $filds_str = "";
+    $filds_str = "-1";
     $sql = "SELECT field_value FROM form_data WHERE form_id='$form_id' AND UID='$uid' AND field_name='$fname'";
     if($result = $conn->query($sql)) {
         $count = mysqli_num_rows($result);
