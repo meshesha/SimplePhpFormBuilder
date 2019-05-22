@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS `form_list` (
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 ALTER TABLE `form_list` ADD COLUMN `form_genral_style` longtext;
+ALTER TABLE `form_list` ADD `amount_form_submission` VARCHAR(6) NOT NULL DEFAULT '-1' COMMENT 'The amount of form submission is allowed (-1 = no limit)' AFTER `publish_status`; 
 
 -- --------------------------------------------------------
 

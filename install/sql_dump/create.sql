@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS `form_list` (
   `publish_type` varchar(10) NOT NULL DEFAULT '',
   `publish_groups` varchar(1024) NOT NULL DEFAULT '',
   `publish_status` varchar(5) NOT NULL DEFAULT '',
+  `amount_form_submission` VARCHAR(6) NOT NULL DEFAULT '-1',
   `admin_users` varchar(255) NOT NULL DEFAULT '1',
   `form_note` text,
   `form_genral_style` longtext,
