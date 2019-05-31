@@ -207,6 +207,8 @@ function fixRGBtoRGBA($rgb){
     </script>
     <!--///////////////////////////////////////////////////////-->
     <script src="./include/formbuilder/form-render.min.js"></script>
+    <script src="./include/formbuilder/control_plugins/table.js"></script>
+    <script src="./include/formbuilder/control_plugins/starRating.min.js"></script>
 
         <!-- Number fields handler-->
     <link rel="stylesheet" href="./include/Formstone-1.4.13.1/css/number.css">

@@ -84,6 +84,19 @@ if(isset($_POST['button-submit-form']) &&  $_SESSION['is_form_reload'] == "0"){
                          //echo "You didn't select any ".$field->name;
                         $frmFieldsValuesAry[] = [$field->name, "",$field->type];
                     }
+                }else if($field->type == "table"){
+                    $tbl_name = $field->name;
+                    $tbl_data_field_name = "editable-data-$tbl_name";
+                    $tbl_data_field_val = $_POST[$tbl_data_field_name];
+                    //$conn,$userId,$uid,$form_id,$tbl_name,$tbl_data_field_val
+                    //echo $tbl_name . ", " . $field->type .  ", $tbl_data_field_val<br>";
+                    $tbl_stt = setTableInDB($conn,$form_id,$uid,$tbl_name,$tbl_data_field_val);
+                    if($tbl_stt != "success"){
+                        $frmFieldsValuesAry[] = [$tbl_name, "error",$field->type];
+                        $errors[] = "upload error (single) : ". $upload_stt_ary[1]."<br>";
+                    }else{
+                        $frmFieldsValuesAry[] = [$tbl_name, "yes",$field->type];
+                    }
                 }else{
                     $frmFieldsValuesAry[] = [$field->name, $_POST[$field->name],$field->type];
                 }
@@ -370,6 +383,29 @@ function setFileInDB($conn,$frmId,$uid,$fileName,$filPath){
     return $rtrn_stt;
 
 }
+
+function setTableInDB($conn,$frmId,$uid,$tblName,$tblData){
+    $rtrn_stt = "";
+    $files = "";
+    $tblData = mysqli_real_escape_string($conn, $tblData);
+    $sql = "INSERT INTO form_tables (
+        UID,
+        form_id,
+        table_name,
+        table_data)  VALUES (
+            '{$uid}',
+            '{$frmId}',
+            '{$tblName}',
+            '{$tblData}')";
+    if($result = $conn->query($sql)) {
+        $rtrn_stt = "success";
+    }else{
+        $rtrn_stt = 'Error: ' . mysqli_error($conn);
+    }
+
+    return $rtrn_stt;
+
+}
 ?>
 
 <!DOCTYPE html>
@@ -416,7 +452,7 @@ function setFileInDB($conn,$frmId,$uid,$fileName,$filPath){
         }
     </script>
 <!--===============================================================================================-->	
-	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="./include/jquery/jquery-1.12.4.min.js"></script>
 <!--===============================================================================================-->
 	<script src="js/main.js"></script>
 

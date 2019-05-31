@@ -267,7 +267,9 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
     $frm_note = $data_ary["form_note"];
     $frm_gnrl_style = $data_ary["form_general_style"];
 
-    //$fldName = mysqli_real_escape_string($conn, $fldName);
+    $frm_name = mysqli_real_escape_string($conn, $frm_name);
+    $frm_title = mysqli_real_escape_string($conn, $frm_title);
+    $frm_note = mysqli_real_escape_string($conn, $frm_note);
     $sql = "INSERT INTO form_list (
         form_name,
         form_title,
@@ -521,6 +523,7 @@ function deletForm($conn, $data_ary){
     $sql_form_data_tbl = "DELETE FROM form_data WHERE form_id = '$idx'";
     $sql_form_datetime_tbl = "DELETE FROM form_data_datetimes WHERE form_id = '$idx'";
     $sql_form_files_tbl = "DELETE FROM form_files WHERE form_id = '$idx'";
+    $sql_form_table = "DELETE FROM form_tables WHERE form_id = '$idx'";
     //1. delete from table "form_list".
     //$fldName = mysqli_real_escape_string($conn, $fldName);
     if($conn->query($sql_form_list_tbl)) {
@@ -580,6 +583,14 @@ function deletForm($conn, $data_ary){
             $isErr = true;
             $err[] = "Error delete (UID:'$idx') from table 'form_files' : " . mysqli_error($conn);
         }
+        //6 delete from table "form_tables".
+
+        if($conn->query($sql_form_table)) {
+            $isErr = false;
+        }else{
+            $isErr = true;
+            $err[] = "Error delete (UID:'$idx') from table 'form_tables' : " . mysqli_error($conn);
+        }
     }
     if(!$isErr && empty($err)){
         return "success";
@@ -604,7 +615,12 @@ function deletUserFormData($conn, $data_ary){
         if($del_stt != "success"){
             $del_stt_ary[] = $del_stt;
         }
-        //3. DELET file
+        //3. delete from table "form_tables".
+        $del_stt = delteFormTable($conn, $formID, $uid);
+        if($del_stt != "success"){
+            $del_stt_ary[] = $del_stt;
+        }
+        //4. DELET file
         //4.1 get file names/path
         //4.2 delete files from dir
         $del_stt = deleteFilesFromDir($conn, $formID, $uid);
@@ -645,7 +661,12 @@ function deletUserFormData($conn, $data_ary){
             if($del_stt != "success"){
                 $del_stt_ary[] = $del_stt;
             }
-            //3. DELET file
+            //3. delete from table "form_tables".
+            $del_stt = delteFormTable($conn, $formID, $uid);
+            if($del_stt != "success"){
+                $del_stt_ary[] = $del_stt;
+            }
+            //4. DELET file
             //4.1 get file names/path
             //4.2 delete files from dir
             $del_stt = deleteFilesFromDir($conn, $formID, $uid);
@@ -699,7 +720,20 @@ function delteFormDataDatetime($conn, $formID, $uid){
     }
 
 }
-
+function delteFormTable($conn, $formID, $uid){
+    $sql = "DELETE FROM form_tables WHERE UID='$uid' AND form_id = '$formID'";
+    if($conn->query($sql)) {
+        $isErr = false;
+    }else{
+        $isErr = true;
+        $err = "Error delete (form_id:'$formID') from table 'form_tables' : " . mysqli_error($conn);
+    }
+    if(!$isErr){
+        return "success";
+    }else{
+        return $err;
+    }
+}
 function delteFormDataFiles($conn, $formID, $uid){
     $sql = "DELETE FROM form_files WHERE UID='$uid' AND form_id = '$formID'";
     if($conn->query($sql)) {

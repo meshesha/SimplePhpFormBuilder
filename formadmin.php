@@ -189,6 +189,7 @@ $about_html = ABOUT_APP_AUTHOR;
     <!--///////////////////////////////////////////////////////-->
     <script src="./include/formbuilder/form-builder.min.js"></script>
     <script src="./include/formbuilder/form-render.min.js"></script>
+    <script src="./include/formbuilder/control_plugins/table.js"></script>
 
     <script src="./include/jQueryPopMenu/src/jquery.popmenu.js"></script>
 

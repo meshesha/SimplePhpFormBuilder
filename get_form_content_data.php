@@ -45,17 +45,27 @@ if(isset($_POST['form_id'])){
         $frm_ary = array();
         foreach($form as $fild){
             //remove header and paragraph if exists
-            if($fild->type != "file" && $fild->type != "header" && $fild->type != "paragraph"){ // 
+            if($fild->type != "file" && $fild->type != "header" && $fild->type != "paragraph" && $fild->type != "table"){ // 
                 $frm_ary[] = setFormValues($conn, $form_id, $uid, $fild);
             }
             //if file
             if($fild->type == "file"){
-                $fileTbl = getFilesListTable($conn, $form_id, $uid);
+                $fileTbl = getFilesListTable($conn, $form_id, $uid, $fild->name, $fild->label);
                 $filesTblObj = new stdClass();
                 $filesTblObj->type = "paragraph";
                 $filesTblObj->subtype = "div";
                 $filesTblObj->label = $fileTbl;
-                $filesTblObj->className = "ui-widget-content file-list-table";
+                $filesTblObj->className = "file-list-table";
+                $frm_ary[] = $filesTblObj;
+            }
+            //if table
+            if($fild->type == "table"){
+                $tblContent = getTableContent($conn, $form_id, $uid,$fild->name, $fild->placeholder, $fild->label);
+                $filesTblObj = new stdClass();
+                $filesTblObj->type = "paragraph";
+                $filesTblObj->subtype = "div";
+                $filesTblObj->label = $tblContent;
+                $filesTblObj->className = "file-list-table";
                 $frm_ary[] = $filesTblObj;
             }
 
@@ -183,10 +193,10 @@ function getFormDatetime($conn, $formId, $uid){
     }
     return $datetime;
 }
-function getFilesListTable($conn, $form_id, $uid){
+function getFilesListTable($conn, $form_id, $uid, $name, $label){
     //$tbl = "<table class='table'><tr><td>#</td><td>File name</td><td>Link</td></tr><td>1</td><td>test.png</td><td><a href='#'>open</a></td><tr></tr></table>";
     
-    $tble = "<table class='table table-sm'><thead><tr class='table-primary'><td>#</td><td>File name</td><td>Link</td></tr></thead>";
+    $tble = "<label for='$name'>$label</label><table id='$name' class='table table-sm'><thead><tr class='table-primary'><td>#</td><td>File name</td><td>Link</td></tr></thead>";
     $sql = "SELECT * FROM form_files WHERE UID='$uid' AND form_id='$form_id'";
     if($result = $conn->query($sql)) {
         $count = mysqli_num_rows($result);
@@ -196,12 +206,67 @@ function getFilesListTable($conn, $form_id, $uid){
                 $tble .= "<tr><td>$row_indx</td><td>" .$row['file_name']."</td><td><a href='".$row['file_path']."' target='_blank' class='btn btn-outline-primary' role='button'>open</a></td></tr>";
             }
         }else{
-            $tble .= "<table class='table'><tr><td colspan='3'>No file</td></tr>";
+            $tble .= "<tr><td colspan='3'>No file</td></tr>";
         }
     }else{
         $err =  mysqli_error($conn);
-        $tble .= "<table class='table'><tr><td colspan='3'>sql error:  $err</td></tr>";
+        $tble .= "<tr><td colspan='3'>sql error:  $err</td></tr>";
     }
+    $tble .= "</table><br>";
+    return $tble;
+}
+
+function getTableContent($conn, $form_id, $uid, $tblName, $attr, $label){
+    $columns = $attr;
+    $columns = str_replace("&quot;","\"",$columns);
+    //$columns = str_replace("\n"," ",$columns);
+    //$columns = str_replace("\r"," ",$columns);
+    //return $columns;
+    $columnsObj = json_decode($columns);
+    if(empty($columnsObj)){
+        return $columns;
+    }
+    $headerAry = array();
+    $tble = "<label for='$tblName'>$label</label><table id='tblName' class='table table-bordered table-sm'><thead><tr class='table-primary'>";
+    foreach($columnsObj as $column){
+        $columName = $column->name;
+        $columName = str_replace("&quot;","\"",$columName);
+        $headerAry[] = $columName;
+        $tble .= "<td>".$columName."</td>";
+    }
+    $colsLen = count($headerAry);
+    $tble .= "</tr></thead>";
+    $sql = "SELECT * FROM form_tables WHERE UID='$uid' AND form_id='$form_id' AND table_name='$tblName' ";
+    if($result = $conn->query($sql)) {
+        $count = mysqli_num_rows($result);
+        if($count > 0){
+            $tblRows = "";
+            while($row = mysqli_fetch_assoc($result)){
+                $tblRows = $row['table_data'];
+            }
+            if($tblRows != ""){
+                $tblRows = str_replace("&quot;","\"",$tblRows);
+                $tblRows = str_replace("\n","<br>",$tblRows);
+                $tblRows = str_replace("\r","<br>",$tblRows);
+                $tblRowsObj = json_decode($tblRows);
+                foreach($tblRowsObj as $tblRow){
+                    $tble .= "<tr>";
+                    foreach($tblRow as $tblCol){
+                        $tblCol = str_replace("&quot;","\"",$tblCol);
+                        $tble .= "<td>$tblCol</td>";
+                    }
+                    $tble .= "</tr>";
+                }
+                //$tble .= "<tr><td></td><td></td><td></td></tr>";
+            }
+        }else{
+            $tble .= "<tr><td colspan='$colsLen'>No content</td></tr>";
+        }
+    }else{
+        $err =  mysqli_error($conn);
+        $tble .= "<tr><td colspan='$colsLen'>sql error:  $err</td></tr>";
+    }    
+    $tble .= "</table>";
     return $tble;
 }
 ?>

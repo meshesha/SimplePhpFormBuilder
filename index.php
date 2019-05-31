@@ -161,8 +161,18 @@ $about_html = ABOUT_APP_AUTHOR;
         document.write('<script src="./include/formbuilder/polyfill-4ie11.js"><\/script>');
     </script>
     <!--///////////////////////////////////////////////////////-->
+    
+
+    <!--///////////// formbuilder jquery ///////////////-->
     <script src="./include/formbuilder/form-builder.min.js"></script>
     <script src="./include/formbuilder/form-render.min.js"></script>
+    <script src="./include/formbuilder/control_plugins/table.js"></script>
+    <!--<script src="./include/formbuilder/control_plugins/starRating.min.js"></script>-->
+
+    <!--///////////////////////////////////////////////////////
+
+    <link rel="stylesheet" href="./include/editTable-0.2.1/jquery.edittable.min.css">
+    <script src="./include/editTable-0.2.1/jquery.edittable.min.js"></script>-->
 
     <script src="./include/jQueryPopMenu/src/jquery.popmenu.js"></script>
 
@@ -1128,6 +1138,18 @@ $about_html = ABOUT_APP_AUTHOR;
             var frm_id = $("#form_id").val();
             $("#form_content_id").val(frm_id);
             var form_content = get_form_content(frm_id);
+            /*
+            var tblCols = "";
+            if(form_content != undefined && form_content != null && form_content != "new" && form_content != ""){
+                form_content_obj = JSON.parse(form_content);
+                $.each(form_content_obj, function(i,fld){
+                    if(fld.type == "table"){
+                        //console.log(fld)
+                        tblCols = fld.placeholder;
+                    }
+                })
+            }
+            */
             var $fbEditor = $(document.getElementById('builder-editor'));
             var formBuilder;
             var positionOptions = {
@@ -1161,6 +1183,15 @@ $about_html = ABOUT_APP_AUTHOR;
                     }
                 }
             };
+            var tableBtn = {
+                title: {
+                    label: 'Table Columns',
+                    type: "button",
+                    value: "Edit",
+                    style: "width:80px",
+                    onclick: "setTableSettings(this)"
+                }
+            };
             
             var options = {
                 controlPosition: 'left',
@@ -1169,7 +1200,8 @@ $about_html = ABOUT_APP_AUTHOR;
                 dataType: 'json',
                 typeUserAttrs: {
                     header: positionOptions,
-                    file: maxFileSize
+                    file: maxFileSize,
+                    table: tableBtn
                 },
                 disableFields: ['autocomplete','hidden','button'],
                 controlOrder: [
@@ -1183,6 +1215,9 @@ $about_html = ABOUT_APP_AUTHOR;
                 disabledSubtypes: {
                     file: ['fineuploader'],
                     textarea: ['quill']
+                },
+                disabledFieldButtons: {
+                    table: ['copy'], // disables the copy butotn for table fields
                 },
                 stickyControls: {
                     enable: true
@@ -1212,7 +1247,15 @@ $about_html = ABOUT_APP_AUTHOR;
                                 }
                             });
                         }
+                    },
+                    table: {
+                        onadd: function (fld) {
+                            var $patternField = $(".fld-placeholder", fld);
+                            var $patternWrap = $patternField.parents(".placeholder-wrap:eq(0)");
+                            $patternWrap.hide();
+                        }
                     }
+
                 },
                 actionButtons: [{
                     id: 'preview_form',
@@ -1222,7 +1265,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     events: {
                         click: function() {
                             var data = formBuilder.actions.getData('json', true);
-                    formBuilder.actions.removeField("button-submit-form");
+                            formBuilder.actions.removeField("button-submit-form");
                             showPreview(data);
                         }
                     }
@@ -1243,7 +1286,14 @@ $about_html = ABOUT_APP_AUTHOR;
                     //console.log(formData);x
                     formContentJsonObj = formData;
                     setFormJsonObj(formbuilder_content_dialog);
-                }
+                },
+                onOpenFieldEdit: function(editPanel) {
+                    //console.log()
+                    //console.log($(editPanel).parent()[0].type)
+                    if($(editPanel).parent()[0].type == "table"){
+                        $($($($(editPanel)[0].children[0]).find(".title-wrap")[0]).find(".input-wrap")[0].children[0]).click();
+                    }
+                },
             };
             if(form_content == "new"){
                 $("#form_content_status").val("new");
@@ -1265,12 +1315,17 @@ $about_html = ABOUT_APP_AUTHOR;
             };
             let $renderContainer = $('<form/>');
             $renderContainer.formRender(formRenderOpts);
+            var htmlCod = $renderContainer.formRender("html")
             let html = '<!doctype html><head>' +
                         '<link rel="stylesheet" href="./include/bootstrap/css/bootstrap.min.css">'+
                         '<link rel="stylesheet" href="./css/render_main.css">'+
+                        '<link rel="stylesheet" href="./include/editTable-0.2.1/jquery.edittable.min.css">'+
                          '<title>Form Preview</title></head><body><div class="container"><hr>'+$renderContainer.html()+'</div></body></html>';
             var formPreviewWindow = window.open('', 'formPreview', 'height=480,width=640,toolbar=no,scrollbars=yes');
             formPreviewWindow.document.write(html);
+            var script = document.createElement('script');
+            script.setAttribute('src', './include/editTable-0.2.1/jquery.edittable.min.js');
+            formPreviewWindow.document.head.appendChild(script);
         }
         function setFormJsonObj(dialogBox) {
             var action_type;

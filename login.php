@@ -69,12 +69,14 @@ if(!empty($_POST['username']) && !empty($_POST['password'])){
 					header("Location: index.php");
 				}else if($_SESSION['rederect_url'] == "form_admin"){
 					if(isset($_SESSION['form_id'])){
+						$formId = $_SESSION['form_id'];
 						header("Location: formadmin.php?id=$formId");
 					}else{
 						header("Location: formadmin.php");
 					}
 				}else if($_SESSION['rederect_url'] == "form"){
 					if(isset($_SESSION['form_id'])){
+						$formId = $_SESSION['form_id'];
 						header("Location: form.php?id=$formId");
 					}else{
 						header("Location: form.php");
