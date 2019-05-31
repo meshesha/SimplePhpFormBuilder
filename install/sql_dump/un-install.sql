@@ -34,6 +34,12 @@ DROP TABLE IF EXISTS `form_files`;
 DROP TABLE IF EXISTS `form_list`;
 
 --
+-- Table structure for table `form_tables`
+--
+
+DROP TABLE IF EXISTS `form_tables`;
+
+--
 -- Table structure for table `registration_request`
 --
 
