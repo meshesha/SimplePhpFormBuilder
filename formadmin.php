@@ -437,10 +437,10 @@ $about_html = ABOUT_APP_AUTHOR;
             }
         }
         function getFormDetails(form_id, uid){
-            console.log(form_id, uid)
+            //console.log(form_id, uid)
             if(form_id != "" && uid != ""){
                 var form_content = get_form_content(form_id, uid);
-                console.log(form_content);
+                //console.log(form_content);
                 if(form_content != "new" && form_content != "" && form_content != null && form_content !== undefined){
                     $('#form-render-content').formRender({
                         dataType: 'json',
@@ -479,7 +479,7 @@ $about_html = ABOUT_APP_AUTHOR;
             return rt_data;
         }
         function delFormRecord(form_id, uid){
-            console.log(form_id, uid)
+            //console.log(form_id, uid)
             if(confirm("Are you sure you want to delete this record?")){
                 var frm_data = {
                     del_type: "single",
@@ -506,7 +506,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     url: url,
                     data: {data : JSON.stringify(data_obj)},
                     success: function (response) {
-                        console.log(response);
+                        //console.log(response);
                         if(response == "success"){
                             if (dialogbox !== undefined && dialogbox.hasClass('ui-dialog-content')){
                                 dialogbox.dialog("close");
