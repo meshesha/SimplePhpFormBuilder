@@ -226,6 +226,10 @@ window.fbControls.push(function (controlClass) {
                             }
                         }
                     });
+
+                    if (jQuery().number) {
+                        $("input[type='number']").number();
+                    }
                 }
             }], [{
                 key: "definition",
