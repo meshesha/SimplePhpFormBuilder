@@ -21,6 +21,12 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 ## usage
 * see [wiki-usage](https://github.com/meshesha/SimplePhpFormBuilder/wiki/usage)
 
+## Changelog
+
+* pre-release:
+  - in "User menu" add "Help" button.
+  - in "User menu" add "About" button.
+  
 ## License
     - Copyright © 2017 Meshesha
     - MIT
