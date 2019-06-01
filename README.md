@@ -22,7 +22,27 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 * see [wiki-usage](https://github.com/meshesha/SimplePhpFormBuilder/wiki/usage)
 
 ## Changelog
-
+* ver 1.3.2:
+  - fixed number type input inside table.
+  - fixed "about" loading data.
+  - fixed version number in "About" window. 
+* ver 1.3.1:
+  - convert table.js from es6 to es5 (for supporting ie11).
+  - hide text input witch collect all data in table control.
+  - fix border of text input in table.
+  - fix update.sql.
+  - hide console.log firing data in formadmin.php in "details" click.
+* ver 1.3.0:
+  - added table in controls option.
+* ver 1.2.0:
+  - add "admin" button in form manger page.
+  - add in form's manager "form" button witch display the mata data of the form.
+  - Add a choice if the form is anonymous or not (force user to register).
+    - Changed "publish_type" "User groups" to "Groups" (index.php,formadmin.php).
+    - added new "publish_type" (3:Public-Anonymously,4:Groups-Anonymously) (index.php,formadmin.php,get_form_list_table.php).
+  - If not Anonymously form - add userName (Groups) Or UserIP (Public)  data in form's manager page.
+    - add user id in table (get_form_data_table.php).
+  - Limit sending form - Limit the number of times a form can be submitted (from form settings).
 * ver 1.1.2:
   - fixed - after logout redirect to login.php.
   - fixed - in form process -  cancel restricted.
