@@ -124,48 +124,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `settings`
---
-
-INSERT INTO `settings` (`indx`, `setting_group`, `setting_name`, `setting_nik`, `setting_value`, `options`, `note`) VALUES
-(1, 'general', 'appMode', 'Application Mode', '1', '{\"type\":\"select\", \"values\":[{\"text\":\"Debag\",\"value\":\"0\"},{\"text\":\"Production\",\"value\":\"1\"}] }', 'Application Mode:\r\n0- Debag,\r\n1- Production '),
-(2, 'general', 'maxFileSeize', 'Max file seize', '1048576', '{\"type\":\"text\"}', 'default max file size allowed (Bytes). 1KB = 1024 Bytes. 1MB = 1048576 Bytes'),
-(3, 'email', 'SMTP_host', 'SMTP host', 'localhost', '{\"type\":\"text\"}', 'Sets the SMTP hosts of your Email hosting'),
-(4, 'email', 'SMTP_port', 'SMTP port', '25', '{\"type\":\"number\",\"min\":\"0\"}', 'ets the default SMTP server port'),
-(5, 'email', 'SMTP_Auth', 'SMTP Auth', '0', '{\"type\":\"select\", \"values\":[{\"text\":\"true\",\"value\":\"1\"},{\"text\":\"false\",\"value\":\"0\"}] }', 'Sets SMTP authentication. Utilizes the Username and Password variables'),
-(6, 'email', 'SMTP_Username', 'SMTP Username', '', '{\"type\":\"text\"}', 'Sets SMTP username'),
-(7, 'email', 'SMTP_Password', 'SMTP Password', '', '{\"type\":\"password\"}', 'Sets SMTP password'),
-(8, 'email', 'SMTP_Secure', 'SMTP Secure', '', '{\"type\":\"text\"}', 'Sets connection prefix. Options are \"\", \"ssl\" or \"tls\"'),
-(9, 'general', 'enableUserRegistration', 'Enable User registration', '1', '{\"type\":\"select\",\"values\":[{\"text\":\"Yes\",\"value\":\"1\"},{\"text\":\"No\",\"value\":\"0\"}]}', 'Enable User registration'),
-(10, 'general', 'enableAutoRegistration', 'Auto registration', '1', '{\"type\":\"select\",\"values\":[{\"text\":\"Yes\",\"value\":\"1\"},{\"text\":\"No\",\"value\":\"0\"}]}', 'Accept automatically user registration after verification'),
-(11, 'general', 'newUserDefaultGroupId', 'New User Default Group', '3', '{\"type\":\"sqlselect\",\"table\":\"users_gropes\",\"term\":\"group_status=\'1\'\",\"column_text\":\"group_name\",\"column_value\":\"indx\"}', 'Default Group of new user'),
-(12, 'general', 'enableUserPasswordRecovery', 'Enable User Password Recovery', '1', '{\"type\":\"select\",\"values\":[{\"text\":\"Yes\",\"value\":\"1\"},{\"text\":\"No\",\"value\":\"0\"}]}', 'Enable User Password Recovery\r\n(\"Forgot password\")'),
-(13, 'general', 'setAdministratorUsersAsDefaultFormManager', 'set Administrator Users As Default Form Manager', '1', '{\"type\":\"select\",\"values\":[{\"text\":\"Yes\",\"value\":\"1\"},{\"text\":\"No\",\"value\":\"0\"}]}', 'set Administrator Users As Default Form Manager if form managers not set in form.'),
-(15, 'general', 'enableUsingCookies', 'Enable Cookies', '1', '{\"type\":\"select\",\"values\":[{\"text\":\"Yes\",\"value\":\"1\"},{\"text\":\"No\",\"value\":\"0\"}]}', 'Allow cookies to be used to avoid filling out a form more than once'),
-(16, 'general', 'cookiesLifeTime', 'Cookies Lifetime', '365', '{\"type\":\"text\"}', 'Cookies lifetime (in days).'),
-(17, 'email', 'from_email', 'From Email', 'info@localhost.com', '{\"type\":\"text\"}', 'Sets the From email address for the message'),
-(18, 'email', 'from_name', 'From Name', 'localhost', '{\"type\":\"text\"}', 'Sets the From name of the message'),
-(19, 'email', 'verification_mail_subject', 'Verification Mail Subject', 'Email Verification', '{\"type\":\"text\"}', 'Sets the Subject of the message'),
-(20, 'email', 'reset_pass_mail_subject', 'Reset password mail subject', 'Reset password', '{\"type\":\"text\"}', 'Sets the Subject of the Reset password mail message'),
-(21, 'general', 'enableFormManagersToEditFormTamplate', 'Enable Form-Managers Edit Form Tamplate', '0', '{\"type\":\"select\",\"values\":[{\"text\":\"Yes\",\"value\":\"1\"},{\"text\":\"No\",\"value\":\"0\"}]}', 'Enable Form-Managers Edit Form Tamplate'),
-(22, 'form_style', 'form_body_bgcolor_1', 'Form body bgcolor 1', 'rgba(44, 43, 239, 0.55)', '{\"type\":\"color\"}', 'Sets form body bgcolor 1'),
-(23, 'form_style', 'form_body_bgcolor_2', 'Form body bgcolor 2', 'rgb(29, 59, 238)', '{\"type\":\"color\"}', 'Sets form body bgcolor 2'),
-(24, 'form_style', 'form_body_bgcoloe_angle', 'Form body bgcolors angle', '0', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"360\",\"step\":\"1\"}', 'Linear gradient color angle'),
-(25, 'form_style', 'max_body_bgImg_size', 'Max Form body bgImage size', '1048576', '{\"type\":\"text\"}', 'Max Form body bgImage size allowed (Bytes). 1KB = 1024 Bytes. 1MB = 1048576 Bytes'),
-(26, 'form_style', 'form_body_bgImage_attach', 'Form body bgImage attachment', 'scroll', '{\"type\":\"select\", \"values\":[{\"text\":\"scroll\",\"value\":\"scroll\"},{\"text\":\"fixed\",\"value\":\"fixed\"}]}', 'Form body bgImage attachment'),
-(27, 'form_style', 'form_body_bgImage_position', 'Form body bgImage position', 'center center', '{\"type\":\"select\", \"values\":[{\"text\":\"left top\",\"value\":\"left top\"},{\"text\":\"left center\",\"value\":\"left center\"},{\"text\":\"left bottom\",\"value\":\"left bottom\"},{\"text\":\"right top\",\"value\":\"right top\"},{\"text\":\"right center\",\"value\":\"right center\"},{\"text\":\"right bottom\",\"value\":\"right bottom\"},{\"text\":\"center top\",\"value\":\"center top\"},{\"text\":\"center center\",\"value\":\"center center\"},{\"text\":\"center bottom\",\"value\":\"center bottom\"}]}', 'Form body bgImage position'),
-(28, 'form_style', 'form_body_bgImage_repet', 'Form body bgImage repet', 'repeat', '{\"type\":\"select\", \"values\":[{\"text\":\"no-repeat\",\"value\":\"no-repeat\"},{\"text\":\"repeat\",\"value\":\"repeat\"},{\"text\":\"repeat-x\",\"value\":\"repeat-x\"},{\"text\":\"repeat-y\",\"value\":\"repeat-y\"}]}', 'Form body bgImage repet'),
-(29, 'form_style', 'form_body_bgImage_size', 'Form body bgImage size', 'auto', '{\"type\":\"select\", \"values\":[{\"text\":\"Orginal size\",\"value\":\"auto\"},{\"text\":\"contain\",\"value\":\"contain\"},{\"text\":\"cover\",\"value\":\"cover\"}]}', 'Form body bgImage size'),
-(30, 'form_style', 'form_width', 'Form width', '80', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form width (%)'),
-(31, 'form_style', 'form_vertical_margin', 'Form width', '5', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form Vertical margin (%)'),
-(32, 'form_style', 'form_Background_color', 'Form bgcolor', 'rgba(255, 255, 255, 1)', '{\"type\":\"color\"}', 'Form Background Color'),
-(33, 'form_style', 'form_opacity', 'Form Opacity', '100', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form Opacity (%)'),
-(34, 'form_style', 'form_border_size', 'Form border size', '1', '{\"type\":\"number\",\"min\":\"0\",\"step\":\"1\"}', 'Form border size (px)'),
-(35, 'form_style', 'form_border_type', 'Form border type', 'solid', '{\"type\":\"select\", \"values\":[{\"text\":\"solid\",\"value\":\"solid\"},{\"text\":\"dotted\",\"value\":\"dotted\"},{\"text\":\"dashed\",\"value\":\"dashed\"},{\"text\":\"double\",\"value\":\"double\"},{\"text\":\"groove\",\"value\":\"groove\"},{\"text\":\"ridge\",\"value\":\"ridge\"},{\"text\":\"inset\",\"value\":\"inset\"},{\"text\":\"outset\",\"value\":\"outset\"},{\"text\":\"none\",\"value\":\"none\"}]}', 'Form border type'),
-(36, 'form_style', 'form_border_color', 'Form border color', 'rgba(0, 0, 0, 1)', '{\"type\":\"color\"}', 'Form border color'),
-(37, 'form_style', 'form_border_radius', 'Form border radius', '5', '{\"type\":\"number\",\"min\":\"0\",\"step\":\"1\"}', 'Form border radius size (px)');
-
 -- --------------------------------------------------------
 
 --
@@ -183,13 +141,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `status`, `groups`, `forgot_verify`) VALUES
-(1, 'admin', 'admin@localhost.com', '$2y$10$FTyD8hpjyNVCbxsdM2.M5eIEm1OQ0NqXj7Qyv60X38rR6Nxh/BoRy', '1', '1', '');
-
 -- --------------------------------------------------------
 
 --
@@ -203,12 +154,3 @@ CREATE TABLE IF NOT EXISTS `users_gropes` (
   `admin_ids` varchar(255) NOT NULL DEFAULT '1',
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `users_gropes`
---
-
-INSERT INTO `users_gropes` (`indx`, `group_name`, `group_status`, `admin_ids`) VALUES
-(1, 'administrator', '1', '1'),
-(2, 'managers', '1', '1'),
-(3, 'registered', '1', '1');
