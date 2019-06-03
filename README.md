@@ -22,6 +22,10 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 * see [wiki-usage](https://github.com/meshesha/SimplePhpFormBuilder/wiki/usage)
 
 ## Changelog
+* ver 1.3.3:       
+   - fixed: On the Form Builder (Form Template) screen, when typing,
+     in the input property fields, text with double or single quotation marks,
+      Causes the problem when you reopen the form to edit the form.
 * ver 1.3.2:
   - fixed number type input inside table.
   - fixed "about" loading data.
