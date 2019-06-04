@@ -22,7 +22,12 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 * see [wiki-usage](https://github.com/meshesha/SimplePhpFormBuilder/wiki/usage)
 
 ## Changelog
-* ver 1.3.3:       
+
+* ver 1.3.4:
+  - in table plugin, the customize number input appear only if set value in the field.
+  - fixed - in table plugin when add new row the number plugin not work;
+  - fixed - in table plugin when add new row the datepicker plugin not work in IE11 browser.
+* ver 1.3.3:
    - fixed: On the Form Builder (Form Template) screen, when typing,
      in the input property fields, text with double or single quotation marks,
       Causes the problem when you reopen the form to edit the form.
