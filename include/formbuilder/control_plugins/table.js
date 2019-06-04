@@ -181,6 +181,13 @@ window.fbControls.push(function (controlClass) {
                             'number': {
                                 html: '<input type="number" class="form-control editable-input" onkeyup="editableGetData(this,\'' + editTableId + '\')"/>',
                                 getValue: function getValue(input) {
+                                    if (jQuery().number) {
+                                        if ($(input).val() != "") {
+                                            $(input).number();
+                                        } else {
+                                            $(input).number("destroy");
+                                        }
+                                    }
                                     return $(input).val();
                                 },
                                 setValue: function setValue(input, value, i) {
@@ -197,7 +204,7 @@ window.fbControls.push(function (controlClass) {
                                 }
                             },
                             'date': {
-                                html: '<input type="date" class="form-control editable-input" onchange="editableGetData(this,\'' + editTableId + '\')"/>',
+                                html: '<input type="date" class="form-control editable-input" onfocus="showDataPicker(this)" onchange="editableGetData(this,\'' + editTableId + '\')"/>',
                                 getValue: function getValue(input) {
                                     return $(input).val();
                                 },
@@ -226,10 +233,6 @@ window.fbControls.push(function (controlClass) {
                             }
                         }
                     });
-
-                    if (jQuery().number) {
-                        $("input[type='number']").number();
-                    }
                 }
             }], [{
                 key: "definition",
@@ -254,6 +257,18 @@ window.fbControls.push(function (controlClass) {
     controlClass.register('table', controlTable);
     return controlTable;
 });
+
+function showDataPicker(obj) {
+    if (jQuery().datepicker) {
+        //"input[type='date']"
+        if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
+            $(obj).datepicker({
+                dateFormat: "yy-mm-dd"
+            });
+            $(obj).datepicker("show");
+        }
+    }
+};
 
 function setTableSettings(obj) {
     //console.log()
