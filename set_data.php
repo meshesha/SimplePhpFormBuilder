@@ -299,11 +299,12 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
 }
 function satNewTemplate($conn,$data_ary){
     $form_obj = $data_ary["template"];
+    //$form_obj = mysqli_real_escape_string($conn, $form_obj);
     $form_id = $data_ary["record_id"];
     $submitAndLablsAry = getFormSubmitFields($form_obj);
     $fields_str = $submitAndLablsAry[0];
     $form_labels_str = $submitAndLablsAry[1];
-    //$fldName = mysqli_real_escape_string($conn, $fldName);
+    //$form_labels_str = mysqli_real_escape_string($conn, $form_labels_str);
     $sql = "INSERT INTO  form_content (form_id,form_form,submit_fields,form_labels) VALUES ( 
         '{$form_id}','{$form_obj}','{$fields_str}','{$form_labels_str}')";
 
@@ -336,7 +337,7 @@ function getFormSubmitFields($formObj){
             $form_labels_ary[] = $field->label;
         }
     }
-    $form_labels_str = json_encode($form_labels_ary);
+    $form_labels_str = json_encode($form_labels_ary, JSON_UNESCAPED_UNICODE);
     $fields_str = json_encode($fields_ary);
     return [$fields_str,$form_labels_str];
 }
