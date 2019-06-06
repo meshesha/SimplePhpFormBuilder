@@ -23,6 +23,8 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog
 
+* ver 1.3.5:
+  - fixed - Unicode characters issue.
 * ver 1.3.4:
   - in table plugin, the customize number input appear only if set value in the field.
   - fixed - in table plugin when add new row the number plugin not work;
