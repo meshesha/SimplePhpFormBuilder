@@ -35,8 +35,12 @@ function getUser($conn){
                 $params_cell[] = $row["email"]; 
                 $params_cell[] = $row["groups"];
                 $params_cell[] = $row["status"]; 
-                $params_cell[] = "<button type='button' class='btn btn-primary btn-sm' onclick='addUpdateUser(\"update\",\"$row_id\")' >Setting</button>
-                                    <button type='button' class='btn btn-danger btn-sm' onclick='delete_user(\"$row_id\")' >Delete</button>"; 
+                $btn = "<button type='button' class='btn btn-primary btn-sm' onclick='addUpdateUser(\"update\",\"$row_id\")' >Setting</button>";
+                if($row_id != 1){ //Admin user
+                    $btn .=  "<button type='button' class='btn btn-danger btn-sm' onclick='delete_user(\"$row_id\")' >Delete</button>"; 
+                }
+                                   
+                $params_cell[] = $btn;
                 $params_row[] = $params_cell;
                 $count_indx++;
             }
@@ -81,9 +85,12 @@ function getGroups($conn){
                 $params_cell[] = $row["group_status"]; 
                 $params_cell[] = $statusName[(int)$row["group_status"]];
                 $admins_id = $row["admin_ids"];
-                $params_cell[] = getUserNames($conn,$admins_id); 
-                $params_cell[] = "<button type='button' class='btn btn-primary btn-sm' onclick='addUpdateGroup(\"update\",\"$row_id\",\"$admins_id\",this)' >Setting</button>
-                                    <button type='button' class='btn btn-danger btn-sm' onclick='delete_group(\"$row_id\")' >Delete</button>"; 
+                $params_cell[] = getUserNames($conn,$admins_id);
+                $btn = "<button type='button' class='btn btn-primary btn-sm' onclick='addUpdateGroup(\"update\",\"$row_id\",\"$admins_id\",this)' >Setting</button>";
+                if($row_id != 1 && $row_id != 2){ //1=administrator group, 2=Managers group
+                    $btn .= "<button type='button' class='btn btn-danger btn-sm' onclick='delete_group(\"$row_id\")' >Delete</button>";
+                }
+                $params_cell[] = $btn;
                 $params_row[] = $params_cell;
                 $count_indx++;
             }
@@ -477,6 +484,11 @@ function add_update_user(dialogBox){
     var usr_id = $("#user_id").val();
     var usr_name = $("#user_name").val();
     var usr_pass = $("#user_password").val();
+    var conf_pass = $("#confirm_password").val();
+    if(usr_pass != "" && usr_pass != conf_pass){
+        alert("confirm password - Passwords Don't Match");
+        return false;
+    }
     var usr_email = $("#user_email").val();
     var usr_groups = $("#groupList").val();
     var usr_pblsh_stt = $("#user_status").val();

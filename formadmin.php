@@ -1,8 +1,14 @@
 <?php
-
 require 'settings/tracy-2.6.2/src/tracy.php';
 use Tracy\Debugger;
-
+if(!isset($isGetSetting)){
+    require 'get_setting_data.php';
+}
+$appMode = getSetting("", "appMode");
+if($appMode == "0"){
+    //Debug mode
+    Debugger::enable();
+}
 $formId = "";
 if(isset($_GET["id"])){
     $formId = $_GET["id"];
@@ -22,11 +28,12 @@ $_SESSION['form_id'] = $formId;
 
 require 'settings/database.login.php';
 
-$formDataAry = getFormType($conn, $formId);
+$formDataAry = getFormData($conn, $formId);
 $formType = $formDataAry[0];
 $formStatus = $formDataAry[1];
 $formAmins = $formDataAry[2];
 $formTitle = $formDataAry[3];
+$formStyle = $formDataAry[4];
 
 
 //echo "Typr:$formType , Status:$formStatus, formAdmins: $formAmins, title: $formTitle <br>";
@@ -111,8 +118,7 @@ function init($conn, $formId, $user,$formAmins){
             $labeldObjz->index = $lastIdx + 1;
             $labeldObjz->title = "";
             $labeld_ary[] = $labeldObjz;
-            $labels_str = json_encode($labeld_ary);
-            //echo " <script>console.log('Labels: $labeld_str')</script> ";
+            $labels_str = json_encode($labeld_ary, JSON_UNESCAPED_UNICODE);
             return ["adminuser","",$labels_str];
         }else{
             return ["adminuser","",""];
@@ -122,15 +128,22 @@ function init($conn, $formId, $user,$formAmins){
         return ["noadmin",$msg,""];
     }
 }
-function getFormType($conn, $formId){
-    $records = $conn->prepare('SELECT form_title,publish_type,publish_status,admin_users FROM form_list WHERE indx = :formid');
+
+function getFormData($conn, $formId){
+    $records = $conn->prepare('SELECT * FROM form_list WHERE indx = :formid');
 	$records->bindParam(':formid',$formId);
 	$records->execute();
     $results = $records->fetch(PDO::FETCH_ASSOC);
-    if(count($results) > 0){
-        return [$results['publish_type'],$results['publish_status'],$results['admin_users'],$results['form_title']];
+    if($results != "" && count($results) > 0){
+        return [
+            $results['publish_type'],
+            $results['publish_status'],
+            $results['admin_users'],
+            $results['form_title'],
+            $results['form_genral_style']
+        ];
     }else{
-        return ["","","",""];
+        return ["","","","",""];
     }
 }
 
@@ -143,31 +156,43 @@ function getFormLabels($conn, $formId){
     return json_decode($results['form_labels']);
 }
 
-if(!isset($isGetSetting)){
-    require 'get_setting_data.php';
-}
+
 
 ////////get settings ///////
 $isRegistrationEnabled = getSetting("", "enableUserRegistration");
 $isPassRecoveryEnabled = getSetting("", "enableUserPasswordRecovery");
-$appMode = getSetting("", "appMode");
-if($appMode == "0"){
-    //Debug mode
-    Debugger::enable();
-}
 
 //echo "isRegistrationEnabled: ".$isRegistrationEnabled;
 
 include "settings/about.php";
 $about_html = ABOUT_APP_AUTHOR;
+
+////////////////////////Form Style params/////////////
+//echo "Style: $formStyle";
+if($formStyle != null && $formStyle != ""){
+    $formStyleObj = json_decode($formStyle);
+
+    $formDirection = $formStyleObj->form_body_direction;//ltr,rtl
+    if($formDirection == "rtl"){
+        $bodyDirection = "right";
+    }else{
+        $bodyDirection = "left";
+    }
+}else{
+    $formDirection = "ltr";
+    $bodyDirection = "left";
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <title><?= $formTitle . " - Manager" ?></title>
     
     <?php if($isAdmin && !empty($user) ): ?>
+
 
     <link rel="stylesheet" href="./include/fonts/fontawesome/css/fontawesome-all.min.css">
     <!--<link rel="stylesheet" href="./fonts/fontawesome/css/awesome-bootstrap-checkbox.css">-->
@@ -210,20 +235,28 @@ $about_html = ABOUT_APP_AUTHOR;
     <script type="text/javascript" src="./include/select2/dist/js/select2.min.js"></script>
     
     <link rel="stylesheet" href="./css/formadmin_main.css">
+    <style>
+        /*RTL form preview*/
+        #form-content-warper{
+            direction: <?=$formDirection ?>;
+        }
+        #form-content-warper form{
+            text-align: <?=$bodyDirection ?>;
+        }
+    </style>
     <script type="text/javascript">
         var form_content_dialog,general_dialog;
         $(function () {
-            $("#main-vewer-menu").popmenu({
-                'width': '100px',         // width of menu
-                'top': '0',              // pixels that move up
-                'left': '0',              // pixels that move left
-                'iconSize': '50px' // size of menu's buttons
-            });
+            var isFullMode = false;
             form_content_dialog = $("#form-content-warper").dialog({
                 modal: true,
                 autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
                 width: 0.9*$(window).width(),
-                height: 0.9*$(window).height()/*,
+                height: 0.9*$(window).height(),
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }/*,
                 buttons: [
                     {
                     text: "Cancel",
@@ -238,10 +271,67 @@ $about_html = ABOUT_APP_AUTHOR;
             general_dialog = $("#formbuilder_general_dialog").dialog({
                 modal: true,
                 autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
                 width: 0.5*$(window).width(),
-                height: 0.5*$(window).height()
+                height: 0.5*$(window).height(),
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
             });
+
+            $(".formbuilder_dialg_win")
+                .children(".ui-dialog-titlebar")
+                .append("<button title='full screen' class='ui-button ui-corner-all ui-widget ui-button-icon-only ui-button-fullscreen'><span class='fullscreen-btn ui-button-icon ui-icon ui-icon-arrow-4-diag'></span></button>");
+
+            var oldWidth, oldHeight , oldTop, oldLeft;
+            $(".fullscreen-btn").click(function(){
+                var dialogWin = $(this).parent().parent().parent();
+                var contentWin =  $(dialogWin).children(".ui-dialog-titlebar").next();
+                //var footTool = $(dialogWin).children(".ui-dialog-buttonpane");
+                //console.log(contentWin)
+                var winWidth = $(window).width();
+                var winHeight = $(window).height();
+                if(isFullMode){
+                    isFullMode = false;
+                    //set full screen state
+                    $(dialogWin).css("top",oldTop);
+                    $(dialogWin).css("left",oldLeft);
+                    //$(dialogWin).scrollLeft(0);
+                    $(dialogWin).width(oldWidth);
+                    $(dialogWin).height(oldHeight);
+
+                }else{
+                    isFullMode = true;
+                    //save original state
+                    oldWidth = $(dialogWin).width();
+                    oldHeight = $(dialogWin).height();
+                    oldTop = $(dialogWin).css("top");
+                    oldLeft = $(dialogWin).css("left");
+                    //set full screen state
+                    $(dialogWin).css("top",0);
+                    $(dialogWin).css("left",0);
+                    //$(dialogWin).scrollLeft(0);
+                    $(dialogWin).width(winWidth);
+                    $(dialogWin).height(winHeight);
+                    //fix content height
+                    //var footToolHeight = $(footTool).height();
+                    $(contentWin).css("height","80%");
+                }
+
+                //console.log()
+                //alert('fullscreen');
+            });
+            //////////////////////////////////////////////////////////////////////////
+            
+            $("#main-vewer-menu").popmenu({
+                'width': '100px',         // width of menu
+                'top': '0',              // pixels that move up
+                'left': '0',              // pixels that move left
+                'iconSize': '50px' // size of menu's buttons
+            });
+
         });
+    
 
         function openLinkInNewTab(url) {
             var win = window.open(url, '_blank');
@@ -255,6 +345,121 @@ $about_html = ABOUT_APP_AUTHOR;
             general_dialog.dialog("option","title","About");
             general_dialog.dialog("open");
             $("#main-vewer-menu ul").hide();
+        }
+        
+        function checkNewVer(currentVer){
+            //alert("currentVer: " + currentVer)
+            $("#app-ver-check-result").html("<img src='images/spinner.gif' />");
+            $("#app-ver-check-result").show();
+            var appUrl = "https://api.github.com/repos/meshesha/SimplePhpFormBuilder/releases/latest";
+            $.ajax({
+                type: "GET",
+                url: appUrl,
+                dataType: "json",
+                success: function (response) {
+                    if(response != "" && response !== undefined && response !== null){
+                        var new_ver_str = response.tag_name.toLowerCase();
+                        var new_ver_url = response.html_url;
+                        var isDraft = response.draft;
+                        var isPrerelease = response.prerelease;
+                        var note = response.body.replace(/\r\n/g,"<br>");
+                        var new_ver_num = "";
+                        var verPrefix = ["v","v.","ver","ver."];
+                        $.each(verPrefix, function(i,prefix){
+                            var prefixLoc = new_ver_str.indexOf(prefix);
+                            if(prefixLoc != -1){
+                                new_ver_num = new_ver_str.substr((prefixLoc + 1));
+                            }
+                        })
+                        if(currentVer == new_ver_num){
+                            $("#app-ver-check-result").html("SimplePhpFormBuilder is up to date.")
+                        }else{
+                            var currentVerAry = [];
+                            if(currentVer.indexOf(".") != -1){
+                                currentVerAry = currentVer.split(".");
+                            }else{
+                                currentVerAry[0] = currentVer;
+                            }
+                            var newVerNumAry = [];
+                            if(new_ver_num.indexOf(".") != -1){
+                                newVerNumAry = new_ver_num.split(".");
+                            }else{
+                                newVerNumAry[0] = new_ver_num;
+                            }
+                            /**Semantic Versioning:
+                            1.0.0
+                            1.0.0
+                            1.10.5-RC1
+                            4.4.4-beta2
+                            2.0.0-alpha
+                            2.0.4-p1
+                            */
+                            if(currentVerAry.length == 3 && newVerNumAry.length == 3){
+                                var newVerNum3thd = "";
+                                var newVerSuffix = "";
+                                if(newVerNumAry[2].indexOf("-") != -1){
+                                    newVernum3thdAry = newVerNumAry[2].split("-");
+                                    newVerNum3thd = newVernum3thdAry[0];
+                                    newVerSuffix =  newVernum3thdAry[1];
+                                }else{
+                                    newVerNum3thd = newVerNumAry[2];
+                                }
+                                var crntVerNum3thd = "";
+                                var crntVerSuffix = "";
+                                if(currentVerAry[2].indexOf("-") != -1){
+                                    crntVerNum3thdAry = currentVerAry[2].split("-");
+                                    crntVerNum3thd = crntVerNum3thdAry[0];
+                                    crntVerSuffix =  crntVerNum3thdAry[1];
+                                }else{
+                                    crntVerNum3thd = currentVerAry[2];
+                                }
+                                if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
+                                        Number(newVerNumAry[1]) > Number(currentVerAry[1]) ||
+                                        Number(newVerNum3thd) > Number(crntVerNum3thd)){
+                                    if(isDraft && isPrerelease){
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
+                                    }else if(!isDraft && isPrerelease){
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release</p>");
+                                    }else if(isDraft && !isPrerelease){
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is a draft</p>");
+                                    }else{
+                                        if(newVerSuffix == ""){
+                                            $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                        }else{
+                                            $("#app-ver-check-result").html("<p>There is a new version but this is '"  +newVerSuffix + "'</p>");
+                                        }
+                                    }
+                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: " + new_ver_num + "<br>" +  note + "</p>");
+                                }else if(Number(newVerNumAry[0]) == Number(currentVerAry[0]) &&
+                                        Number(newVerNumAry[1]) == Number(currentVerAry[1]) &&
+                                        Number(newVerNum3thd) == Number(crntVerNum3thd)){ 
+                                    if(newVerSuffix != ""  && newVerSuffix != crntVerSuffix){
+                                        $("#app-ver-check-result").html("<p>There is a new '"+newVerSuffix+"' version</p>");
+                                        $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                        $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + "<br>" + note + "</p>");
+                                    }else if(newVerSuffix == ""  && newVerSuffix != crntVerSuffix){
+                                        $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                        $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                        $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + " (stable)<br>" + note + "</p>");
+                                    }
+                                }else{
+                                    $("#app-ver-check-result").html("This version is newer than what exists in the Github :)")
+                                }
+                            }else{
+                                $("#app-ver-check-result").html("<span style='color:red;'>Error: Semantic Versioning error.</span>");
+                            }
+                            //console.log(new_ver_str,new_ver_num, new_ver_url);
+                        }
+                    }else{
+                        $("#app-ver-check-result").html("<span style='color:red;'>Error: the github api response no json format</span>");
+                    }
+                },
+                error:function (response) {
+                    $("#app-ver-check-result").html("<span style='color:red;'>Error:" + JSON.stringify(response) + "</span>");
+                    //alert(response.responseText)
+                }
+            });
         }
     </script>
 </head>
@@ -554,9 +759,15 @@ $about_html = ABOUT_APP_AUTHOR;
             var uInput = "<input type='text' id='user_name' value = '" + userName + "'  />";
             var uName = addElement("User Name","user_name", uInput);
             uName.appendTo(gContent);
+
             var pInput = "<input type='password' id='user_password' value = '" + userPass + "' />";
             var uPass = addElement("Password","user_password", pInput);
             uPass.appendTo(gContent);
+
+            var cPInput = "<input type='password' id='confirm_password' value = '' />";
+            var cPPass = addElement("Confirm password","confirm_password", cPInput);
+            cPPass.appendTo(gContent);
+
             var eInput = "<input type='text' id='user_email' value = '" + userEmail + "' />";
             var uEmail = addElement("Email","user_email", eInput);
             uEmail.appendTo(gContent);
@@ -606,6 +817,11 @@ $about_html = ABOUT_APP_AUTHOR;
             var usr_id = $("#user_id").val();
             var usr_name = $("#user_name").val();
             var usr_pass = $("#user_password").val();
+            var conf_pass = $("#confirm_password").val();
+            if(usr_pass != "" && usr_pass != conf_pass){
+                alert("confirm password - Passwords Don't Match");
+                return false;
+            }
             var usr_email = $("#user_email").val();
             var usr_groups = $("#groupList").val();
             var usr_pblsh_stt = $("#user_status").val();
@@ -810,9 +1026,11 @@ $about_html = ABOUT_APP_AUTHOR;
             var uName = addElement("Publish type","publish_type", uInput);
             uName.appendTo(gContent);
 
-            var uInput = "<input type='text' id='groups_list' value = '" + formGroupsNames + "' disabled  />";
-            var uName = addElement("Groups","groups_list", uInput);
-            uName.appendTo(gContent);
+            if(publishTypeId == "2" || publishTypeId == "4"){
+                var uInput = "<input type='text' id='groups_list' value = '" + formGroupsNames + "' disabled  />";
+                var uName = addElement("Groups","groups_list", uInput);
+                uName.appendTo(gContent);
+            }
 
             var uInput = "<input type='text' id='form_managers_list' value = '" + formMngrsNames + "' disabled />";
             var uName = addElement("Form Managers","form_managers_list", uInput);
@@ -820,6 +1038,12 @@ $about_html = ABOUT_APP_AUTHOR;
 
             var uInput = "<input type='text' id='status_type' value = '" + statusTypeName[statusTypeId] + "' disabled  />";
             var uName = addElement("Status","status_type", uInput);
+            uName.appendTo(gContent);
+
+            var frmDir = '<?=$formDirection ?>';
+            frmDir = frmDir.toUpperCase() + " (" + ((frmDir == "ltr")?"Left To Right":"Right To Left") + ")";
+            var uInput = "<input type='text' id='form_direction' value = '" + frmDir + "' disabled  />";
+            var uName = addElement("Form direction","form_direction", uInput);
             uName.appendTo(gContent);
 
             var uInput = "<textarea id='form_note' disabled>" + formNots + "</textarea>";

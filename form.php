@@ -126,8 +126,16 @@ function getUserIp(){
 ////////////////////////Form Style params/////////////
 //echo "Style: $formStyle";
 if($formStyle != null && $formStyle != ""){
-    //form background style settings
     $formStyleObj = json_decode($formStyle);
+
+    $formDirection = $formStyleObj->form_body_direction;//ltr,rtl
+    if($formDirection == "rtl"){
+        $bodyDirection = "right";
+    }else{
+        $bodyDirection = "left";
+    }
+
+    //form background style settings
     if(isset($formStyleObj->form_body_bgImage)){
         //echo "<script>console.log('{$formStyleObj->form_body_bgImage}')</script>";
         $formBgImagePath = $formStyleObj->form_body_bgImage;
@@ -154,6 +162,8 @@ if($formStyle != null && $formStyle != ""){
     $formBorderRaduse =  $formStyleObj->form_border_radius . "px";//"20px";
     $formBorder = "$formBorderSize $formBorderType $formBorderColor"; //1px solid black
 }else{
+    $formDirection = "ltr"; //ltr,rtl
+    $bodyDirection = "left";
     //form background style settings
     $formBgImagePath = "";
     $gradientAngle = "0deg"; 
@@ -190,6 +200,7 @@ function fixRGBtoRGBA($rgb){
 <html>
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta charset="UTF-8">
     <title><?= $formTitle ?></title>
 
     <?php if(!empty($user) ): ?>
@@ -208,7 +219,7 @@ function fixRGBtoRGBA($rgb){
     <!--///////////////////////////////////////////////////////-->
     <script src="./include/formbuilder/form-render.min.js"></script>
     <script src="./include/formbuilder/control_plugins/table.js"></script>
-    <script src="./include/formbuilder/control_plugins/starRating.min.js"></script>
+    <!--<script src="./include/formbuilder/control_plugins/starRating.min.js"></script>-->
 
         <!-- Number fields handler-->
     <link rel="stylesheet" href="./include/Formstone-1.4.13.1/css/number.css">
@@ -220,6 +231,7 @@ function fixRGBtoRGBA($rgb){
     html, body {
         height: 100%;
         min-height: 100%;
+        text-align: <?=$bodyDirection ?>;
     }
     body{
         margin:0 auto;
@@ -236,6 +248,9 @@ function fixRGBtoRGBA($rgb){
         transform: translateY(<?=$formVertical ?>);
         background-color: <?=$formBgColor ?>;
         opacity:  <?=$formOpacity ?>;
+    }
+    .rendered-form .form-group{
+        direction: <?=$formDirection ?>;
     }
     </style>
     <link rel="stylesheet" href="./css/form_main.css">

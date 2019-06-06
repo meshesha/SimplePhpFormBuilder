@@ -2,6 +2,16 @@
 
 require 'settings/tracy-2.6.2/src/tracy.php';
 use Tracy\Debugger;
+////////get settings ///////
+if(!isset($isGetSetting)){
+    require 'get_setting_data.php';
+}
+$appMode = getSetting("", "appMode");
+
+if($appMode == "0"){
+	//Debug mode
+	Debugger::enable();
+}
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -186,17 +196,12 @@ function isFormManager($conn, $userId){
     }
 }
 
-////////get settings ///////
-if(!isset($isGetSetting)){
-    require 'get_setting_data.php';
-}
+
 $isRegistrationEnabled = getSetting("", "enableUserRegistration");
 $isPassRecoveryEnabled = getSetting("", "enableUserPasswordRecovery");
-$appMode = getSetting("", "appMode");
-if($appMode == "0"){
-    //Debug mode
-    Debugger::enable();
-}
+
+/*
+*/
 ?>
 <!DOCTYPE html>
 <html lang="en">

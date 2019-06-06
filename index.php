@@ -139,9 +139,10 @@ $about_html = ABOUT_APP_AUTHOR;
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Form builder</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <link rel="stylesheet" type="text/css" href="./css/index_main.css">
+    <meta charset="UTF-8">
+    
+    <title>Form builder</title>
     <link rel="stylesheet" href="./include/fonts/fontawesome/css/fontawesome-all.min.css">
 
     <link rel="stylesheet" href="./include/bootstrap/css/bootstrap.min.css">
@@ -201,12 +202,15 @@ $about_html = ABOUT_APP_AUTHOR;
     <link rel="stylesheet" href="./include/jstree/themes/default/style.min.css" />
     <script src="./include/jstree/jstree.min.js"></script>
 
-
     <!-- Number fields handler-->
     <link rel="stylesheet" href="./include/Formstone-1.4.13.1/css/number.css">
     <link href="./include/Formstone-1.4.13.1/css/themes/light.css" rel="stylesheet">
     <script src="./include/Formstone-1.4.13.1/js/core.js"></script>
     <script src="./include/Formstone-1.4.13.1/js/number.js"></script>
+
+
+    
+    <link rel="stylesheet" type="text/css" href="./css/index_main.css">
 
 	<?php if( !empty($user)): ?>
     <script type="text/javascript">
@@ -214,10 +218,13 @@ $about_html = ABOUT_APP_AUTHOR;
             formbuilder_content_dialog,
             general_dialog,
             general_style_dialog;
+
         $(function () {
+             var isFullMode = false;
              formbuilder_dialog = $("#formbuilder_form").dialog({
                 modal: true,
                 autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
                 width: 0.7*$(window).width(),
                 height: 0.8*$(window).height(),
                 buttons: [
@@ -236,36 +243,86 @@ $about_html = ABOUT_APP_AUTHOR;
                         }
                     }
 
-                ]
+                ],
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
             });
             formbuilder_content_dialog = $("#formbuilder_content").dialog({
                 modal: true,
                 autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
                 width: 0.9*$(window).width(),
-                height: 0.9*$(window).height()/*,
-                buttons: [
-                    {
-                    text: "Cancel",
-                    class: "btn btn-primary btn-lg",
-                    click: function() {
-                        $( this ).dialog( "close" );
-                        }
-                    }
-
-                ]*/
+                height: 0.9*$(window).height(),
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
             });
             general_dialog = $("#formbuilder_general_dialog").dialog({
                 modal: true,
                 autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
                 width: 0.5*$(window).width(),
-                height: 0.5*$(window).height()
+                height: 0.5*$(window).height(),
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
             });
             general_style_dialog = $("#form_general_style").dialog({
                 modal: true,
                 autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
                 width: 0.7*$(window).width(),
-                height: 0.8*$(window).height()
+                height: 0.8*$(window).height(),
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
             });
+            
+            $(".formbuilder_dialg_win")
+                .children(".ui-dialog-titlebar")
+                .append("<button title='full screen' class='ui-button ui-corner-all ui-widget ui-button-icon-only ui-button-fullscreen'><span class='fullscreen-btn ui-button-icon ui-icon ui-icon-arrow-4-diag'></span></button>");
+
+            var oldWidth, oldHeight , oldTop, oldLeft;
+            $(".fullscreen-btn").click(function(){
+                var dialogWin = $(this).parent().parent().parent();
+                var contentWin =  $(dialogWin).children(".ui-dialog-titlebar").next();
+                //var footTool = $(dialogWin).children(".ui-dialog-buttonpane");
+                //console.log(contentWin)
+                var winWidth = $(window).width();
+                var winHeight = $(window).height();
+                if(isFullMode){
+                    isFullMode = false;
+                    //set full screen state
+                    $(dialogWin).css("top",oldTop);
+                    $(dialogWin).css("left",oldLeft);
+                    //$(dialogWin).scrollLeft(0);
+                    $(dialogWin).width(oldWidth);
+                    $(dialogWin).height(oldHeight);
+
+                }else{
+                    isFullMode = true;
+                    //save original state
+                    oldWidth = $(dialogWin).width();
+                    oldHeight = $(dialogWin).height();
+                    oldTop = $(dialogWin).css("top");
+                    oldLeft = $(dialogWin).css("left");
+                    //set full screen state
+                    $(dialogWin).css("top",0);
+                    $(dialogWin).css("left",0);
+                    //$(dialogWin).scrollLeft(0);
+                    $(dialogWin).width(winWidth);
+                    $(dialogWin).height(winHeight);
+                    //fix content height
+                    //var footToolHeight = $(footTool).height();
+                    $(contentWin).css("height","85%");
+                }
+
+                //console.log()
+                //alert('fullscreen');
+            });
+            /////////////////////////////////////////////////////
+
             var index = 'qpsstats-active-tab';
             //  Define friendly data store name
             var dataStore = window.sessionStorage;
@@ -418,6 +475,120 @@ $about_html = ABOUT_APP_AUTHOR;
         general_dialog.dialog("option","title","About");
         general_dialog.dialog("open");
         $("#main-vewer-menu ul").hide();
+    }
+    function checkNewVer(currentVer){
+        //alert("currentVer: " + currentVer)
+        $("#app-ver-check-result").html("<img src='images/spinner.gif' />");
+        $("#app-ver-check-result").show();
+        var appUrl = "https://api.github.com/repos/meshesha/SimplePhpFormBuilder/releases/latest";
+        $.ajax({
+            type: "GET",
+            url: appUrl,
+            dataType: "json",
+            success: function (response) {
+                if(response != "" && response !== undefined && response !== null){
+                    var new_ver_str = response.tag_name.toLowerCase();
+                    var new_ver_url = response.html_url;
+                    var isDraft = response.draft;
+                    var isPrerelease = response.prerelease;
+                    var note = response.body.replace(/\r\n/g,"<br>");
+                    var new_ver_num = "";
+                    var verPrefix = ["v","v.","ver","ver."];
+                    $.each(verPrefix, function(i,prefix){
+                        var prefixLoc = new_ver_str.indexOf(prefix);
+                        if(prefixLoc != -1){
+                            new_ver_num = new_ver_str.substr((prefixLoc + 1));
+                        }
+                    })
+                    if(currentVer == new_ver_num){
+                        $("#app-ver-check-result").html("SimplePhpFormBuilder is up to date.")
+                    }else{
+                        var currentVerAry = [];
+                        if(currentVer.indexOf(".") != -1){
+                            currentVerAry = currentVer.split(".");
+                        }else{
+                            currentVerAry[0] = currentVer;
+                        }
+                        var newVerNumAry = [];
+                        if(new_ver_num.indexOf(".") != -1){
+                            newVerNumAry = new_ver_num.split(".");
+                        }else{
+                            newVerNumAry[0] = new_ver_num;
+                        }
+                        /**Semantic Versioning:
+                        1.0.0
+                        1.0.0
+                        1.10.5-RC1
+                        4.4.4-beta2
+                        2.0.0-alpha
+                        2.0.4-p1
+                         */
+                        if(currentVerAry.length == 3 && newVerNumAry.length == 3){
+                            var newVerNum3thd = "";
+                            var newVerSuffix = "";
+                            if(newVerNumAry[2].indexOf("-") != -1){
+                                newVernum3thdAry = newVerNumAry[2].split("-");
+                                newVerNum3thd = newVernum3thdAry[0];
+                                newVerSuffix =  newVernum3thdAry[1];
+                            }else{
+                                newVerNum3thd = newVerNumAry[2];
+                            }
+                            var crntVerNum3thd = "";
+                            var crntVerSuffix = "";
+                            if(currentVerAry[2].indexOf("-") != -1){
+                                crntVerNum3thdAry = currentVerAry[2].split("-");
+                                crntVerNum3thd = crntVerNum3thdAry[0];
+                                crntVerSuffix =  crntVerNum3thdAry[1];
+                            }else{
+                                crntVerNum3thd = currentVerAry[2];
+                            }
+                            if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
+                                    Number(newVerNumAry[1]) > Number(currentVerAry[1]) ||
+                                    Number(newVerNum3thd) > Number(crntVerNum3thd)){
+                                if(isDraft && isPrerelease){
+                                    $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
+                                }else if(!isDraft && isPrerelease){
+                                    $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release</p>");
+                                }else if(isDraft && !isPrerelease){
+                                    $("#app-ver-check-result").html("<p>There is a new version but this is a draft</p>");
+                                }else{
+                                    if(newVerSuffix == ""){
+                                        $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                    }else{
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is '"  +newVerSuffix + "'</p>");
+                                    }
+                                }
+                                $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: " + new_ver_num + "<br>" +  note + "</p>");
+                            }else if(Number(newVerNumAry[0]) == Number(currentVerAry[0]) &&
+                                    Number(newVerNumAry[1]) == Number(currentVerAry[1]) &&
+                                    Number(newVerNum3thd) == Number(crntVerNum3thd)){ 
+                                if(newVerSuffix != ""  && newVerSuffix != crntVerSuffix){
+                                    $("#app-ver-check-result").html("<p>There is a new '"+newVerSuffix+"' version</p>");
+                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + "<br>" + note + "</p>");
+                                }else if(newVerSuffix == ""  && newVerSuffix != crntVerSuffix){
+                                    $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + " (stable)<br>" + note + "</p>");
+                                }
+                            }else{
+                                $("#app-ver-check-result").html("This version is newer than what exists in the Github :)")
+                            }
+                        }else{
+                            $("#app-ver-check-result").html("<span style='color:red;'>Error: Semantic Versioning error.</span>");
+                        }
+                        //console.log(new_ver_str,new_ver_num, new_ver_url);
+                    }
+                }else{
+                    $("#app-ver-check-result").html("<span style='color:red;'>Error: the github api response no json format</span>");
+                }
+            },
+            error:function (response) {
+                $("#app-ver-check-result").html("<span style='color:red;'>Error:" + JSON.stringify(response) + "</span>");
+                //alert(response.responseText)
+            }
+        });
     }
     </script>
 </head>
@@ -605,223 +776,199 @@ $about_html = ABOUT_APP_AUTHOR;
     </div>
 
     <div id="form_general_style" title="General form style settings">
-        <div class="form_general_style_warper ">
-            <h5>Form body background style: </h5>
-            <table>
-                <tr>
-                    <td>
-                        <div class="dialog_form_style">
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_body_bgcolor_1">Body BgColor 1:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="text" class="color_pecker form_style_input" id="form_body_bgcolor_1"  title="Body Background Color 1" value="rgba(255, 255, 255, 1)" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_body_bgcolor_2">Body BgColor 2:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="text" class="color_pecker form_style_input" id="form_body_bgcolor_2"  title="Body Background Color 2" value="rgba(255, 255, 255, 1)" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_body_bgcoloe_angle">Body BgColor Angle:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="number" class="form_style_input input_numper_type" id="form_body_bgcoloe_angle" min="0" max="360" setp="1"  title="Linear gradient color angle"  value="0" />(deg)
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_body_bgImage">Body BgImage:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="file" class="form_style_input" id="form_body_bgImage"  accept="image/*" title="Body Background Image" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <label for="form_body_bgImage_attach">Image attachment:</label>
-                                            <select id="form_body_bgImage_attach" class="form_style_input">
-                                                <option value="scroll">scroll</option>
-                                                <option value="fixed">fixed</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label for="form_body_bgImage_position">Image position:</label>
-                                            <select id="form_body_bgImage_position" class="form_style_input">
-                                                <option value="left top">left top</option>
-                                                <option value="left center">left center</option>
-                                                <option value="left bottom">left bottom</option>
-                                                <option value="right top">right top</option>
-                                                <option value="right center">right center</option>
-                                                <option value="right bottom">right bottom</option>
-                                                <option value="center top">center top</option>
-                                                <option value="center center" selected >center center</option>
-                                                <option value="center bottom">center bottom</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label for="form_body_bgImage_repet">Image repet:</label>
-                                            <select id="form_body_bgImage_repet" class="form_style_input">
-                                                <option value="no-repeat">no-repeat</option>
-                                                <option value="repeat">repeat both</option>
-                                                <option value="repeat-x">repeat-x</option>
-                                                <option value="repeat-y">repeat-y</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label for="form_body_bgImage_size">Image size:</label>
-                                            <select id="form_body_bgImage_size" class="form_style_input">
-                                                <option value="auto">Orginal size</option>
-                                                <option value="contain">contain</option>
-                                                <option value="cover">cover</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+        <div class="form_general_style_warper">
+            <div class="prop-area">
+                <h5>Form direction: </h5>
+                <div class="dialog_form_style">
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_body_direction">Direction:</label>
                         </div>
-                    </td>
-                    <td>
-                        <style>
-                            .example{
-                                width: 800px;
-                                height: 400px;
-                                top: 0;
-                                border: 1px solid black;
-                                background: linear-gradient(0deg, rgba(255, 255, 255, 1),rgba(255, 255, 255, 1));
-                            }
-                            .example-body{
-                                height: 100%;
-                            }
-                            .example-form-warper-1{
-                                margin:0 auto;
-                                width: 80%;
-                                height: 80%;
-                                border: 1px solid black;
-                                border-radius: 5px;
-                                transform: translateY(10%);
-                                background-color: white;
-                                opacity: 1;
-                            }
-                        </style>
-                        <div class="example">
-                            <div class="example-body">
-                                <div class="example-form-warper-1">
-                                    <div class="example-form-content" style="text-align:center;"><h4>Form example</h4></div>
-                                </div>
-                            </div>
+                        <div class="column-a2">
+                            <select class="form_style_input" id="form_body_direction"  title="Form direction">
+                                <option value="ltr" selected>Left to Right (LTR)</option>
+                                <option value="rtl" selected>Right to Left (RTL)</option>
+                            </select>
                         </div>
-                    </td>
-                </tr>
-            </table>
-            <hr>
-            
-            <h5>Form style: </h5>
-            <table>
-                <tr>
-                    <td>
-                        <div class="dialog_form_style">
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_width">width:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="number" class="form_style_input" id="form_width" min="0" max="100" setp="1"  title="Form width" value="80"/>(px)
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_vertical_margin">Vertical margin:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="number" class="form_style_input" id="form_vertical_margin" min="0" max="100" setp="1"  title="Form Vertical margin" value="10" />(%)
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_Background_color">Form bgcolor:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="text" class="color_pecker form_style_input" id="form_Background_color"  title="Form Background Color" value="rgba(255, 255, 255, 1)" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_opacity">Opacity:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="number" class="form_style_input" id="form_opacity" min="0" max="100" setp="1"  title="Form Opacity" value="100" />(%)
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_border_size">Form border size:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="number" class="form_style_input" id="form_border_size" min="0" setp="1"  title="Form border size" value="1" />(px)
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_border_type">Form border type:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <select class="form_style_input" id="form_border_type"  title="Form border type">
-                                        <option value="solid">solid</option>
-                                        <option value="dotted">dotted</option>
-                                        <option value="dashed">dashed</option>
-                                        <option value="double">double</option>
-                                        <option value="groove">groove</option>
-                                        <option value="ridge">ridge</option>
-                                        <option value="inset">inset</option>
-                                        <option value="outset">outset</option>
-                                        <option value="none">none</option>
+                    </div>
+                </div>
+                <hr>
+                <h5>Form body background style: </h5>
+                <div class="dialog_form_style">
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_body_bgcolor_1">Body BgColor 1:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="text" class="color_pecker form_style_input" id="form_body_bgcolor_1"  title="Body Background Color 1" value="rgba(255, 255, 255, 1)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_body_bgcolor_2">Body BgColor 2:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="text" class="color_pecker form_style_input" id="form_body_bgcolor_2"  title="Body Background Color 2" value="rgba(255, 255, 255, 1)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_body_bgcoloe_angle">Body BgColor Angle:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="number" class="form_style_input input_numper_type" id="form_body_bgcoloe_angle" min="0" max="360" setp="1"  title="Linear gradient color angle"  value="0" />(deg)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_body_bgImage">Body BgImage:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="file" class="form_style_input" id="form_body_bgImage"  accept="image/*" title="Body Background Image" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="form_body_bgImage_attach">Image attachment:</label>
+                                    <select id="form_body_bgImage_attach" class="form_style_input">
+                                        <option value="scroll">scroll</option>
+                                        <option value="fixed">fixed</option>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_border_color">Form border color:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="text" class="color_pecker form_style_input" id="form_border_color"  title="Form border color" value="rgba(0, 0, 0, 1)" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="column-a1">
-                                    <label for="form_border_radius">Form border radius:</label>
-                                </div>
-                                <div class="column-a2">
-                                    <input type="number" class="form_style_input" id="form_border_radius" min="0" setp="1"  title="Form border radius" value="5" />(px)
-                                </div>
-                            </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="form_body_bgImage_position">Image position:</label>
+                                    <select id="form_body_bgImage_position" class="form_style_input">
+                                        <option value="left top">left top</option>
+                                        <option value="left center">left center</option>
+                                        <option value="left bottom">left bottom</option>
+                                        <option value="right top">right top</option>
+                                        <option value="right center">right center</option>
+                                        <option value="right bottom">right bottom</option>
+                                        <option value="center top">center top</option>
+                                        <option value="center center" selected >center center</option>
+                                        <option value="center bottom">center bottom</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="form_body_bgImage_repet">Image repet:</label>
+                                    <select id="form_body_bgImage_repet" class="form_style_input">
+                                        <option value="no-repeat">no-repeat</option>
+                                        <option value="repeat">repeat both</option>
+                                        <option value="repeat-x">repeat-x</option>
+                                        <option value="repeat-y">repeat-y</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="form_body_bgImage_size">Image size:</label>
+                                    <select id="form_body_bgImage_size" class="form_style_input">
+                                        <option value="auto">Orginal size</option>
+                                        <option value="contain">contain</option>
+                                        <option value="cover">cover</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <hr>
+                <h5>Form style: </h5>
+
+                <div class="dialog_form_style">
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_width">width:</label>
                         </div>
-                    </td>
-                    <td>
-                        <div class="example">
-                            <div class="example-body">
-                                <div class="example-form-warper-1">
-                                    <div class="example-form-content" style="text-align:center;"><h4>Form example</h4></div>
-                                </div>
-                            </div>
+                        <div class="column-a2">
+                            <input type="number" class="form_style_input" id="form_width" min="0" max="100" setp="1"  title="Form width" value="80"/>(px)
                         </div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_vertical_margin">Vertical margin:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="number" class="form_style_input" id="form_vertical_margin" min="0" max="100" setp="1"  title="Form Vertical margin" value="10" />(%)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_Background_color">Form bgcolor:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="text" class="color_pecker form_style_input" id="form_Background_color"  title="Form Background Color" value="rgba(255, 255, 255, 1)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_opacity">Opacity:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="number" class="form_style_input" id="form_opacity" min="0" max="100" setp="1"  title="Form Opacity" value="100" />(%)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_border_size">Form border size:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="number" class="form_style_input" id="form_border_size" min="0" setp="1"  title="Form border size" value="1" />(px)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_border_type">Form border type:</label>
+                        </div>
+                        <div class="column-a2">
+                            <select class="form_style_input" id="form_border_type"  title="Form border type">
+                                <option value="solid">solid</option>
+                                <option value="dotted">dotted</option>
+                                <option value="dashed">dashed</option>
+                                <option value="double">double</option>
+                                <option value="groove">groove</option>
+                                <option value="ridge">ridge</option>
+                                <option value="inset">inset</option>
+                                <option value="outset">outset</option>
+                                <option value="none">none</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_border_color">Form border color:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="text" class="color_pecker form_style_input" id="form_border_color"  title="Form border color" value="rgba(0, 0, 0, 1)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="column-a1">
+                            <label for="form_border_radius">Form border radius:</label>
+                        </div>
+                        <div class="column-a2">
+                            <input type="number" class="form_style_input" id="form_border_radius" min="0" setp="1"  title="Form border radius" value="5" />(px)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-area">
+                <style>
+                </style>
+                <div class="example">
+                    <div class="example-body">
+                        <div class="example-form-warper-1">
+                            <div class="example-form-content" style="text-align:center;"><h4>Form example</h4></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1138,12 +1285,12 @@ $about_html = ABOUT_APP_AUTHOR;
             var frm_id = $("#form_id").val();
             $("#form_content_id").val(frm_id);
             var form_content = get_form_content(frm_id);
-
+            
             if(form_content != undefined && form_content != null && form_content != "new" && form_content != ""){
                 var form_content_obj = JSON.parse(form_content);
                 if(form_content_obj.length > 0){
                     form_content_obj.forEach(function(item, index){
-                        if(item.label !== undefined){
+                        if(item.label !== undefined){ //item.type == "paragraph" || item.type == "header" //
                             item.label = item.label.replace(/&quot;/g,"\"");
                             item.label = item.label.replace(/&apos;/g, "'"); 
                         }
@@ -1373,7 +1520,7 @@ $about_html = ABOUT_APP_AUTHOR;
             };
             let $renderContainer = $('<form/>');
             $renderContainer.formRender(formRenderOpts);
-            var htmlCod = $renderContainer.formRender("html")
+            //var htmlCod = $renderContainer.formRender("html")
             let html = '<!doctype html><head>' +
                         '<link rel="stylesheet" href="./include/bootstrap/css/bootstrap.min.css">'+
                         '<link rel="stylesheet" href="./css/render_main.css">'+
@@ -1545,12 +1692,20 @@ $about_html = ABOUT_APP_AUTHOR;
             var uInput = "<input type='text' id='user_name' value = '" + userName + "'  />";
             var uName = addElement("User Name","user_name", uInput);
             uName.appendTo(gContent);
+
             var pInput = "<input type='password' id='user_password' value = '" + userPass + "' />";
             var uPass = addElement("Password","user_password", pInput);
             uPass.appendTo(gContent);
+
+            var cPInput = "<input type='password' id='confirm_password' value = '' />";
+            var cPPass = addElement("Confirm password","confirm_password", cPInput);
+            cPPass.appendTo(gContent);
+            
+
             var eInput = "<input type='text' id='user_email' value = '" + userEmail + "' />";
             var uEmail = addElement("Email","user_email", eInput);
             uEmail.appendTo(gContent);
+
             var gInput = "<select id='groupList' class='groupslist js-states form-control' multiple='multiple' style='width:80%;'></select>";
             var uGroups = addElement("Groups","groupList", gInput);
             uGroups.appendTo(gContent);
@@ -1659,6 +1814,9 @@ $about_html = ABOUT_APP_AUTHOR;
                 if(obj != "null"){
                     //console.log("update",obj);
                     var parsedObj = JSON.parse(obj);
+
+                    $("#form_body_direction").val(parsedObj.form_body_direction).change();
+
                     $("#form_body_bgcolor_1").spectrum("set", parsedObj.form_body_bgcolor_1);
                     $("#form_body_bgcolor_2").spectrum("set", parsedObj.form_body_bgcolor_2);
                     $("#form_body_bgcoloe_angle").val(parsedObj.form_body_bgcoloe_angle).change();
@@ -1696,6 +1854,7 @@ $about_html = ABOUT_APP_AUTHOR;
                 defaultFormStylObj = JSON.parse(defaultSets);
             }else{
                 defaultFormStylObj = {
+                    form_body_direction: "ltr",
                     form_body_bgcolor_1: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_1").val(),
                     form_body_bgcolor_2: "rgba(222, 222, 222, 1)", //$("#form_body_bgcolor_2").val(),
                     form_body_bgcoloe_angle: "0", //$("#form_body_bgcoloe_angle").val(),
@@ -1716,6 +1875,8 @@ $about_html = ABOUT_APP_AUTHOR;
             //console.log(defaultFormStylObj)
              
             sessionStorage.formStylObj = JSON.stringify(defaultFormStylObj);
+
+            $("#form_body_direction").val(defaultFormStylObj.form_body_direction).change();
 
             $("#form_body_bgcolor_1").spectrum("set", defaultFormStylObj.form_body_bgcolor_1);
             $("#form_body_bgcolor_2").spectrum("set", defaultFormStylObj.form_body_bgcolor_2);
@@ -1794,11 +1955,14 @@ $about_html = ABOUT_APP_AUTHOR;
             var el_id = $(this).attr("id");
             var el_val = $(this).val();
             //console.log(el_id," ,value: ",el_val);
-            //form_body_bgcolor_1, form_body_bgcolor_2 , form_body_bgcoloe_angle , form_body_bgImage  
+            //form_body_direction,form_body_bgcolor_1, form_body_bgcolor_2 , form_body_bgcoloe_angle , form_body_bgImage  
             //form_width, form_vertical_margin, form_Background_color,form_opacity,form_border_size,form_border_type ,
             //form_border_color,form_border_radius  
             //form_body_bgImage_attach,form_body_bgImage_position,form_body_bgImage_repet,form_body_bgImage_size
-            if(el_id == "form_body_bgcolor_1"){
+            if(el_id == "form_body_direction"){
+                //$(".example").css("background-attachment",el_val);
+                setFormStyleObj(el_id, el_val);
+            }else if(el_id == "form_body_bgcolor_1"){
                 var color1 = el_val;
                 var color2 = $("#form_body_bgcolor_2").val();
                 var angle = $("#form_body_bgcoloe_angle").val();
