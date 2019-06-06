@@ -258,6 +258,48 @@
   }
 }
 
+/* /////////////////////////////////////Form style win/////////////////////////////////*/
+.form_general_style_warper{
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+.form_general_style_warper * {
+  box-sizing: border-box;
+}
+.form_general_style_warper .prop-area{
+  overflow-y: auto;
+  width: calc(40% - 10px);
+  float: left;
+  height: calc(100% - 1px);
+  padding: 1px;
+}
+.form_general_style_warper .preview-area{
+  left: 0;
+  width: calc(60% - 20px);
+  height: calc(100% - 1px);
+  float: right;
+}
+
+.example{
+    width: 800px;
+    height: 400px;
+    top: 0;
+    border: 1px solid black;
+    background: linear-gradient(0deg, rgba(255, 255, 255, 1),rgba(255, 255, 255, 1));
+}
+.example-body{
+    height: 100%;
+}
+.example-form-warper-1{
+    margin:auto auto;
+    height: 80%;
+    border: 1px solid black;
+    border-radius: 5px;
+    transform: translateY(10%);
+    background-color: white;
+    opacity: 1;
+}
 /* /////////////////////////////////////Settings section/////////////////////////////////*/
 
 .settings_warper * {
@@ -293,3 +335,15 @@
   }
 }
 /*///////////////////////////////////////////////////////////////////////////////////*/
+/*dialogs - full screen mode button */
+
+.ui-button-fullscreen{
+    position: absolute;
+    right: 1.6em;
+    top: 50%;
+    width: 20px;
+    margin: -10px 0 0 0;
+    padding: 1px;
+    height: 20px;
+}
+/*________________________________________________________________________________*/
