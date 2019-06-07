@@ -71,13 +71,13 @@ if($formStatus == "2"){
 $userId = '';
 $email = '';
 $userName = '';
-if($formType == "2" || $formType == "4"){ //geoups not Anonymously, geoups Anonymously
+if($formType == "2" || $formType == "4"){ //2-geoups not Anonymously, 4-geoups Anonymously
     if(isset($_SESSION['user_id'])){
         if($formType == "2"){ //geoups not Anonymously
             $userId = $_SESSION['user_id'];
         }
         $records = $conn->prepare('SELECT * FROM users WHERE status="1" AND id = :userid');
-        $records->bindParam(':userid', $userId);
+        $records->bindParam(':userid', $_SESSION['user_id']);
         $records->execute();
         $results = $records->fetch(PDO::FETCH_ASSOC);
         $message = '';
