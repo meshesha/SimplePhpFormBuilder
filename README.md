@@ -23,6 +23,8 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog
 
+* ver 1.4.1
+  -fixed - Anonymously groups form not accessible.
 * ver 1.4.0
   - added full screen mode in dialogs windows (index.php - v, formadmin.php - V).
   - added in "about" page dynamic app ver.
