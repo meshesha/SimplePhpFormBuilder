@@ -1,5 +1,5 @@
 <?php
-    define('APP_VERSION',"1.4.0");
+    define('APP_VERSION',"1.4.1");
     define('ABOUT_APP_AUTHOR', preg_replace("/[\r\n]*/","","
     <style>
         .about-row.content {height: 100%}
