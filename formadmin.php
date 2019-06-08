@@ -647,6 +647,38 @@ if($formStyle != null && $formStyle != ""){
                 var form_content = get_form_content(form_id, uid);
                 //console.log(form_content);
                 if(form_content != "new" && form_content != "" && form_content != null && form_content !== undefined){
+		     var form_content_obj = JSON.parse(form_content);
+		     if(form_content_obj.length > 0){
+                        form_content_obj.forEach(function(item, index){
+                            if(item.label !== undefined){ //item.type == "paragraph" || item.type == "header" //
+                                item.label = item.label.replace(/&quot;/g,"\"");
+                                item.label = item.label.replace(/&apos;/g, "'"); 
+                            }
+                            if(item.description !== undefined){ 
+                                item.description = item.description.replace(/&quot;/g,"\""); 
+                                item.description = item.description.replace(/&apos;/g, "'"); 
+                            }
+                            if(item.type != "table" && item.placeholder !== undefined){ 
+                                item.placeholder = item.placeholder.replace(/&quot;/g,"\""); 
+                                item.placeholder = item.placeholder.replace(/&apos;/g, "'"); 
+                            }
+                            if(item.type != "hidden" && item.value !== undefined){
+                                item.value = item.value.replace(/&quot;/g,"\"");
+                                item.value = item.value.replace(/&apos;/g, "'"); 
+                            }
+
+                            if(item.type == "select" || item.type == "checkbox-group" || item.type == "radio-group"){
+                                if(item.values !== undefined && item.values.length > 0){
+                                    item.values.forEach(function(item2, index){
+                                        item2.label = item2.label.replace(/&quot;/g,"\""); 
+                                        item2.label = item2.label.replace(/&apos;/g, "'");
+                                    });
+                                }
+                            }
+
+                        });
+                        form_content = JSON.stringify(form_content_obj);
+                    }
                     $('#form-render-content').formRender({
                         dataType: 'json',
                         formData: form_content
