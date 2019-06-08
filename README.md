@@ -23,6 +23,10 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog
 
+* ver 1.4.2
+  - fixed - in form viewer (form.php) and form manger (formadmin.php) special Characters (",') 
+        appears in html code  inside select options inputs ( &amp;quot).
+        
 * ver 1.4.1
   - fixed - Anonymously groups form not accessible.
   
