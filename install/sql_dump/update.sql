@@ -17,6 +17,18 @@ CREATE TABLE IF NOT EXISTS `form_content` (
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+--
+-- Table structure for table `form_custom_style`
+--
+
+CREATE TABLE IF NOT EXISTS `form_custom_style` (
+  `indx` int(11) NOT NULL AUTO_INCREMENT,
+  `form_id` varchar(255) NOT NULL DEFAULT '',
+  `form_style` mediumtext,
+  PRIMARY KEY (`indx`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
 -- --------------------------------------------------------
 
 --

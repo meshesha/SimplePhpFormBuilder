@@ -11,6 +11,13 @@ DROP TABLE IF EXISTS `form_content`;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `form_custom_style`
+--
+
+DROP TABLE IF EXISTS `form_custom_style`;
+
+-- --------------------------------------------------------
+--
 -- Table structure for table `form_data`
 --
 

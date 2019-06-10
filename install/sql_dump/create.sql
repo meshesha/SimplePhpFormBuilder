@@ -16,6 +16,19 @@ CREATE TABLE IF NOT EXISTS `form_content` (
   `form_labels` text,
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `form_custom_style`
+--
+
+DROP TABLE IF EXISTS `form_custom_style`;
+CREATE TABLE IF NOT EXISTS `form_custom_style` (
+  `indx` int(11) NOT NULL AUTO_INCREMENT,
+  `form_id` varchar(255) NOT NULL DEFAULT '',
+  `form_style` mediumtext,
+  PRIMARY KEY (`indx`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -164,7 +177,7 @@ INSERT INTO `settings` (`indx`, `setting_group`, `setting_name`, `setting_nik`, 
 (28, 'form_style', 'form_body_bgImage_repet', 'Form body bgImage repet', 'repeat', '{\"type\":\"select\", \"values\":[{\"text\":\"no-repeat\",\"value\":\"no-repeat\"},{\"text\":\"repeat\",\"value\":\"repeat\"},{\"text\":\"repeat-x\",\"value\":\"repeat-x\"},{\"text\":\"repeat-y\",\"value\":\"repeat-y\"}]}', 'Form body bgImage repet'),
 (29, 'form_style', 'form_body_bgImage_size', 'Form body bgImage size', 'auto', '{\"type\":\"select\", \"values\":[{\"text\":\"Orginal size\",\"value\":\"auto\"},{\"text\":\"contain\",\"value\":\"contain\"},{\"text\":\"cover\",\"value\":\"cover\"}]}', 'Form body bgImage size'),
 (30, 'form_style', 'form_width', 'Form width', '80', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form width (%)'),
-(31, 'form_style', 'form_vertical_margin', 'Form width', '5', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form Vertical margin (%)'),
+(31, 'form_style', 'form_vertical_margin', 'Vertical margin', '5', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form Vertical margin (%)'),
 (32, 'form_style', 'form_Background_color', 'Form bgcolor', 'rgba(255, 255, 255, 1)', '{\"type\":\"color\"}', 'Form Background Color'),
 (33, 'form_style', 'form_opacity', 'Form Opacity', '100', '{\"type\":\"number\",\"min\":\"0\",\"max\":\"100\",\"step\":\"1\"}', 'Form Opacity (%)'),
 (34, 'form_style', 'form_border_size', 'Form border size', '1', '{\"type\":\"number\",\"min\":\"0\",\"step\":\"1\"}', 'Form border size (px)'),
