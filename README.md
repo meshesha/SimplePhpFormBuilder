@@ -23,6 +23,14 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog
 
+* ver 1.5.0
+  - approved form-builder preview popup.
+  - added user details (user id, name , email) in submission form details (formadmin.php)
+  - added custom form style editor for advanced CSS programmers.
+  - added clear button to form.
+  - added ability to customize submit and clear buttons.
+  - fixed some bugs.
+
 * ver 1.4.2
   - fixed - in form viewer (form.php) and form manger (formadmin.php) special Characters (",') 
         appears in html code  inside select options inputs ( &amp;quot).
