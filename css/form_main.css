@@ -8,12 +8,15 @@ body{
 #form-render-content{
     padding: 10px;
 }
-.form-control-element-right{
+.form-control-element-right,
+.form-control-buttons-right{
     text-align: right;
 }
-.form-control-element-left{
+.form-control-element-left,
+.form-control-buttons-left{
     text-align: left;
 }
-.form-control-element-center{
+.form-control-element-center,
+.form-control-buttons-center{
     text-align: center;
 }
