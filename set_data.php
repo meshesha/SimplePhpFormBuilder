@@ -37,6 +37,8 @@ if(isset($_POST['data'])){
         $tbl = "form_data";
     }else if($data_table == "settings"){
         $tbl = "settings";
+    }else if($data_table == "form_style"){
+        $tbl = "form_custom_style";
     }
     if($tbl == ""){
         die("data table not set");
@@ -77,6 +79,9 @@ if(isset($_POST['data'])){
            }
         }else if($data_table == "settings"){
             //////////////////////////////////////////
+        }else if($data_table == "form_style"){
+            $set_new_styl_stt = satNewCustomFormStyle($conn,$data_ary);
+            echo $set_new_styl_stt;
         }
     }else if($actionType == "update"){
         $data_ary = get_object_vars($frm_data);
@@ -204,6 +209,10 @@ if(isset($_POST['data'])){
             }
         }else if($data_table == "settings"){
             ///////////
+        }else if($data_table == "form_style"){
+            $form_id = $data_ary["record_id"];
+            $form_style = $data_ary["form_style"];
+            $update_stt_ary[] = updateData($conn,$tbl,"form_style", $form_style,"form_id='$form_id'");
         }
         $echo_data = "";
         foreach ($update_stt_ary as $stt){
@@ -235,6 +244,8 @@ if(isset($_POST['data'])){
             $deleteSatt = deletGroup($conn, $data_ary);
             echo $deleteSatt;
         }else if($data_table == "settings"){
+            ////////////
+        }else if($data_table == "form_style"){
             ////////////
         }
     }
@@ -315,12 +326,16 @@ function satNewTemplate($conn,$data_ary){
     }
     return $echo_data;
 }
+
 function getFormSubmitFields($formObj){
     $formFields = json_decode($formObj);
     $fields_ary = array();
     $form_labels_ary = array();
     foreach($formFields as $field){
-        if($field->type != "paragraph" && $field->type != "header" && $field->type != "button" && $field->type != "hidden"){
+        if($field->type != "paragraph" && 
+            $field->type != "header" && 
+            $field->type != "Buttons" && 
+            $field->type != "button" && $field->type != "hidden"){
             $fieldObj = new stdClass();
             $fieldObj->type = $field->type;
             $fieldObj->name = $field->name;
@@ -340,6 +355,24 @@ function getFormSubmitFields($formObj){
     $form_labels_str = json_encode($form_labels_ary, JSON_UNESCAPED_UNICODE);
     $fields_str = json_encode($fields_ary);
     return [$fields_str,$form_labels_str];
+}
+
+function satNewCustomFormStyle($conn,$data_ary){
+    $rtrn_stt = "";
+    $frm_id = $data_ary["record_id"];
+    $frm_style = $data_ary["form_style"];
+    $sql = "INSERT INTO form_custom_style (
+        form_id,
+        form_style)  VALUES (
+        '{$frm_id}',
+        '{$frm_style}')";
+    if($result = $conn->query($sql)) {
+        $rtrn_stt = "success";
+    }else{
+        $rtrn_stt = 'Error: ' . mysqli_error($conn);
+    }
+
+    return $rtrn_stt;
 }
 
 function satNewUser($conn,$data_ary){
@@ -525,6 +558,7 @@ function deletForm($conn, $data_ary){
     $sql_form_datetime_tbl = "DELETE FROM form_data_datetimes WHERE form_id = '$idx'";
     $sql_form_files_tbl = "DELETE FROM form_files WHERE form_id = '$idx'";
     $sql_form_table = "DELETE FROM form_tables WHERE form_id = '$idx'";
+    $sql_form_cstm_styl_table = "DELETE FROM form_custom_style WHERE form_id = '$idx'";
     //1. delete from table "form_list".
     //$fldName = mysqli_real_escape_string($conn, $fldName);
     if($conn->query($sql_form_list_tbl)) {
@@ -584,13 +618,21 @@ function deletForm($conn, $data_ary){
             $isErr = true;
             $err[] = "Error delete (UID:'$idx') from table 'form_files' : " . mysqli_error($conn);
         }
-        //6 delete from table "form_tables".
 
+        //6 delete from table "form_tables".
         if($conn->query($sql_form_table)) {
             $isErr = false;
         }else{
             $isErr = true;
             $err[] = "Error delete (UID:'$idx') from table 'form_tables' : " . mysqli_error($conn);
+        }
+
+        //7 delete from table "form_custom_style".
+        if($conn->query($sql_form_cstm_styl_table)) {
+            $isErr = false;
+        }else{
+            $isErr = true;
+            $err[] = "Error delete (UID:'$idx') from table 'form_custom_style' : " . mysqli_error($conn);
         }
     }
     if(!$isErr && empty($err)){

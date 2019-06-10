@@ -43,7 +43,46 @@ if(isset($_POST['form_id'])){
 
         $form = json_decode($echo_data);
         $frm_ary = array();
+
+        //get form type - if it is type 1 or 2 then show user data
+        $publishTyp = getFormData($conn, $form_id);
+        if($publishTyp != "" && ($publishTyp == "1" || $publishTyp == "2")){
+            $hideShowUserObj = new stdClass();
+            $hideShowUserObj->type = "paragraph";
+            $hideShowUserObj->subtype = "div";
+            $hideShowUserObj->className = "ui-widget-header hide-show-user-data";
+            $hideShowUserObj->label = "Show/hide user data";
+            $frm_ary[] = $hideShowUserObj;
+            //User data
+            $userData = getUserData($conn, $form_id, $uid,$publishTyp);
+            $user_id = "";
+            $user_name = "";
+            $user_mail = "";
+            if($userData != "" && !empty($userData)){
+                $user_id = $userData[0];
+                $user_name = $userData[1];
+                $user_mail = $userData[2];
+            }
+            $userIPID = "<label for='sender_user_id_ip'>User id/ip: </label><input type='text' id='sender_user_id_ip' class='form-control' value='$user_id' disabled/><br>";
+            $userIPID .= "<label for='sender_user_name'>User name: </label><input type='text' id='sender_user_name' class='form-control' value='$user_name' disabled/><br>";
+            $userIPID .= "<label for='sender_user_email'>User email: </label><input type='text' id='sender_user_email' class='form-control' value=' $user_mail' disabled/>";
+            $userDataObj = new stdClass();
+            $userDataObj->type = "paragraph";
+            $userDataObj->subtype = "div";
+            $userDataObj->className = "ui-widget-content user-data-content-warper";
+            $userDataObj->label = $userIPID;
+            $frm_ary[] = $userDataObj;
+
+            $sprtObj = new stdClass();
+            $sprtObj->type = "paragraph";
+            $sprtObj->subtype = "div";
+            $sprtObj->label = "<hr>";
+            $frm_ary[] = $sprtObj;
+        }
+
         foreach($form as $fild){
+            //get user data if exist
+
             //remove header and paragraph if exists
             if($fild->type != "file" && $fild->type != "header" && $fild->type != "paragraph" && $fild->type != "table"){ // 
                 $frm_ary[] = setFormValues($conn, $form_id, $uid, $fild);
@@ -77,6 +116,31 @@ if(isset($_POST['form_id'])){
     echo $echo_data;
 }else{
     echo 'Error: missing form_id';
+}
+function getUserData($conn, $form_id, $uid , $publishTyp){
+    $userId = "";
+    $sql = "SELECT user_id FROM form_data WHERE form_id='$form_id' AND UID='$uid' LIMIT 1";
+    if($result = $conn->query($sql)) {
+        $row = mysqli_fetch_assoc($result);
+        $userId = $row['user_id'];
+    }
+    if($userId == "" || $publishTyp == "1"){
+        return [$userId,"",""];
+    }else{
+        $uSql = "SELECT username,email FROM users WHERE id=$userId ";
+        $data_ary = array();
+        if($result = $conn->query($uSql)) {
+            $count = mysqli_num_rows($result);
+            if($count > 0){
+                while($row = mysqli_fetch_assoc($result)){
+                    $data_ary[] = $userId;
+                    $data_ary[] = $row['username'];
+                    $data_ary[] = $row['email'];
+                }
+            }
+        }
+        return $data_ary;
+    }
 }
 function setFormValues($conn, $form_id, $uid, $field){
     $fType = $field->type;
@@ -166,6 +230,21 @@ function setFormValues($conn, $form_id, $uid, $field){
 
     return $field;
 }
+
+function getFormData($conn, $formId){
+    $data = "";
+    $sql = "SELECT publish_type FROM form_list WHERE indx = $formId";
+    if($result = $conn->query($sql)) {
+        $count = mysqli_num_rows($result);
+        if($count > 0){
+            while($row = mysqli_fetch_assoc($result)){
+                $data = $row['publish_type'];
+            }
+        }
+    }
+    return $data;
+}
+
 function getFieldValue($conn, $form_id, $uid,$fname){
     $filds_str = "-1";
     $sql = "SELECT field_value FROM form_data WHERE form_id='$form_id' AND UID='$uid' AND field_name='$fname'";

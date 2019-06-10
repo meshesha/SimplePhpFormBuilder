@@ -167,6 +167,7 @@ $about_html = ABOUT_APP_AUTHOR;
     <!--///////////// formbuilder jquery ///////////////-->
     <script src="./include/formbuilder/form-builder.min.js"></script>
     <script src="./include/formbuilder/form-render.min.js"></script>
+    <script src="./include/formbuilder/control_plugins/buttons.js"></script>
     <script src="./include/formbuilder/control_plugins/table.js"></script>
     <!--<script src="./include/formbuilder/control_plugins/starRating.min.js"></script>-->
 
@@ -208,6 +209,17 @@ $about_html = ABOUT_APP_AUTHOR;
     <script src="./include/Formstone-1.4.13.1/js/core.js"></script>
     <script src="./include/Formstone-1.4.13.1/js/number.js"></script>
 
+    <!-- codemirror - custom form style -->
+    <link rel="stylesheet" href="./include/codemirror-5.47.0/lib/codemirror.css">
+    <!--<link rel="stylesheet" href="./include/codemirror-5.47.0/addon/hint/show-hint.css">-->
+    <script src="./include/codemirror-5.47.0/lib/codemirror.js"></script>
+    <script src="./include/codemirror-5.47.0/mode/css/css.js"></script>
+    <script src="./include/codemirror-5.47.0/addon/display/autorefresh.js"></script>
+    <!--
+    <script src="./include/codemirror-5.47.0/addon/hint/show-hint.js"></script>
+    <script src="./include/codemirror-5.47.0/addon/hint/css-hint.js"></script>
+    -->
+
 
     
     <link rel="stylesheet" type="text/css" href="./css/index_main.css">
@@ -217,7 +229,10 @@ $about_html = ABOUT_APP_AUTHOR;
         var formbuilder_dialog,
             formbuilder_content_dialog,
             general_dialog,
-            general_style_dialog;
+            general_style_dialog,
+            custom_style_editor_dialog,
+            custom_style_editor,
+            old_custom_style;
 
         $(function () {
              var isFullMode = false;
@@ -278,7 +293,69 @@ $about_html = ABOUT_APP_AUTHOR;
                     isFullMode = false;
                 }
             });
-            
+            custom_style_editor_dialog = $("#form_custom_style_editor").dialog({
+                modal: true,
+                autoOpen: false,
+                dialogClass: "formbuilder_dialg_win",
+                width: 0.7*$(window).width(),
+                height: 0.8*$(window).height(),
+                buttons: [
+                    {
+                        text: "Cancel",
+                        class: "btn btn-primary btn-lg",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    {
+                        text: "Save",
+                        class: "btn btn-primary btn-lg",
+                        click: function() {
+                            setCustomFormStyle();
+                        }
+                    }
+
+                ],
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
+            });
+            custom_style_editor = CodeMirror.fromTextArea(document.getElementById("form_custom_style_editor_code"), {
+                lineNumbers: true,
+                autoRefresh: true,
+                lineWrapping: true,
+                mode:  "css"
+            });
+            let $editorResizeHandle = document.querySelector(".style_editor_resize_handle");
+            let $editorContainer = document.querySelector(".form_custom_style_editor_warper");
+
+            function height_of($el) {
+                return parseInt(window.getComputedStyle($el).height.replace(/px$/, ""));
+            }
+
+            const MIN_HEIGHT = 200;
+
+            var start_x;
+            var start_y;
+            var start_h;
+
+            function on_drag(e) {
+                custom_style_editor.setSize(null, Math.max(MIN_HEIGHT, (start_h + e.y - start_y)) + "px");
+            }
+
+            function on_release(e) {
+                document.body.removeEventListener("mousemove", on_drag);
+                window.removeEventListener("mouseup", on_release);
+            }
+
+            $editorResizeHandle.addEventListener("mousedown", function (e) {    
+                start_x = e.x;
+                start_y = e.y;
+                start_h = height_of($editorContainer);
+                document.body.addEventListener("mousemove", on_drag);
+                window.addEventListener("mouseup", on_release);
+            });
+
             $(".formbuilder_dialg_win")
                 .children(".ui-dialog-titlebar")
                 .append("<button title='full screen' class='ui-button ui-corner-all ui-widget ui-button-icon-only ui-button-fullscreen'><span class='fullscreen-btn ui-button-icon ui-icon ui-icon-arrow-4-diag'></span></button>");
@@ -369,34 +446,48 @@ $about_html = ABOUT_APP_AUTHOR;
                 }
             })
 
-            $("#status_type").on("click",function(){
+            $("#status_type").on("change",function(){
                 var formId = $("#form_id").val();
                 if(formId == ""){
                     return false;
                 }
                 if($(this).val() == "1"){ //Publisheds
                     var formContent = get_form_content(formId);
-                    var emptyContent = '[{"type":"hidden","name":"hidden-form-id","id":"hidden-form-id","value":"'+formId+'"},{"type":"button","subtype":"submit","label":"Submit","className":"btn-primary btn","name":"button-submit-form","id":"button-submit-form","style":"primary"}]';
+                    var emptyContent = '[{"type":"hidden","name":"hidden-form-id","id":"hidden-form-id","value":"'+formId+'"},{"type":"Buttons","label":"","className":"buttons-container","name":"","submitBtnColor":"btn btn-primary","clearBtnColor":"btn btn-danger","btnsPos":"","submitLabel":"Submit","cancelLabel":"Clear"}]';
                     //console.log("formId: ",formId,", formContent:",(formContent == emptyContent)?"empty":"not empty",formContent)
                     if(formContent == emptyContent || formContent === undefined || formContent=="" || formContent=="new" || formContent === null){
                         alert("You can't to publish this form because it has no form template.")
-                        $("#status_type").val("2").change();
+                        $("#status_type").val("2");//.change();
                         $("#form_links").hide();
                     }else{
-                        //show links
-                        var webformlink = "form.php?id=" + formId;
-                        var adminformlink = "formadmin.php?id=" + formId;
-                        $("#web_form_link").attr("href", webformlink);
-                        $("#admin_web_form_link").attr("href", adminformlink);
-                        $("#form_links").show();
-                        $("#form_preview").prop("disabled",true);
-                        $(".form_preview_worn").html("<span style='color:red'>You can not edit form template when form status is 'Published' mode</span>")
+                        if(confirm("Are you sure you want to publish this form now?")){
+                            var frm_data  = {
+                                record_id: formId,
+                                status_type: "1"
+                            };
+                            ajaxAction("update", "form" , frm_data, null)
+                            //show links
+                            var webformlink = "form.php?id=" + formId;
+                            var adminformlink = "formadmin.php?id=" + formId;
+                            $("#web_form_link").attr("href", webformlink);
+                            $("#admin_web_form_link").attr("href", adminformlink);
+                            $("#form_links").show();
+                            $("#form_preview").prop("disabled",true);
+                            $(".form_preview_worn").html("<span style='color:red'>You can not edit form template when form status is 'Published' mode</span>")
+                        }
                     }
                 }else if($(this).val() == "2"){
-                    $("#form_links").hide();
-                    $("#form_preview").prop("disabled",true);
-                    $(".form_preview_worn").html("<span style='color:red'>First save the settings and then reopen for edit the template")
-                    
+                    if(confirm("Are you sure you want to unpublish this form now?")){
+                        var frm_data  = {
+                            record_id: formId,
+                            status_type: "2"
+                        };
+                        ajaxAction("update", "form" , frm_data, null)
+                        $("#form_links").hide();
+                        $("#form_preview").prop("disabled",false);
+                        $(".form_preview_worn").html("");
+                        //$(".form_preview_worn").html("<span style='color:red'>First save the settings and then reopen for edit the template")
+                    }
                 }
 
             })
@@ -437,7 +528,7 @@ $about_html = ABOUT_APP_AUTHOR;
                 success: function (response) {
                     console.log(response);
                     if(response == "success"){
-                        if (dialogbox !== undefined && dialogbox.hasClass('ui-dialog-content')){
+                        if (dialogbox !== undefined && dialogbox !== null && dialogbox.hasClass('ui-dialog-content')){
                             dialogbox.dialog("close");
                         }
                         if(tbl == "form"){
@@ -714,6 +805,7 @@ $about_html = ABOUT_APP_AUTHOR;
                         <p class="gneral_style_worn"></p>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-25">
                         <label for="status_type">Status</label>
@@ -751,7 +843,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     </div>
                 </div>
                 <?php if($isEditForm): ?>
-                <div class="row" id="previw_btn_toolbar">
+                <div class="row previw_btn_toolbar">
                     <div class="col-25">
                         <label for="form_preview">Form Template</label>
                     </div>
@@ -759,6 +851,18 @@ $about_html = ABOUT_APP_AUTHOR;
                         <button type="button" id="form_preview" class="btn btn-primary btn-lg" onclick="edit_form_file()">Edit</button><p class="form_preview_worn"></p>
                     </div>
                 </div>
+
+                <!-- //////////////Customize form style/////////////// -->
+                <div class="row previw_btn_toolbar">
+                    <div class="col-25">
+                        <label for="form_customize_style">Customize Form Style</label>
+                    </div>
+                    <div class="col-75">
+                        <button type="button" id="form_customize_style" class="btn btn-success btn-lg" onclick="edit_custom_style()">Edit</button>
+                        <p class="custim_style_worn"></p>
+                    </div>
+                </div>
+                <!-- //////////////////////////////////////////////// -->
                 <?php endif;?>
             </form>
         </div>
@@ -959,8 +1063,6 @@ $about_html = ABOUT_APP_AUTHOR;
                 </div>
             </div>
             <div class="preview-area">
-                <style>
-                </style>
                 <div class="example">
                     <div class="example-body">
                         <div class="example-form-warper-1">
@@ -969,6 +1071,19 @@ $about_html = ABOUT_APP_AUTHOR;
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="form_custom_style_editor" title="Custom form style editor">
+        <input type="hidden" id="custom_style_editor_type" />
+        <div style="padding: 2px 2px 3px 2px;" class="ui-widget-content">
+            <button id="form_custom_style_editor_clear_btn" class="btn btn-outline-danger btn-sm" onclick="clearCustomStyleEditor()" >Clear</button>
+            <button id="form_custom_style_editor_clear_btn" class="btn btn-outline-primary btn-sm" onclick="undoCustomStyleEditor()" >Undo</button>
+            <button id="form_custom_style_editor_clear_btn" class="btn btn-outline-primary btn-sm" onclick="redoCustomStyleEditor()" >Redo</button>
+        </div>
+        <div class="form_custom_style_editor_warper ui-widget-content" >
+            <textarea id="form_custom_style_editor_code"></textarea>
+            <div class="style_editor_resize_handle"></div>
         </div>
     </div>
 
@@ -1085,9 +1200,9 @@ $about_html = ABOUT_APP_AUTHOR;
             $('#groups_list').val("");
             $('#form_managers_list').val("");
             $("#form_note").val("");
-            $("#status_type").val("2").change();
+            $("#status_type").val("2");//.change();
             $("#status_type").prop("disabled",true);
-            $("#previw_btn_toolbar").hide();
+            $(".previw_btn_toolbar").hide();
             formbuilder_dialog.dialog("option","title","Add New");
             //form style
             setDefaultFormStyleObj();
@@ -1247,7 +1362,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     }
                     setUsersManagerList(mor_data.data.admin_users);
                     $("#status_type").prop("disabled",false);
-                    $("#status_type").val(mor_data.data.publ_status).change();
+                    $("#status_type").val(mor_data.data.publ_status);//.change();
                     if(mor_data.data.publ_status == "1"){
                         var webformlink = "form.php?id=" + data[1];
                         var adminformlink = "formadmin.php?id=" + data[1];
@@ -1262,7 +1377,7 @@ $about_html = ABOUT_APP_AUTHOR;
                         $(".form_preview_worn").html("");
                     }
                     $("#form_note").val(mor_data.data.frm_note);
-                    $("#previw_btn_toolbar").show();
+                    $(".previw_btn_toolbar").show();
                     /////Form style object////////////////////////////
                     sessionStorage.formStylObj = mor_data.data.frm_style;
                     //////////////////////////////////////////////////
@@ -1371,9 +1486,71 @@ $about_html = ABOUT_APP_AUTHOR;
                 typeUserAttrs: {
                     header: positionOptions,
                     file: maxFileSize,
-                    table: tableBtn
+                    table: tableBtn,
+                    Buttons: {
+                        label:{
+                            label: 'Container label',
+                            type: 'text',
+                            value: ''
+                        },
+                        submitBtnColor: {
+                            label: 'Submit button color',
+                            multiple: false, // optional, omitting generates normal <select>
+                            options: {
+                                '':'',
+                                'btn btn-primary': 'blue',
+                                'btn btn-secondary': 'gray',
+                                'btn btn-success': 'green',
+                                'btn btn-danger': 'red',
+                                'btn btn-warning': 'yellow',
+                                'btn btn-info': 'light blue',
+                                'btn btn-light': 'white',
+                                'btn btn-dark': 'dark',
+                                'btn btn-link': 'link'
+                            }/*,
+                            onchange: 'console.log(this)'*/
+                        },
+                        clearBtnColor: {
+                            label: 'Clear button color',
+                            multiple: false, // optional, omitting generates normal <select>
+                            options: {
+                                '':'',
+                                'btn btn-primary': 'blue',
+                                'btn btn-secondary': 'gray',
+                                'btn btn-success': 'green',
+                                'btn btn-danger': 'red',
+                                'btn btn-warning': 'yellow',
+                                'btn btn-info': 'lightblue',
+                                'btn btn-light': 'white',
+                                'btn btn-dark': 'dark',
+                                'btn btn-link': 'link'
+                            }/*,
+                            onchange: 'console.log(this)'*/
+                        },
+                        btnsPos: {
+                            label: 'Buttons position',
+                            multiple: false, // optional, omitting generates normal <select>
+                            options: {
+                                '':'',
+                                'form-control-buttons-right': 'Right',
+                                'form-control-buttons-left': 'Left',
+                                'form-control-buttons-center': 'Center'
+                            }/*,
+                            onchange: 'console.log(this)'*/
+                        },
+                        submitLabel:{
+                            label: 'Submit button label',
+                            type: 'text',
+                            value: ''
+                        },
+                        cancelLabel:{
+                            label: 'Cancel button label',
+                            type: 'text',
+                            value: ''
+                        }
+                    }
                 },
-                disableFields: ['autocomplete','hidden','button'],
+                disableFields: ['autocomplete','hidden','button','Buttons'],
                 controlOrder: [
                     'header',
                     'text',
@@ -1387,7 +1564,9 @@ $about_html = ABOUT_APP_AUTHOR;
                     textarea: ['quill']
                 },
                 disabledFieldButtons: {
-                    table: ['copy'], // disables the copy butotn for table fields
+                    table: ['copy'], // disables the copy button for table fields
+                    Buttons: ['copy','remove'],
+                    hidden: ['copy','remove']
                 },
                 stickyControls: {
                     enable: true
@@ -1424,6 +1603,32 @@ $about_html = ABOUT_APP_AUTHOR;
                             var $patternWrap = $patternField.parents(".placeholder-wrap:eq(0)");
                             $patternWrap.hide();
                         }
+                    },
+                    Buttons: {
+                        onadd: function (fld) {
+                            var $patternField = $(".fld-value", fld);
+                            var $patternWrap = $patternField.parents(".value-wrap:eq(0)");
+                            $patternWrap.hide();
+                            var $patternField = $(".fld-required", fld);
+                            var $patternWrap = $patternField.parents(".required-wrap:eq(0)");
+                            $patternWrap.hide();
+                            var $patternField = $(".fld-placeholder", fld);
+                            var $patternWrap = $patternField.parents(".placeholder-wrap:eq(0)");
+                            $patternWrap.hide();
+                            /*
+                            var $patternField = $(".fld-name", fld);
+                            var $patternWrap = $patternField.parents(".name-wrap:eq(0)");
+                            $patternWrap.hide();
+                            */
+                        }
+                    },
+                    hidden: {
+                        onadd: function (fld) {
+                            var $valueField = $(".fld-value", fld);
+                            $valueField.attr("readonly",true);
+                            var $nameField = $(".fld-name", fld);
+                            $nameField.attr("readonly",true);
+                        }
                     }
 
                 },
@@ -1436,7 +1641,17 @@ $about_html = ABOUT_APP_AUTHOR;
                         click: function() {
                             var data = formBuilder.actions.getData('json', true);
                             formBuilder.actions.removeField("button-submit-form");
-                            showPreview(data);
+                            previewForm(frm_id,data);
+                        }
+                    }
+                },{
+                    id: 'custom_form_stle_btn',
+                    className: 'btn btn-warning',
+                    label: 'Style',
+                    type: 'button',
+                    events: {
+                        click: function() {
+                            edit_custom_style();
                         }
                     }
                 },{
@@ -1512,26 +1727,15 @@ $about_html = ABOUT_APP_AUTHOR;
             formbuilder_content_dialog.dialog("open")
         }
 
-        function showPreview(formData) {
-            console.log(formData)
-            let formRenderOpts = {
-                dataType: 'json',
-                formData: formData
-            };
-            let $renderContainer = $('<form/>');
-            $renderContainer.formRender(formRenderOpts);
-            //var htmlCod = $renderContainer.formRender("html")
-            let html = '<!doctype html><head>' +
-                        '<link rel="stylesheet" href="./include/bootstrap/css/bootstrap.min.css">'+
-                        '<link rel="stylesheet" href="./css/render_main.css">'+
-                        '<link rel="stylesheet" href="./include/editTable-0.2.1/jquery.edittable.min.css">'+
-                         '<title>Form Preview</title></head><body><div class="container"><hr>'+$renderContainer.html()+'</div></body></html>';
-            var formPreviewWindow = window.open('', 'formPreview', 'height=480,width=640,toolbar=no,scrollbars=yes');
-            formPreviewWindow.document.write(html);
-            var script = document.createElement('script');
-            script.setAttribute('src', './include/editTable-0.2.1/jquery.edittable.min.js');
-            formPreviewWindow.document.head.appendChild(script);
+        function previewForm(frm_id,data){
+            console.log(data)
+            // Store
+            var dataName = "formpreview-" + frm_id; 
+            localStorage.setItem(dataName, data);
+            var previewLink = "formpreview.php?id="+frm_id;
+             window.open(previewLink, 'formPreview', 'height=480,width=640,toolbar=no,scrollbars=yes');
         }
+
         function setFormJsonObj(dialogBox) {
             var action_type;
             var frm_id = $("#form_content_id").val();
@@ -1847,6 +2051,101 @@ $about_html = ABOUT_APP_AUTHOR;
             }
             general_style_dialog.dialog("open");
         }
+        /////////////////////////////////////Custom form style editor////////////////
+        function edit_custom_style(){
+            var form_id = $("#form_id").val();
+            if(form_id != ""){
+                clearCustomStyleEditorHestory();
+                //get style content from db if exists
+                //set the content in $("#form_custom_style_editor_code").text(the_contetn)
+                var formStyle = getCustomFormStyle(form_id,"edit");
+                if(formStyle == "ERROR"){
+                    alert("Error loading custom form style!!!\n see console.log for details.");
+                    return false;
+                }
+                if(formStyle != "" && formStyle != "-1" ){
+                    $("#custom_style_editor_type").val("update");
+                    custom_style_editor.setValue(formStyle);
+                }else{
+                    if(formStyle == "-1"){
+                        //new
+                        $("#custom_style_editor_type").val("new");
+                    }else{
+                        //update
+                        $("#custom_style_editor_type").val("update");
+                    }
+                    custom_style_editor.setValue("/*custom form style editor*/\n");
+                }
+                old_custom_style =  custom_style_editor.getValue();
+
+                custom_style_editor_dialog.dialog("open");
+                custom_style_editor.refresh();
+                custom_style_editor.focus();
+                // Set the cursor at the end of existing content
+                custom_style_editor.setCursor(custom_style_editor.lineCount(), 0);
+            }
+        }
+
+        function clearCustomStyleEditorHestory(){
+            custom_style_editor.setValue("");
+            custom_style_editor.clearHistory();
+            //$(".CodeMirror-code div").html("");
+        }
+
+        function clearCustomStyleEditor(){
+            custom_style_editor.setValue("");
+        }
+
+        function undoCustomStyleEditor(){
+            custom_style_editor.undo();
+        }
+
+        function redoCustomStyleEditor(){
+            custom_style_editor.redo();
+        }
+        function getCustomFormStyle(form_id,type){
+            var rt_data = "";
+            if(form_id != ""){
+                $.ajax({
+                    type: "POST",
+                    url: "get_custom_form_style.php",
+                    async:false,
+                    data: {
+                        formId : form_id,
+                        get_type: type
+                    },
+                    success: function (response) {
+                        //response = JSON.parse(response);
+                        rt_data = response;
+                    },
+                    error:function (response) {
+                         rt_data = "ERROR";
+                        console.log("Error:",JSON.stringify(response.responseText));
+                    }
+                });
+            }
+            return rt_data;
+        }
+
+        function setCustomFormStyle(){
+            var newFormStyle = custom_style_editor.getValue();
+            if(old_custom_style == newFormStyle){
+                alert("no change");
+                custom_style_editor_dialog.dialog("close");
+                return false;
+            }
+            var frm_id = $("#form_id").val();
+            var action_type =  $("#custom_style_editor_type").val();
+            //console.log(frm_id,action_type,newFormStyle);
+            var frm_data  = {
+                record_id: frm_id,
+                form_style: newFormStyle,
+            };
+            var tbl = "form_style";
+            ajaxAction(action_type, tbl , frm_data, custom_style_editor_dialog);
+        }
+
+        /////////////////////////////////////////////////////////////////////
         function setDefaultFormStyleObj(){
             var defaultSets = '<?=$dFrmSets ?>';
             var defaultFormStylObj = {};
