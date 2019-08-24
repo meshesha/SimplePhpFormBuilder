@@ -70,9 +70,9 @@ if(!empty($_POST['username']) && !empty($_POST['password'])){
 				}
 			}
 		}
-		if((!empty($usrGroupsAry) && in_array($adminGroupId, $usrGroupsAry)) || 
-			($isUserFormAdmin != "") ||
-			(!empty($formUsersMngAry) && in_array($userId, $formUsersMngAry))){
+		//if((!empty($usrGroupsAry) && in_array($adminGroupId, $usrGroupsAry)) || 
+		//	($isUserFormAdmin != "") ||
+		//	(!empty($formUsersMngAry) && in_array($userId, $formUsersMngAry))){
 			$_SESSION['user_id'] = $userId;
 			if( isset($_SESSION['user_id']) ){
 				if($_SESSION['rederect_url'] == "main_page"){
@@ -93,10 +93,10 @@ if(!empty($_POST['username']) && !empty($_POST['password'])){
 					}
 				}
 			}
-		}else{
-			$isShowLogin = false;
-			$message = 'Sorry, you not Administrator';
-		}
+		//}else{
+		//	$isShowLogin = false;
+		//	$message = 'Sorry, you not Administrator';
+		//}
 	} else {
 		$message = 'Sorry,  Username does not exist or is suspended';
 	}

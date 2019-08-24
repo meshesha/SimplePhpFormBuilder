@@ -38,8 +38,8 @@ $formStatus = $formDataAry[1];
 $formTitle = $formDataAry[2];
 $formStyle = $formDataAry[3];
 $rstrcSubmit = $formDataAry[4];
-
-
+$formGroups = $formDataAry[5];
+$formAmins = $formDataAry[6];
 //is set cookie protection
 $isCookieSet = getSetting("", "enableUsingCookies");
 if($isCookieSet == "1" && $rstrcSubmit != "-1"){
@@ -82,9 +82,28 @@ if($formType == "2" || $formType == "4"){ //2-groups not Anonymously, 4-groups A
         $results = $records->fetch(PDO::FETCH_ASSOC);
         $message = '';
         if($results != "" && count($results) > 0){
-            $user = $_SESSION['user_id'];
             //$email = $results['email'];
             //$userName = $results['username'];
+            $usrGroups = $results['groups']; //multi values
+            $formAdminsAry = explode(",",$formAmins);
+            if(in_array($_SESSION['user_id'], $formAdminsAry)){
+                $user = $_SESSION['user_id'];
+            }else{
+                //groups
+                $usrGroupsAry = explode(",",$usrGroups);
+                $formGroupsAry = explode(",",$formGroups);
+                $found = false;
+                foreach($usrGroupsAry as $uGrp){
+                    if(in_array($uGrp, $formGroupsAry)){
+                        $found = true;
+                    }
+                }
+                if($found){
+                    $user = $_SESSION['user_id'];
+                }else{
+                    die("Your groups are not allowed to access this form!!");
+                }
+            }
         }else{
             $message = '<label class="text-danger">Sorry, Username does not exist or is suspended</label>';
         }
@@ -106,7 +125,9 @@ function getFormData($conn, $formId){
         $results['publish_status'],
         $results['form_title'],
         $results['form_genral_style'],
-        $results['amount_form_submission']
+        $results['amount_form_submission'],
+        $results['publish_groups'],
+        $results['admin_users']
     ];
 }
 function getUserIp(){
