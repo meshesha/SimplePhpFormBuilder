@@ -23,6 +23,9 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog
 
+* ver 1.5.2
+  - fixed login issue in form.php when publish type is for groups.
+  
 * ver 1.5.1
   - fixed formBuilder.js issue in form.php.
 * ver 1.5.0
