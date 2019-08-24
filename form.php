@@ -218,6 +218,7 @@ function fixRGBtoRGBA($rgb){
     </script>
     <!--///////////////////////////////////////////////////////-->
     <script src="./include/formbuilder/form-render.min.js"></script>
+    <script src="./include/formbuilder/control_plugins/buttons.js"></script>
     <script src="./include/formbuilder/control_plugins/table.js"></script>
     <!--<script src="./include/formbuilder/control_plugins/starRating.min.js"></script>-->
 
