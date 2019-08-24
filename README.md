@@ -23,6 +23,8 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog
 
+* ver 1.5.1
+  - fixed formBulder.js issue in form.php.
 * ver 1.5.0
   - approved form-builder preview popup.
   - added user details (user id, name , email) in submission form details (formadmin.php)
