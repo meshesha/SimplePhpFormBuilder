@@ -633,9 +633,11 @@ $about_html = ABOUT_APP_AUTHOR;
                             }else{
                                 crntVerNum3thd = currentVerAry[2];
                             }
+                            //console.log(newVerNumAry[0],newVerNumAry[1],newVerNum3thd)
+                            //console.log(currentVerAry[0],currentVerAry[1],crntVerNum3thd)
                             if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
-                                    Number(newVerNumAry[1]) > Number(currentVerAry[1]) ||
-                                    Number(newVerNum3thd) > Number(crntVerNum3thd)){
+                                ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) > Number(currentVerAry[1]))) ||
+                                ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) == Number(currentVerAry[1])) &&  (Number(newVerNum3thd) > Number(crntVerNum3thd)))){
                                 if(isDraft && isPrerelease){
                                     $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
                                 }else if(!isDraft && isPrerelease){
@@ -1475,7 +1477,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     value: "Edit",
                     style: "width:80px",
                     onclick: "setTableSettings(this)"
-                }
+                },
             };
             
             var options = {
@@ -1550,6 +1552,13 @@ $about_html = ABOUT_APP_AUTHOR;
                         }
                     }
                 },
+                replaceFields: [
+                    {
+                        type: "table",
+                        label:'Table',
+                        placeholder: "[{&quot;name&quot;:&quot;Column1&quot;,&quot;type&quot;:&quot;txt&quot;,&quot;attr&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Column2&quot;,&quot;type&quot;:&quot;txt&quot;,&quot;attr&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Column3&quot;,&quot;type&quot;:&quot;txt&quot;,&quot;attr&quot;:&quot;&quot;}]"
+                    }
+                ],
                 disableFields: ['autocomplete','hidden','button','Buttons'],
                 controlOrder: [
                     'header',

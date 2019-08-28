@@ -214,6 +214,7 @@ if($formStyle != null && $formStyle != ""){
     <!--///////////////////////////////////////////////////////-->
     <script src="./include/formbuilder/form-builder.min.js"></script>
     <script src="./include/formbuilder/form-render.min.js"></script>
+    <script src="./include/formbuilder/control_plugins/buttons.js"></script>
     <script src="./include/formbuilder/control_plugins/table.js"></script>
 
     <script src="./include/jQueryPopMenu/src/jquery.popmenu.js"></script>
@@ -347,120 +348,122 @@ if($formStyle != null && $formStyle != ""){
             $("#main-vewer-menu ul").hide();
         }
         
-        function checkNewVer(currentVer){
-            //alert("currentVer: " + currentVer)
-            $("#app-ver-check-result").html("<img src='images/spinner.gif' />");
-            $("#app-ver-check-result").show();
-            var appUrl = "https://api.github.com/repos/meshesha/SimplePhpFormBuilder/releases/latest";
-            $.ajax({
-                type: "GET",
-                url: appUrl,
-                dataType: "json",
-                success: function (response) {
-                    if(response != "" && response !== undefined && response !== null){
-                        var new_ver_str = response.tag_name.toLowerCase();
-                        var new_ver_url = response.html_url;
-                        var isDraft = response.draft;
-                        var isPrerelease = response.prerelease;
-                        var note = response.body.replace(/\r\n/g,"<br>");
-                        var new_ver_num = "";
-                        var verPrefix = ["v","v.","ver","ver."];
-                        $.each(verPrefix, function(i,prefix){
-                            var prefixLoc = new_ver_str.indexOf(prefix);
-                            if(prefixLoc != -1){
-                                new_ver_num = new_ver_str.substr((prefixLoc + 1));
-                            }
-                        })
-                        if(currentVer == new_ver_num){
-                            $("#app-ver-check-result").html("SimplePhpFormBuilder is up to date.")
-                        }else{
-                            var currentVerAry = [];
-                            if(currentVer.indexOf(".") != -1){
-                                currentVerAry = currentVer.split(".");
-                            }else{
-                                currentVerAry[0] = currentVer;
-                            }
-                            var newVerNumAry = [];
-                            if(new_ver_num.indexOf(".") != -1){
-                                newVerNumAry = new_ver_num.split(".");
-                            }else{
-                                newVerNumAry[0] = new_ver_num;
-                            }
-                            /**Semantic Versioning:
-                            1.0.0
-                            1.0.0
-                            1.10.5-RC1
-                            4.4.4-beta2
-                            2.0.0-alpha
-                            2.0.4-p1
-                            */
-                            if(currentVerAry.length == 3 && newVerNumAry.length == 3){
-                                var newVerNum3thd = "";
-                                var newVerSuffix = "";
-                                if(newVerNumAry[2].indexOf("-") != -1){
-                                    newVernum3thdAry = newVerNumAry[2].split("-");
-                                    newVerNum3thd = newVernum3thdAry[0];
-                                    newVerSuffix =  newVernum3thdAry[1];
-                                }else{
-                                    newVerNum3thd = newVerNumAry[2];
-                                }
-                                var crntVerNum3thd = "";
-                                var crntVerSuffix = "";
-                                if(currentVerAry[2].indexOf("-") != -1){
-                                    crntVerNum3thdAry = currentVerAry[2].split("-");
-                                    crntVerNum3thd = crntVerNum3thdAry[0];
-                                    crntVerSuffix =  crntVerNum3thdAry[1];
-                                }else{
-                                    crntVerNum3thd = currentVerAry[2];
-                                }
-                                if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
-                                        Number(newVerNumAry[1]) > Number(currentVerAry[1]) ||
-                                        Number(newVerNum3thd) > Number(crntVerNum3thd)){
-                                    if(isDraft && isPrerelease){
-                                        $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
-                                    }else if(!isDraft && isPrerelease){
-                                        $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release</p>");
-                                    }else if(isDraft && !isPrerelease){
-                                        $("#app-ver-check-result").html("<p>There is a new version but this is a draft</p>");
-                                    }else{
-                                        if(newVerSuffix == ""){
-                                            $("#app-ver-check-result").html("<p>There is a new version</p>");
-                                        }else{
-                                            $("#app-ver-check-result").html("<p>There is a new version but this is '"  +newVerSuffix + "'</p>");
-                                        }
-                                    }
-                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
-                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: " + new_ver_num + "<br>" +  note + "</p>");
-                                }else if(Number(newVerNumAry[0]) == Number(currentVerAry[0]) &&
-                                        Number(newVerNumAry[1]) == Number(currentVerAry[1]) &&
-                                        Number(newVerNum3thd) == Number(crntVerNum3thd)){ 
-                                    if(newVerSuffix != ""  && newVerSuffix != crntVerSuffix){
-                                        $("#app-ver-check-result").html("<p>There is a new '"+newVerSuffix+"' version</p>");
-                                        $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
-                                        $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + "<br>" + note + "</p>");
-                                    }else if(newVerSuffix == ""  && newVerSuffix != crntVerSuffix){
-                                        $("#app-ver-check-result").html("<p>There is a new version</p>");
-                                        $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
-                                        $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + " (stable)<br>" + note + "</p>");
-                                    }
-                                }else{
-                                    $("#app-ver-check-result").html("This version is newer than what exists in the Github :)")
-                                }
-                            }else{
-                                $("#app-ver-check-result").html("<span style='color:red;'>Error: Semantic Versioning error.</span>");
-                            }
-                            //console.log(new_ver_str,new_ver_num, new_ver_url);
+    function checkNewVer(currentVer){
+        //alert("currentVer: " + currentVer)
+        $("#app-ver-check-result").html("<img src='images/spinner.gif' />");
+        $("#app-ver-check-result").show();
+        var appUrl = "https://api.github.com/repos/meshesha/SimplePhpFormBuilder/releases/latest";
+        $.ajax({
+            type: "GET",
+            url: appUrl,
+            dataType: "json",
+            success: function (response) {
+                if(response != "" && response !== undefined && response !== null){
+                    var new_ver_str = response.tag_name.toLowerCase();
+                    var new_ver_url = response.html_url;
+                    var isDraft = response.draft;
+                    var isPrerelease = response.prerelease;
+                    var note = response.body.replace(/\r\n/g,"<br>");
+                    var new_ver_num = "";
+                    var verPrefix = ["v","v.","ver","ver."];
+                    $.each(verPrefix, function(i,prefix){
+                        var prefixLoc = new_ver_str.indexOf(prefix);
+                        if(prefixLoc != -1){
+                            new_ver_num = new_ver_str.substr((prefixLoc + 1));
                         }
+                    })
+                    if(currentVer == new_ver_num){
+                        $("#app-ver-check-result").html("SimplePhpFormBuilder is up to date.")
                     }else{
-                        $("#app-ver-check-result").html("<span style='color:red;'>Error: the github api response no json format</span>");
+                        var currentVerAry = [];
+                        if(currentVer.indexOf(".") != -1){
+                            currentVerAry = currentVer.split(".");
+                        }else{
+                            currentVerAry[0] = currentVer;
+                        }
+                        var newVerNumAry = [];
+                        if(new_ver_num.indexOf(".") != -1){
+                            newVerNumAry = new_ver_num.split(".");
+                        }else{
+                            newVerNumAry[0] = new_ver_num;
+                        }
+                        /**Semantic Versioning:
+                        1.0.0
+                        1.0.0
+                        1.10.5-RC1
+                        4.4.4-beta2
+                        2.0.0-alpha
+                        2.0.4-p1
+                         */
+                        if(currentVerAry.length == 3 && newVerNumAry.length == 3){
+                            var newVerNum3thd = "";
+                            var newVerSuffix = "";
+                            if(newVerNumAry[2].indexOf("-") != -1){
+                                newVernum3thdAry = newVerNumAry[2].split("-");
+                                newVerNum3thd = newVernum3thdAry[0];
+                                newVerSuffix =  newVernum3thdAry[1];
+                            }else{
+                                newVerNum3thd = newVerNumAry[2];
+                            }
+                            var crntVerNum3thd = "";
+                            var crntVerSuffix = "";
+                            if(currentVerAry[2].indexOf("-") != -1){
+                                crntVerNum3thdAry = currentVerAry[2].split("-");
+                                crntVerNum3thd = crntVerNum3thdAry[0];
+                                crntVerSuffix =  crntVerNum3thdAry[1];
+                            }else{
+                                crntVerNum3thd = currentVerAry[2];
+                            }
+                            //console.log(newVerNumAry[0],newVerNumAry[1],newVerNum3thd)
+                            //console.log(currentVerAry[0],currentVerAry[1],crntVerNum3thd)
+                            if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
+                                ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) > Number(currentVerAry[1]))) ||
+                                ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) == Number(currentVerAry[1])) &&  (Number(newVerNum3thd) > Number(crntVerNum3thd)))){
+                                if(isDraft && isPrerelease){
+                                    $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
+                                }else if(!isDraft && isPrerelease){
+                                    $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release</p>");
+                                }else if(isDraft && !isPrerelease){
+                                    $("#app-ver-check-result").html("<p>There is a new version but this is a draft</p>");
+                                }else{
+                                    if(newVerSuffix == ""){
+                                        $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                    }else{
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is '"  +newVerSuffix + "'</p>");
+                                    }
+                                }
+                                $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: " + new_ver_num + "<br>" +  note + "</p>");
+                            }else if(Number(newVerNumAry[0]) == Number(currentVerAry[0]) &&
+                                    Number(newVerNumAry[1]) == Number(currentVerAry[1]) &&
+                                    Number(newVerNum3thd) == Number(crntVerNum3thd)){ 
+                                if(newVerSuffix != ""  && newVerSuffix != crntVerSuffix){
+                                    $("#app-ver-check-result").html("<p>There is a new '"+newVerSuffix+"' version</p>");
+                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + "<br>" + note + "</p>");
+                                }else if(newVerSuffix == ""  && newVerSuffix != crntVerSuffix){
+                                    $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + " (stable)<br>" + note + "</p>");
+                                }
+                            }else{
+                                $("#app-ver-check-result").html("This version is newer than what exists in the Github :)")
+                            }
+                        }else{
+                            $("#app-ver-check-result").html("<span style='color:red;'>Error: Semantic Versioning error.</span>");
+                        }
+                        //console.log(new_ver_str,new_ver_num, new_ver_url);
                     }
-                },
-                error:function (response) {
-                    $("#app-ver-check-result").html("<span style='color:red;'>Error:" + JSON.stringify(response) + "</span>");
-                    //alert(response.responseText)
+                }else{
+                    $("#app-ver-check-result").html("<span style='color:red;'>Error: the github api response no json format</span>");
                 }
-            });
-        }
+            },
+            error:function (response) {
+                $("#app-ver-check-result").html("<span style='color:red;'>Error:" + JSON.stringify(response) + "</span>");
+                //alert(response.responseText)
+            }
+        });
+    }
     </script>
 </head>
 <body>
