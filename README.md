@@ -21,8 +21,14 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 ## usage
 * see [wiki-usage](https://github.com/meshesha/SimplePhpFormBuilder/wiki/usage)
 
-## Changelog
+## Changelog  
 
+* ver 1.5.3
+  - fixed issue in formadmin.php. 
+  - fixed - in form builder mode ("Form Template") (index.php) - not save default table columns.
+  - fixed - in  form builder mode ("Form Template") (index.php) - remove column in table attr issue.
+  - fixed - in about window - "check for update" issue.
+  
 * ver 1.5.2
   - fixed login issue in form.php when publish type is for groups.
   
