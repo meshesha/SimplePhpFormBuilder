@@ -317,12 +317,12 @@ function setTableSettings(obj) {
                 }
 
                 var option = slectOptionHtml(colType);
-                var tr = "<tr class='participantRow_" + elName + "'>" + "<td><input name='" + elmInputId + "' id='txt-" + elmInputId + "' type='text' data-type='colname' placeholder='Column Name' value='" + colName + "' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' /></td>" + "<td><select name='" + elmInputId + "' id='slct-" + elmInputId + "' type='select' data-type='coltype' class='form-control' onchange='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")'>" + option + "</select></td>" + "<td><input name='" + elmInputId + "' id='attr-" + elmInputId + "' type='text' data-type='colattr' placeholder='Attr' value='" + colAttr + "' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' " + isAttrDisabled + " /></td>" + "<td><button class='btn-danger remove icon-cancel' type='button' onclick='removeRowParticipantTable(\"" + elName + "\",this)'>Remove</button></td></tr>";
+                var tr = "<tr class='participantRow_" + elName + "'>" + "<td><input name='" + elmInputId + "' id='txt-" + elmInputId + "' type='text' data-type='colname' placeholder='Column Name' value='" + colName + "' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' /></td>" + "<td><select name='" + elmInputId + "' id='slct-" + elmInputId + "' type='select' data-type='coltype' class='form-control' onchange='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")'>" + option + "</select></td>" + "<td><input name='" + elmInputId + "' id='attr-" + elmInputId + "' type='text' data-type='colattr' placeholder='Attr' value='" + colAttr + "' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' " + isAttrDisabled + " /></td>" + "<td><button name='" + elmInputId + "' id='attr-" + elmInputId + "' class='btn-danger remove icon-cancel' type='button' onclick='removeRowParticipantTable(\"" + elName + "\",this)'>Remove</button></td></tr>";
                 $("#" + elName + " tbody").append(tr);
             });
         } else {
             var option = slectOptionHtml("text");
-            var tr = "<tr class='participantRow_" + elName + "'>" + "<td><input name='" + elmInputId + "' id='txt-" + elmInputId + "' type='text' data-type='colname' placeholder='Column Name' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' /></td>" + "<td><select name='" + elmInputId + "' id='slct-" + elmInputId + "' type='select' data-type='coltype' class='form-control' onchange='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")'>" + option + "</select></td>" + "<td><input name='" + elmInputId + "' id='attr-" + elmInputId + "' type='text' data-type='colattr' placeholder='Attr' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' /></td>" + "<td><button class='btn-danger remove icon-cancel' type='button' onclick='removeRowParticipantTable(\"" + elName + "\",this)'>Remove</button></td></tr>";
+            var tr = "<tr class='participantRow_" + elName + "'>" + "<td><input name='" + elmInputId + "' id='txt-" + elmInputId + "' type='text' data-type='colname' placeholder='Column Name' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' /></td>" + "<td><select name='" + elmInputId + "' id='slct-" + elmInputId + "' type='select' data-type='coltype' class='form-control' onchange='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")'>" + option + "</select></td>" + "<td><input name='" + elmInputId + "' id='attr-" + elmInputId + "' type='text' data-type='colattr' placeholder='Attr' class='form-control' onkeyup='setNewTblColumnName(\"" + elName + "\",this,\"" + obj + "\")' /></td>" + "<td><button name='" + elmInputId + "' id='attr-" + elmInputId + "' class='btn-danger remove icon-cancel' type='button' onclick='removeRowParticipantTable(\"" + elName + "\",this)'>Remove</button></td></tr>";
             $("#" + elName + " tbody").append(tr);
         }
     }
@@ -353,6 +353,7 @@ function removeRowParticipantTable(id, obj) {
     } else {
         $(obj).closest("tr").remove();
     }
+    setNewTblColumnName(id, obj);
 }
 
 function setNewTblColumnName(id, obj, pObject) {
