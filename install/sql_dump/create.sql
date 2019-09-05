@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS `form_list` (
   `form_title` varchar(255) NOT NULL DEFAULT '',
   `publish_type` varchar(10) NOT NULL DEFAULT '',
   `publish_groups` varchar(1024) NOT NULL DEFAULT '',
+  `publish_deps` VARCHAR(4) NOT NULL DEFAULT '',
   `publish_status` varchar(5) NOT NULL DEFAULT '',
   `amount_form_submission` VARCHAR(6) NOT NULL DEFAULT '-1',
   `admin_users` varchar(255) NOT NULL DEFAULT '1',
@@ -109,6 +110,52 @@ CREATE TABLE IF NOT EXISTS `form_tables` (
   `table_data` longtext,
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- --------------------------------------------------------
+--
+-- Table structure for table `organization_tree`
+--
+
+DROP TABLE IF EXISTS `organization_tree`;
+CREATE TABLE IF NOT EXISTS `organization_tree` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(128) NOT NULL DEFAULT '',
+  `parent_id` varchar(64) NOT NULL DEFAULT '1',
+  `dep_mngr_user_id` varchar(6) NOT NULL DEFAULT '',
+  `note` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `organization_tree`
+--
+
+INSERT INTO `organization_tree` (`id`, `name`, `parent_id`, `dep_mngr_user_id`, `note`) VALUES
+(1, 'org manager', '0', '1', NULL);
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `publish_type`
+--
+DROP TABLE IF EXISTS `publish_type`;
+CREATE TABLE IF NOT EXISTS `publish_type` (
+  `id` int(2) NOT NULL AUTO_INCREMENT,
+  `name` varchar(128) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `publish_type`
+--
+
+INSERT INTO `publish_type` (`id`, `name`) VALUES
+(1, 'Public'),
+(2, 'Groups'),
+(3, 'Public-Anonymously'),
+(4, 'Groups-Anonymously'),
+(5, 'departments'),
+(6, 'departments-Anonymously');
 -- --------------------------------------------------------
 
 --
@@ -199,6 +246,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` varchar(200) NOT NULL DEFAULT '',
   `status` varchar(1) NOT NULL DEFAULT '0',
   `groups` varchar(255) NOT NULL DEFAULT '',
+  `dep_id` VARCHAR(6) NOT NULL DEFAULT '',
   `forgot_verify` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
@@ -209,6 +257,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `status`, `groups`, `forgot_verify`) VALUES
 (1, 'admin', 'admin@localhost.com', '$2y$10$FTyD8hpjyNVCbxsdM2.M5eIEm1OQ0NqXj7Qyv60X38rR6Nxh/BoRy', '1', '1', '');
+
 
 -- --------------------------------------------------------
 
@@ -232,3 +281,4 @@ INSERT INTO `users_gropes` (`indx`, `group_name`, `group_status`, `admin_ids`) V
 (1, 'administrator', '1', '1'),
 (2, 'managers', '1', '1'),
 (3, 'registered', '1', '1');
+

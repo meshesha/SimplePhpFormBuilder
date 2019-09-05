@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `form_list` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 ALTER TABLE `form_list` ADD COLUMN `form_genral_style` longtext;
 ALTER TABLE `form_list` ADD `amount_form_submission` VARCHAR(6) NOT NULL DEFAULT '-1' COMMENT 'The amount of form submission is allowed (-1 = no limit)' AFTER `publish_status`; 
-
+ALTER TABLE `form_list` ADD `publish_deps` VARCHAR(4) NOT NULL DEFAULT '' AFTER `publish_groups`;
 
 -- --------------------------------------------------------
 
@@ -104,6 +104,41 @@ CREATE TABLE IF NOT EXISTS `form_tables` (
   `table_data` longtext,
   PRIMARY KEY (`indx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+--
+-- Table structure for table `organization_tree`
+--
+CREATE TABLE IF NOT EXISTS `organization_tree` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(128) NOT NULL DEFAULT '',
+  `parent_id` varchar(64) NOT NULL DEFAULT '1',
+  `dep_mngr_user_id` varchar(6) NOT NULL DEFAULT '',
+  `note` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `publish_type`
+--
+CREATE TABLE IF NOT EXISTS `publish_type` (
+  `id` int(2) NOT NULL AUTO_INCREMENT,
+  `name` varchar(128) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `publish_type`
+--
+
+INSERT INTO `publish_type` (`id`, `name`) VALUES
+(1, 'Public'),
+(2, 'Groups'),
+(3, 'Public-Anonymously'),
+(4, 'Groups-Anonymously'),
+(5, 'departments'),
+(6, 'departments-Anonymously');
 -- --------------------------------------------------------
 
 --
@@ -152,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `forgot_verify` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
+ALTER TABLE `users` ADD `dep_id` VARCHAR(6) NOT NULL DEFAULT '' AFTER `groups`;
 -- --------------------------------------------------------
 
 --
