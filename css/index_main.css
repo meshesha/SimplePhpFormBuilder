@@ -371,3 +371,65 @@
 .style_editor_resize_handle:hover:before {
   color: #000;
 }
+
+/*=========================================================*/
+.users_groups_data{
+  background-image: linear-gradient(#f0f0f0,#f0f0f0);
+  background-repeat: repeat-y;
+}
+
+#org_dep_win{
+  background-image: linear-gradient(#f0f0f0,#f0f0f0);
+}
+.org_dep_warper,
+.container,
+.style-select{
+  height: 60%;
+}
+
+
+
+.style-select select {
+  padding: 0;
+}
+
+.style-select select option {
+  padding: 4px 10px 4px 10px;
+}
+
+.style-select select option:hover {
+  background: #EEEEEE;
+}
+
+.select-users-box-1,
+.select-users-box-2 {
+  float: left;
+  width: 45%;
+  height: 90%;
+}
+
+.select-users-box-1 select,
+.select-users-box-2 select {
+  height: 100%;
+  padding: 0;
+}
+
+.select-users-box-1 select option,
+.select-users-box-2 select option {
+  padding: 4px 10px 4px 10px;
+}
+
+.select-users-box-1 select option:hover,
+.select-users-box-2 select option:hover {
+  background: #EEEEEE;
+}
+
+.select-users-arrows {
+  float: left;
+  width: 10%;
+}
+
+.select-users-arrows input {
+  width: 70%;
+  margin-bottom: 5px;
+}
