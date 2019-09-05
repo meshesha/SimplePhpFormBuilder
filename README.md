@@ -23,6 +23,16 @@ SimplePhpFormBuilder is a Aplication that based on a [jQuery.formbuilder](https:
 
 ## Changelog  
 
+* ver 1.6.0
+  - added organization departments tree.
+       - added tree view.
+       - added table view.
+  - added new publishing type (5-departments (dep), 6-departments Anonymously (dep Anonymously)).
+  - added user info in form.php.
+  - added logout option in form.php.
+  - fixed - when form published as public, and when changing "Publish type" option to "Groups" groups list not appear.
+  - fixed login issue.
+
 * ver 1.5.3
   - fixed issue in formadmin.php. 
   - fixed - in form builder mode ("Form Template") (index.php) - not save default table columns.
