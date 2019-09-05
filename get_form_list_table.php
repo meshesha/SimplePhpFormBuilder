@@ -42,7 +42,7 @@ if(isset($_POST['data_indx']) && $_POST["user_id"]){
                 $params_cell[] =  $row_id; //1
                 $params_cell[] = $row['form_name']; //2
                 $params_cell[] = $row["form_title"]; //3
-                $params_cell[] = getPublishTypes($row["publish_type"]); //4
+                $params_cell[] = getPublishTypes($conn,$row["publish_type"]); //4
                 $params_cell[] = getPublishStatus($row["publish_status"]); //5
                 //$params_cell[] = $row["admin_users"]; //6
                 //$params_cell[] = $row["form_note"]; //7
@@ -81,7 +81,19 @@ if(isset($_POST['data_indx']) && $_POST["user_id"]){
         ]
     }';
 }
-function getPublishTypes($publish_type){
+function getPublishTypes($conn, $publish_type){
+    $sql = "SELECT * FROM publish_type WHERE id=$publish_type";
+    $type_name = "undefined group";
+    if($result = $conn->query($sql)) {
+        $count = mysqli_num_rows($result);
+        if($count > 0){
+            while($row = mysqli_fetch_assoc($result)){
+                $type_name = $row["name"];
+            }
+        }
+    }
+    return $type_name;
+    /*
     switch($publish_type){
         case "0":
             return "";
@@ -101,6 +113,7 @@ function getPublishTypes($publish_type){
         default:
             return "undefined group";
     }
+    */
 }
 function getPublishStatus($publish_status){
     switch($publish_status){

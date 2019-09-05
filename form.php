@@ -33,13 +33,18 @@ if($appMode == "0"){
 require 'settings/database.login.php';
 
 $formDataAry = getFormData($conn, $formId);
-$formType = $formDataAry[0];
-$formStatus = $formDataAry[1];
-$formTitle = $formDataAry[2];
-$formStyle = $formDataAry[3];
-$rstrcSubmit = $formDataAry[4];
-$formGroups = $formDataAry[5];
-$formAmins = $formDataAry[6];
+if($formDataAry == ""){
+    die("No form data!!!");
+}
+$formType = $formDataAry['publish_type'];
+$formStatus = $formDataAry['publish_status'];
+$formTitle = $formDataAry['form_title'];
+$formStyle = $formDataAry['form_genral_style'];
+$rstrcSubmit = $formDataAry['amount_form_submission'];
+$formGroups = $formDataAry['publish_groups'];
+$formDeps = $formDataAry['publish_deps'];
+$formAmins = $formDataAry['admin_users'];
+
 //is set cookie protection
 $isCookieSet = getSetting("", "enableUsingCookies");
 if($isCookieSet == "1" && $rstrcSubmit != "-1"){
@@ -71,9 +76,13 @@ if($formStatus == "2"){
 $userId = '';
 $email = '';
 $userName = '';
-if($formType == "2" || $formType == "4"){ //2-groups not Anonymously, 4-groups Anonymously
+$isLoginUser = false;
+if(isset($_SESSION['user_id']) && $formType != "1" && $formType != "3"){ //not public
+    $isLoginUser = true;
+}
+if($formType == "2" || $formType == "4" || $formType == "5" || $formType == "6"){ //2-groups(not Anonymously), 4-groups Anonymously , 5-6-Dep.
     if(isset($_SESSION['user_id'])){
-        if($formType == "2"){ //groups not Anonymously
+        if($formType == "2" || $formType == "5"){ //groups or deps not Anonymously
             $userId = $_SESSION['user_id'];
         }
         $records = $conn->prepare('SELECT * FROM users WHERE status="1" AND id = :userid');
@@ -85,24 +94,41 @@ if($formType == "2" || $formType == "4"){ //2-groups not Anonymously, 4-groups A
             //$email = $results['email'];
             //$userName = $results['username'];
             $usrGroups = $results['groups']; //multi values
+            $usrDep = $results['dep_id']; //one value
+            $usrGroupsAry = explode(",",$usrGroups);
             $formAdminsAry = explode(",",$formAmins);
-            if(in_array($_SESSION['user_id'], $formAdminsAry)){
+            $adminGroupId = getAdministratorGroupId($conn);
+            if(in_array($_SESSION['user_id'], $formAdminsAry) || in_array($adminGroupId, $usrGroupsAry)){
+                //if the user is administrator or this form manager
                 $user = $_SESSION['user_id'];
             }else{
-                //groups
-                $usrGroupsAry = explode(",",$usrGroups);
-                $formGroupsAry = explode(",",$formGroups);
-                $found = false;
-                foreach($usrGroupsAry as $uGrp){
-                    if(in_array($uGrp, $formGroupsAry)){
-                        $found = true;
+                if($formType == "2" || $formType == "4"){ //groups
+                    $formGroupsAry = explode(",",$formGroups);
+                    $found = false;
+                    foreach($usrGroupsAry as $uGrp){
+                        if(in_array($uGrp, $formGroupsAry)){
+                            $found = true;
+                        }
+                    }
+                    if($found){
+                        $user = $_SESSION['user_id'];
+                    }else{
+                        //die("Your groups are not allowed to access this form!!");
+                        $message = '<label class="text-danger">Sorry, Your groups are not allowed to access this form.</label>';
+                    }
+                }else if($formType == "5" || $formType == "6"){ //deps
+                    $formDepsAry = explode(",",$formDeps);
+                    //$formDepsAry[] = "1"; //add administrator
+                    if(in_array($usrDep, $formDepsAry)){
+                        $user = $_SESSION['user_id'];
+                    }else{
+                        //die("Your department is not authorized to enter this form!!");
+                        $message = '<label class="text-danger">Sorry,Your department is not authorized to enter this form.</label>';
                     }
                 }
-                if($found){
-                    $user = $_SESSION['user_id'];
-                }else{
-                    die("Your groups are not allowed to access this form!!");
-                }
+                //else{
+                //    $user = $_SESSION['user_id'];
+                //}
             }
         }else{
             $message = '<label class="text-danger">Sorry, Username does not exist or is suspended</label>';
@@ -110,8 +136,8 @@ if($formType == "2" || $formType == "4"){ //2-groups not Anonymously, 4-groups A
     }
 }else if($formType == "1"){ //public not Anonymously
     $user = getUserIp();
-    $userId = getUserIp();
-}else{
+    $userId = $user;
+}else{ //$formType = "3" -> public Anonymously
     $userId = "";
     $user = "Anonymously";
 }
@@ -120,15 +146,20 @@ function getFormData($conn, $formId){
 	$records->bindParam(':formid',$formId);
 	$records->execute();
     $results = $records->fetch(PDO::FETCH_ASSOC);
-    return [
-        $results['publish_type'],
-        $results['publish_status'],
-        $results['form_title'],
-        $results['form_genral_style'],
-        $results['amount_form_submission'],
-        $results['publish_groups'],
-        $results['admin_users']
-    ];
+    $formData = array();
+    $formData['publish_type'] = $results['publish_type'];
+    $formData['publish_status'] = $results['publish_status'];
+    $formData['form_title'] = $results['form_title'];
+    $formData['form_genral_style'] = $results['form_genral_style'];
+    $formData['amount_form_submission'] = $results['amount_form_submission'];
+    $formData['publish_groups'] = $results['publish_groups'];
+    $formData['publish_deps'] = $results['publish_deps'];
+    $formData['admin_users'] = $results['admin_users'];
+    if($results != "" && count($results) > 0){
+        return $formData;
+    }else{
+        return "";
+    }
 }
 function getUserIp(){
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -144,6 +175,22 @@ function getUserIp(){
     return $ip;
 }
 
+function getAdministratorGroupId($conn){
+	$admina = "administrator";
+	$adminb = "Administrator";
+	$adminc = "ADMINISTRATOR";
+	$records = $conn->prepare('SELECT indx  FROM users_gropes WHERE (group_name = :groupa) OR (group_name = :groupb) OR (group_name = :groupc)');
+	$records->bindParam(':groupa', $admina);
+	$records->bindParam(':groupb', $adminb);
+	$records->bindParam(':groupc', $adminc);
+	$records->execute();
+	$results = $records->fetch(PDO::FETCH_ASSOC);
+	if($results != '' && count($results) > 0){
+		return $results["indx"];
+	}else{
+		return "";
+	}
+}
 ////////////////////////Form Style params/////////////
 //echo "Style: $formStyle";
 if($formStyle != null && $formStyle != ""){
@@ -242,7 +289,17 @@ function fixRGBtoRGBA($rgb){
     <script src="./include/formbuilder/control_plugins/buttons.js"></script>
     <script src="./include/formbuilder/control_plugins/table.js"></script>
     <!--<script src="./include/formbuilder/control_plugins/starRating.min.js"></script>-->
+    <?php if($isLoginUser): ?>
+    <script src="./include/jQueryPopMenu/src/jquery.popmenu.js"></script>
+    <script src="./js/form.js"></script>
+    
+    <link rel="stylesheet" href="./include/select2/dist/css/select2.min.css">
+    <script type="text/javascript" src="./include/select2/dist/js/select2.min.js"></script>
+    
+    <!-- full dialog -->
+    <script src="./include/fulldialog/jqueryui.dialog.fullmode.js"></script>
 
+    <?php endif; ?>
         <!-- Number fields handler-->
     <link rel="stylesheet" href="./include/Formstone-1.4.13.1/css/number.css">
     <link href="./include/Formstone-1.4.13.1/css/themes/light.css" rel="stylesheet">
@@ -259,10 +316,10 @@ function fixRGBtoRGBA($rgb){
         margin:0 auto;
         width: <?=$formWidth ?>;
         background: <?=$formBgImage ?>;
-        background-size: <?=$bgImgSize ?>; /*contain,cover,auto - PHP-TODO*/ 
-        background-repeat: <?=$bgImgRepet ?>; /*repeat,repeat-x,repeat-y,no-repeat - PHP-TODO*/
-        background-attachment: <?=$bgImgAttachment ?>; /*fixed,scroll - PHP-TODO*/
-        background-position: <?=$bgImgPosition ?>; /* - PHP-TODO*/
+        background-size: <?=$bgImgSize ?>; /*contain,cover,auto*/ 
+        background-repeat: <?=$bgImgRepet ?>; /*repeat,repeat-x,repeat-y,no-repeat*/
+        background-attachment: <?=$bgImgAttachment ?>; /*fixed,scroll */
+        background-position: <?=$bgImgPosition ?>; /**/
     }
     .form-render-warper{
         border: <?=$formBorder ?>;
@@ -275,14 +332,48 @@ function fixRGBtoRGBA($rgb){
         direction: <?=$formDirection ?>;
     }
     </style>
+    <?php 
+    
+    ////////get custom form style ///////
+    if(!isset($isGetCustomFormStyle)){
+        require 'get_custom_form_style.php';
+    }
+    $customFormStyle = getCustomFormStyle($formId,"style");
+    echo "\n\n<!-- ///////////////Custom Form style ////////////////// -->\n";
+    if($customFormStyle != "-1"){
+        echo $customFormStyle;
+    }
+    echo "\n\n<!-- //////////////////////////////////////////////////// -->\n\n";
+    ?>
     <link rel="stylesheet" href="./css/form_main.css">
     <script type="text/javascript">
         //var formbuilder_dialog,formbuilder_content_dialog, add_file_dialog;
-
+        var general_dialog;
         $(function () {
             $("input[type='number']").number();
-        });
+            <?php if($isLoginUser): ?>
+            $("#main-vewer-menu").popmenu({
+                'width': '100px',         // width of menu
+                'top': '0',              // pixels that move up
+                'left': '0',              // pixels that move left
+                'iconSize': '50px' // size of menu's buttons
+            });
+            
+            general_dialog = $("#formbuilder_general_dialog").dialog({
+                modal: true,
+                autoOpen: false,
+                dialogClass: "dialog-full-mode",
+                width: 0.5*$(window).width(),
+                height: 0.5*$(window).height(),
+                close: function( event, ui ) {
+                    isFullMode = false;
+                }
+            });
+            $(document).dialogfullmode();
 
+            <?php endif; ?>
+        });
+        
         //prevent a resubmit on refresh and back button
         if ( window.history.replaceState ) {
             window.history.replaceState( null, null, window.location.href );
@@ -290,7 +381,25 @@ function fixRGBtoRGBA($rgb){
     </script>
 </head>
 <body >
+    <?php if($isLoginUser): ?>
+    <span id="main-vewer-menu">
+        <span class="pop_ctrl"><i class="all_btns fa fa-bars"></i></span>
+        <ul>
+            <li onclick="addUpdateUser('update','<?= $user ?>')" title="User info"><div><i class="fa fa-user"></i></div><div class="menu-icons-text">info</div></li>
+            <li onclick="showAboutForm('<?=$formId?>')" title="Form mata-data"><i class="fa fa-file"></i><div class="menu-icons-text">Form</div></li>
+            <li onclick="openLinkInNewTab('https://github.com/meshesha/SimplePhpFormBuilder/wiki')" title="Help"><i class="fa fa-question-circle"></i><div class="menu-icons-text">Help</div></li>
+            <!--
+            <li onclick="showAbout()" title="About"><i class="fa fa-info-circle"></i><div class="menu-icons-text">About</div></li>
+            <li onclick="javascript:location.href='index.php'" title="Exit from system"><i class="fa fa-cog"></i><div class="menu-icons-text">Admin page</div></li>
+            -->
+            <li onclick="javascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Exit</div></li>
+        </ul>
+    </span>
     
+    <div id="formbuilder_general_dialog">
+        <div id="formbuilder_general_content"></div>
+    </div>
+    <?php endif; ?>
 	<?php if(!empty($message)): ?>
 		<p><?= $message ?></p>
     <?php endif; ?>

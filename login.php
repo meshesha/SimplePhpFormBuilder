@@ -40,39 +40,8 @@ if(!empty($_POST['username']) && !empty($_POST['password'])){
 	$groups = $results['groups'];
 	$message = '';
 
-	if($results != '' && count($results) > 0 && password_verify($_POST['password'], $userPass) ){
-		//check if the user is in administrator group
-		$adminGroupId = getAdministratorGroupId($conn);
-		$usrGroupsAry = array();
-		if($adminGroupId != ""){
-			if(strpos($groups,",") !== false){
-				$usrGroupsAry = explode(",",$groups);
-			}else{
-				$usrGroupsAry[] = $groups;
-			}
-		}
-		//check if the user is form manager
-		$isUserFormAdmin = isFormManager($conn, $userId);
-				
-		//get form admins/mangers
-		$formUsersMngAry = array();
-		if(isset($_SESSION['form_id']) && $_SESSION['rederect_url'] == "form_admin"){
-			$formId = $_SESSION['form_id'];
-			if($formId != ""){
-				$formManagers = getFormManagers($conn, $formId);
-				echo $formManagers;
-				if($formManagers != ""){
-					if(strpos($formManagers,",") !== false){
-						$formUsersMngAry = explode(",",$formManagers);
-					}else{
-						$formUsersMngAry[] = $formManagers;
-					}
-				}
-			}
-		}
-		//if((!empty($usrGroupsAry) && in_array($adminGroupId, $usrGroupsAry)) || 
-		//	($isUserFormAdmin != "") ||
-		//	(!empty($formUsersMngAry) && in_array($userId, $formUsersMngAry))){
+	if($results != '' && count($results) > 0 ){
+		if(password_verify($_POST['password'], $userPass)){
 			$_SESSION['user_id'] = $userId;
 			if( isset($_SESSION['user_id']) ){
 				if($_SESSION['rederect_url'] == "main_page"){
@@ -93,107 +62,12 @@ if(!empty($_POST['username']) && !empty($_POST['password'])){
 					}
 				}
 			}
-		//}else{
-		//	$isShowLogin = false;
-		//	$message = 'Sorry, you not Administrator';
-		//}
+		}else{
+			$message = 'Sorry, wrong Username or password. please try again!';
+		}
 	} else {
-		$message = 'Sorry,  Username does not exist or is suspended';
+		$message = 'Sorry, Username does not exist or is suspended';
 	}
-}
-
-function getFormsIds($conn, $userId){
-	$records = $conn->prepare('SELECT indx,admin_users FROM form_list');
-	$records->execute();
-	$results = $records->fetchAll(PDO::FETCH_ASSOC);
-
-    $formIds = array();
-
-	if($results != "" && count($results) > 0){
-        foreach($results as $row) {
-            //echo $row["indx"]." - ".$row["admin_users"]."<br>";
-            $adminGrpIds = $row["admin_users"];
-            if($adminGrpIds != ""){
-                $adminGroupsAry = array();
-                if(strpos($adminGrpIds,",") !== false){
-                    $adminGroupsAry = explode(",",$adminGrpIds);
-                }else{
-                    $adminGroupsAry[] = $adminGrpIds;
-                }
-
-                if(in_array($userId, $adminGroupsAry)){
-                    $formIds[] = $row["indx"];
-                }
-            }
-        }
-    }
-    //echo "Forms: ". implode(",",$formIds);
-    if(empty($formIds)){
-        return "";
-    }else{
-        return implode(",",$formIds);
-    }
-}
-function getAdministratorGroupId($conn){
-	$admina = "administrator";
-	$adminb = "Administrator";
-	$adminc = "ADMINISTRATOR";
-	$records = $conn->prepare('SELECT indx  FROM users_gropes WHERE (group_name = :groupa) OR (group_name = :groupb) OR (group_name = :groupc)');
-	$records->bindParam(':groupa', $admina);
-	$records->bindParam(':groupb', $adminb);
-	$records->bindParam(':groupc', $adminc);
-	$records->execute();
-	$results = $records->fetch(PDO::FETCH_ASSOC);
-	if($results != '' && count($results) > 0){
-		return $results["indx"];
-	}else{
-		return "";
-	}
-}
-
-function getFormManagers($conn, $formId){
-	$records = $conn->prepare('SELECT admin_users  FROM form_list WHERE indx = :groupId');
-	$records->bindParam(':groupId', $formId);
-	$records->execute();
-	$results = $records->fetch(PDO::FETCH_ASSOC);
-	if($results != '' && count($results) > 0){
-		return $results["admin_users"];
-	}else{
-		return "";
-	}
-}
-
-function isFormManager($conn, $userId){
-	$records = $conn->prepare('SELECT indx,admin_users FROM form_list');
-	$records->execute();
-	$results = $records->fetchAll(PDO::FETCH_ASSOC);
-
-    $formIds = array();
-
-	if($results != "" && count($results) > 0){
-        foreach($results as $row) {
-            //echo $row["indx"]." - ".$row["admin_users"]."<br>";
-            $adminGrpIds = $row["admin_users"];
-            if($adminGrpIds != ""){
-                $adminGroupsAry = array();
-                if(strpos($adminGrpIds,",") !== false){
-                    $adminGroupsAry = explode(",",$adminGrpIds);
-                }else{
-                    $adminGroupsAry[] = $adminGrpIds;
-                }
-
-                if(in_array($userId, $adminGroupsAry)){
-                    $formIds[] = $row["indx"];
-                }
-            }
-        }
-    }
-    //echo "Forms: ". implode(",",$formIds);
-    if(empty($formIds)){
-        return "";
-    }else{
-        return implode(",",$formIds);
-    }
 }
 
 

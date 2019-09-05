@@ -39,7 +39,10 @@ if(isset($_POST['data'])){
         $tbl = "settings";
     }else if($data_table == "form_style"){
         $tbl = "form_custom_style";
+    }else if($data_table == "org_tree"){
+        $tbl = "organization_tree";
     }
+
     if($tbl == ""){
         die("data table not set");
     }
@@ -82,6 +85,9 @@ if(isset($_POST['data'])){
         }else if($data_table == "form_style"){
             $set_new_styl_stt = satNewCustomFormStyle($conn,$data_ary);
             echo $set_new_styl_stt;
+        }else if($data_table == "org_tree"){
+            $set_new_org_stt = satNewOrgDep($conn,$data_ary);
+            echo $set_new_org_stt;
         }
     }else if($actionType == "update"){
         $data_ary = get_object_vars($frm_data);
@@ -113,6 +119,15 @@ if(isset($_POST['data'])){
                                 $value = "";
                             }
                             $update_stt_ary[] = updateData($conn,$tbl,"publish_groups", $value,"indx=$idx");
+                            break;
+                        case ("publish_deps"):
+                            //$value = json_encode($value);
+                            if($value != ""){
+                                $value = implode(",",$value);
+                            }else{
+                                $value = "";
+                            }
+                            $update_stt_ary[] = updateData($conn,$tbl,"publish_deps", $value,"indx=$idx");
                             break;
                         case ("form_managers"):
                             //$value = json_encode($value);
@@ -156,13 +171,13 @@ if(isset($_POST['data'])){
             }
         }else if($data_table == "users"){
             foreach ($data_ary as $name => $value) {
-                if($name != "record_id"){
+                if($name != "record_id" && $name != "changePass"){
                     switch($name){
                         case ("user_name"):
                             $update_stt_ary[] = updateData($conn,$tbl,"username", $value,"id=$idx");
                             break;
                         case ("user_pass"):
-                            if($value != ""){
+                            if($value != "" && $data_ary["changePass"] == "1" ){
                                 $value = password_hash($value, PASSWORD_BCRYPT);
                                 $update_stt_ary[] = updateData($conn,$tbl,"password", $value,"id=$idx");
                             }else{
@@ -179,6 +194,9 @@ if(isset($_POST['data'])){
                                 $value = "";
                             }
                             $update_stt_ary[] = updateData($conn,$tbl,"groups", $value,"id=$idx");
+                            break;
+                        case ("publish_dep"):
+                            $update_stt_ary[] = updateData($conn,$tbl,"dep_id", $value,"id=$idx");
                             break;
                         case ("user_status"):
                             $update_stt_ary[] = updateData($conn,$tbl,"status", $value,"id=$idx");
@@ -213,6 +231,30 @@ if(isset($_POST['data'])){
             $form_id = $data_ary["record_id"];
             $form_style = $data_ary["form_style"];
             $update_stt_ary[] = updateData($conn,$tbl,"form_style", $form_style,"form_id='$form_id'");
+        }else if($data_table == "org_tree"){
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////
+            foreach ($data_ary as $name => $value) {
+                if($name != "record_id"){
+                    switch($name){
+                        case ("dep_name"):
+                            $update_stt_ary[] = updateData($conn,$tbl,"name", $value,"id=$idx");
+                            break;
+                        case ("dep_prnt_id"):
+                            $update_stt_ary[] = updateData($conn,$tbl,"parent_id", $value,"id=$idx");
+                            break;
+                        case ("dep_manager"):
+                            $update_stt_ary[] = updateData($conn,$tbl,"dep_mngr_user_id", $value,"id=$idx");
+                            break;
+                        case ("selected_users"):
+                            //$dep_id = $idx
+                            $update_stt_ary[] = updateDepSelectedUsers($conn,$idx,$value);
+                            break;
+                        case ("available_users"):
+                            $update_stt_ary[] = updateDepAvailableUsers($conn,$value);
+                            break;
+                    }
+                }
+            }
         }
         $echo_data = "";
         foreach ($update_stt_ary as $stt){
@@ -247,11 +289,15 @@ if(isset($_POST['data'])){
             ////////////
         }else if($data_table == "form_style"){
             ////////////
+        }else if($data_table == "org_tree"){
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            $deleteSatt = deletDeps($conn, $data_ary);
+            echo $deleteSatt;
         }
     }
     
 }else{
-    echo "somthing wrong";
+    echo "something wrong";
 }
 
 function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
@@ -265,6 +311,13 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
     }else{
         $frm_grps = "";
     }
+
+    if($data_ary["publish_deps"] != ""){
+        $frm_deps = implode(",",$data_ary["publish_deps"]);
+    }else{
+        $frm_deps = "";
+    }
+
     if($data_ary["form_managers"] != ""){
         $frm_mngrs = implode(",",$data_ary["form_managers"]);
     }else{
@@ -286,6 +339,7 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
         form_title,
         publish_type,
         publish_groups,
+        publish_deps,
         publish_status,
         amount_form_submission,
         admin_users,
@@ -295,6 +349,7 @@ function satNewForm($conn, $data_ary,$setAdminUsersAsDefaultFormManager){
             '{$frm_title}',
             '{$frm_publish_type}',
             '{$frm_grps}',
+            '{$frm_deps}',
             '{$frm_status}',
             '{$frm_restrict_submit}',
             '{$frm_mngrs}',
@@ -374,7 +429,75 @@ function satNewCustomFormStyle($conn,$data_ary){
 
     return $rtrn_stt;
 }
+function satNewOrgDep($conn,$data_ary){
+    $rtrn_stt = "";
+    $dep_name = $data_ary["dep_name"];
+    $prnt_id = $data_ary["dep_prnt_id"];
+    $dep_mngr = $data_ary["dep_manager"];
+    $sUsrs = $data_ary["selected_users"];
+    $avlUsrs = $data_ary["available_users"];
 
+    $dep_name = mysqli_real_escape_string($conn, $dep_name);
+    $prnt_id = mysqli_real_escape_string($conn, $prnt_id);
+    $dep_mngr = mysqli_real_escape_string($conn, $dep_mngr);
+
+    $sql = "INSERT INTO organization_tree (
+        name,
+        parent_id,
+        dep_mngr_user_id)  VALUES (
+        '{$dep_name}',
+        '{$prnt_id}',
+        '{$dep_mngr}')";
+    if($result = $conn->query($sql)) {
+        //$rtrn_stt = "success";
+        $dep_id = mysqli_insert_id($conn);
+        $rtrn_stt = updateDepSelectedUsers($conn,$dep_id,$sUsrs);
+        if($rtrn_stt == "success"){
+            $rtrn_stt = updateDepAvailableUsers($conn,$avlUsrs);
+        }
+    }else{
+        $rtrn_stt = 'Error: ' . mysqli_error($conn);
+    }
+
+    return $rtrn_stt;
+
+}
+function updateDepSelectedUsers($conn,$dep_id,$usrs){
+    $usrsObj = json_decode($usrs);
+    $update_stt_ary = array();
+    foreach($usrsObj as $usrsId){
+        $update_stt_ary[] = updateData($conn,"users","dep_id", $dep_id,"id=$usrsId");
+    }
+    $echo_data = "";
+    foreach ($update_stt_ary as $stt){
+        if($stt != "success"){
+            $echo_data .=  $stt."\n";
+        }
+    }
+    if($echo_data == ""){
+        $echo_data = "success";
+    }
+    return $echo_data;
+
+}
+function updateDepAvailableUsers($conn,$usrs){
+    $usersObj = json_decode($usrs);
+    $update_stt_ary = array();
+    foreach($usersObj as $usrsId){
+        $update_stt_ary[] = updateData($conn,"users","dep_id", "","id=$usrsId");
+    }
+    $echo_data = "";
+    foreach ($update_stt_ary as $stt){
+        if($stt != "success"){
+            $echo_data .=  $stt."\n";
+        }
+    }
+    if($echo_data == ""){
+        $echo_data = "success";
+    }
+    return $echo_data;
+
+}
 function satNewUser($conn,$data_ary){
     $rtrn_stt = "";
     $usr_name = $data_ary["user_name"];
@@ -383,18 +506,21 @@ function satNewUser($conn,$data_ary){
     $usr_pass = password_hash($usr_pass, PASSWORD_BCRYPT);
     $usr_status = $data_ary["user_status"];
     $usr_grps = implode(",",$data_ary["publish_groups"]);
+    $usr_dep = $data_ary["publish_dep"];
     //$fldName = mysqli_real_escape_string($conn, $fldName);
     $sql = "INSERT INTO users (
         username,
         email,
         password,
         status,
-        groups)  VALUES (
+        groups,
+        dep_id)  VALUES (
             '{$usr_name}',
             '{$usr_email}',
             '{$usr_pass}',
             '{$usr_status}',
-            '{$usr_grps}')";
+            '{$usr_grps}',
+            '{$usr_dep}')";
     if($result = $conn->query($sql)) {
         $rtrn_stt = "success";
     }else{
@@ -881,6 +1007,48 @@ function deletGroup($conn, $data_ary){
     }
 
     return $del_stt;
+}
+function deletDeps($conn, $data_ary){
+    $data = $data_ary["data"];
+    $dataAry = json_decode($data);
+    if($dataAry != "" && !empty($dataAry)){
+        $err = array();
+        foreach($dataAry as $dep){
+            $dep_id = $dep->id;
+            $sql = "DELETE FROM organization_tree WHERE id = $dep_id";
+            if($conn->query($sql)) {
+                //$del_stt = "success";
+                $user_ids = getData($conn, "users" , "dep_id='$dep_id'" , "id");
+                if($user_ids != ""){
+                    if(is_array($user_ids)){
+                        $update_stt_ary = array();
+                        foreach($user_ids as $user_id){
+                            $update_stt_ary[] = updateData($conn,"users","dep_id", "","id=$user_id");
+                        }
+                        foreach ($update_stt_ary as $stt){
+                            if($stt != "success"){
+                                $err[] =  $stt;
+                            }
+                        }
+                    }else{
+                        $updt_stt = updateData($conn,"users","dep_id", "","id=$user_ids");
+                        if($updt_stt != "success"){
+                            $err[] = $updt_stt;
+                        }
+                    }
+                }
+            }else{
+                $err[] = "Error : (delet - ".$dep->name.")" . mysqli_error($conn);
+            }
+        }
+        if(!empty($err)){
+            return implode("\n",$err);
+        }else{
+            return "success";
+        }
+    }else{
+        return "no data to delete";
+    }
 }
 function getData($conn, $tbl , $term , $col){
     $data = array();

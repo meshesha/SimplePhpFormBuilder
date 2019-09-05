@@ -23,8 +23,10 @@ if(!file_exists("settings/config.inc.php")){
 require 'settings/database.login.php';
 
 $isAdmin = false;
+$isManager = false;
 $message = "";
 $isUserFormAdmin = "";
+$publishTypes = "";
 if( isset($_SESSION['user_id']) ){
 
 	$records = $conn->prepare('SELECT id,username,password,groups FROM users WHERE status="1" AND id = :id');
@@ -53,6 +55,7 @@ if( isset($_SESSION['user_id']) ){
                 $isUserFormAdmin = getFormsIds($conn, $_SESSION['user_id']);
                 if($isUserFormAdmin != ""){
 		            $user = $myuser;
+                    $isManager = true;
                 }else{                    
                     $message = "<label class='text-danger'>Sorry, You don't have a system Administrator credentials or form manger credentials</label>";
                 }
@@ -64,6 +67,9 @@ if( isset($_SESSION['user_id']) ){
         $message = "<label class='text-danger'>Sorry,  Username does not exist or is suspended</label>";
     }
 
+    if($user != ""){
+        $publishTypes = getPublishTypes($conn);
+    }
 }
 function getAdminGroupId($conn){
     $adminGroupName = "administrator";
@@ -110,6 +116,24 @@ function getFormsIds($conn, $userId){
     }else{
         return implode(",",$formIds);
     }
+}
+
+function getPublishTypes($conn){
+	$records = $conn->prepare('SELECT * FROM publish_type');
+	$records->execute();
+	$results = $records->fetchAll(PDO::FETCH_ASSOC);
+
+    $options = "";
+
+	if($results != "" && count($results) > 0){
+        foreach($results as $row) {
+            $id = $row["id"];
+            $name = $row["name"];
+            $options .= "<option value='$id'>$name</option>";
+        }
+    }
+
+    return $options;
 }
 ////////get settings ///////
 if(!isset($isGetSetting)){
@@ -220,7 +244,20 @@ $about_html = ABOUT_APP_AUTHOR;
     <script src="./include/codemirror-5.47.0/addon/hint/css-hint.js"></script>
     -->
 
+    <!-- Org tree -->
+    <link rel="stylesheet" href="./include/jquery.orgChart/jquery.orgchart.css">
+    <script src="./include/jquery.orgChart/jquery.orgchart.js"></script>
 
+    <!-- full dialog -->
+    <script src="./include/fulldialog/jqueryui.dialog.fullmode.js"></script>
+
+
+    <script src="./include/selectlistactions/jquery.selectlistactions.js"></script>
+
+    <!-- alertifyjs -->
+    <link rel="stylesheet" href="./include/alertifyjs/css/alertify.min.css">
+    <link rel="stylesheet" href="./include/alertifyjs/css/themes/bootstrap.min.css">
+    <script src="./include/alertifyjs/alertify.min.js"></script>
     
     <link rel="stylesheet" type="text/css" href="./css/index_main.css">
 
@@ -239,7 +276,7 @@ $about_html = ABOUT_APP_AUTHOR;
              formbuilder_dialog = $("#formbuilder_form").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.7*$(window).width(),
                 height: 0.8*$(window).height(),
                 buttons: [
@@ -266,7 +303,7 @@ $about_html = ABOUT_APP_AUTHOR;
             formbuilder_content_dialog = $("#formbuilder_content").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.9*$(window).width(),
                 height: 0.9*$(window).height(),
                 close: function( event, ui ) {
@@ -276,7 +313,7 @@ $about_html = ABOUT_APP_AUTHOR;
             general_dialog = $("#formbuilder_general_dialog").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.5*$(window).width(),
                 height: 0.5*$(window).height(),
                 close: function( event, ui ) {
@@ -286,7 +323,7 @@ $about_html = ABOUT_APP_AUTHOR;
             general_style_dialog = $("#form_general_style").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.7*$(window).width(),
                 height: 0.8*$(window).height(),
                 close: function( event, ui ) {
@@ -296,7 +333,7 @@ $about_html = ABOUT_APP_AUTHOR;
             custom_style_editor_dialog = $("#form_custom_style_editor").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.7*$(window).width(),
                 height: 0.8*$(window).height(),
                 buttons: [
@@ -355,50 +392,9 @@ $about_html = ABOUT_APP_AUTHOR;
                 document.body.addEventListener("mousemove", on_drag);
                 window.addEventListener("mouseup", on_release);
             });
-
-            $(".formbuilder_dialg_win")
-                .children(".ui-dialog-titlebar")
-                .append("<button title='full screen' class='ui-button ui-corner-all ui-widget ui-button-icon-only ui-button-fullscreen'><span class='fullscreen-btn ui-button-icon ui-icon ui-icon-arrow-4-diag'></span></button>");
-
-            var oldWidth, oldHeight , oldTop, oldLeft;
-            $(".fullscreen-btn").click(function(){
-                var dialogWin = $(this).parent().parent().parent();
-                var contentWin =  $(dialogWin).children(".ui-dialog-titlebar").next();
-                //var footTool = $(dialogWin).children(".ui-dialog-buttonpane");
-                //console.log(contentWin)
-                var winWidth = $(window).width();
-                var winHeight = $(window).height();
-                if(isFullMode){
-                    isFullMode = false;
-                    //set full screen state
-                    $(dialogWin).css("top",oldTop);
-                    $(dialogWin).css("left",oldLeft);
-                    //$(dialogWin).scrollLeft(0);
-                    $(dialogWin).width(oldWidth);
-                    $(dialogWin).height(oldHeight);
-
-                }else{
-                    isFullMode = true;
-                    //save original state
-                    oldWidth = $(dialogWin).width();
-                    oldHeight = $(dialogWin).height();
-                    oldTop = $(dialogWin).css("top");
-                    oldLeft = $(dialogWin).css("left");
-                    //set full screen state
-                    $(dialogWin).css("top",0);
-                    $(dialogWin).css("left",0);
-                    //$(dialogWin).scrollLeft(0);
-                    $(dialogWin).width(winWidth);
-                    $(dialogWin).height(winHeight);
-                    //fix content height
-                    //var footToolHeight = $(footTool).height();
-                    $(contentWin).css("height","85%");
-                }
-
-                //console.log()
-                //alert('fullscreen');
-            });
-            /////////////////////////////////////////////////////
+            
+            $(document).dialogfullmode();
+            
 
             var index = 'qpsstats-active-tab';
             //  Define friendly data store name
@@ -429,12 +425,22 @@ $about_html = ABOUT_APP_AUTHOR;
                 'left': '0',              // pixels that move left
                 'iconSize': '50px' // size of menu's buttons
             });
+
             $("#publish_type").on("click",function(){
                 var publshTyp = $(this).val();
-                if(publshTyp == "1" || publshTyp == "3" ){ //if publick
-                    $("#groups-row").hide();
+                if(publshTyp == "2" || publshTyp == "4"){ //Grops
+                    //groups_list
+                    setGroupsList();
+                    $("#groups-row").show();
+                    $("#deps-row").hide(); //hide departments
+                }else if(publshTyp == "5" || publshTyp == "6"){ //departments
+                    //departments list
+                    setDepartmentsList();
+                    $("#deps-row").show();
+                    $("#groups-row").hide(); //hide groups
                 }else{
-                     $("#groups-row").show();
+                    $("#groups-row").hide(); //hide groups
+                    $("#deps-row").hide(); //hide departments
                 }
             })
             $("#restrict_multiple_submissions").on("click",function(){
@@ -511,6 +517,12 @@ $about_html = ABOUT_APP_AUTHOR;
 
             $("input[type='number']").number();
         });
+
+        alertify.defaults.transition = "slide";
+        alertify.defaults.theme.ok = "btn btn-primary";
+        alertify.defaults.theme.cancel = "btn btn-danger";
+        alertify.defaults.theme.input = "form-control";
+
     function ajaxAction(action_type, tbl , data, dialogbox){
         var url = "set_data.php";
         var data_obj = {
@@ -539,6 +551,8 @@ $about_html = ABOUT_APP_AUTHOR;
                                 loadUsersGroupsTable(selctedTbl);
                             }
                         }
+                    }else{
+                        alert(response)
                     }
                 },
                 error:function (response) {
@@ -726,6 +740,8 @@ $about_html = ABOUT_APP_AUTHOR;
         </div>
     </div>
     
+    <script src="./js/users_groups_deps.js"></script>
+    
     <div id="formbuilder_form">
         <div class="dialog_form_container">
             <form id="new_file_form" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
@@ -774,10 +790,15 @@ $about_html = ABOUT_APP_AUTHOR;
                     </div>
                     <div class="col-75">
                         <select id="publish_type" name="publish_type">
+                            <?=$publishTypes ?>
+                            <!--
                             <option value="1">Public</option>
                             <option value="2">Groups</option>
                             <option value="3">Public-Anonymously</option>
                             <option value="4">Groups-Anonymously</option>
+                            <option value="5">Department</option>
+                            <option value="6">Department-Anonymously</option>
+                            -->
                         </select>
                     </div>
                 </div>
@@ -788,6 +809,15 @@ $about_html = ABOUT_APP_AUTHOR;
                     </div>
                     <div class="col-75">
                         <select id="groups_list" name="groups_list" class="groupslist js-states form-control" multiple="multiple" style="width: 80%"></select>
+                    </div>
+                </div>
+
+                <div class="row" id="deps-row">
+                    <div class="col-25">
+                        <label for="deps_list">Departments</label>
+                    </div>
+                    <div class="col-75">
+                        <select id="deps_list" name="deps_list" class="depslist js-states form-control" multiple="multiple" style="width: 80%"></select>
                     </div>
                 </div>
                 <div class="row" id="managers-row">
@@ -1198,8 +1228,10 @@ $about_html = ABOUT_APP_AUTHOR;
             $("#submit_amount_allowed").val("");
             $("#submit-amoun-row").hide();
             $("#publish_type").val("1").change();
-             $("#groups-row").hide();
+            $("#groups-row").hide();
             $('#groups_list').val("");
+            $("#deps-row").hide();
+            $('#deps_list').val("");
             $('#form_managers_list').val("");
             $("#form_note").val("");
             $("#status_type").val("2");//.change();
@@ -1210,6 +1242,8 @@ $about_html = ABOUT_APP_AUTHOR;
             setDefaultFormStyleObj();
             //groups_list
             setGroupsList();
+            //departments list
+            setDepartmentsList();
             //manager_list
             setUsersManagerList();
             $("#form_links").hide();
@@ -1221,6 +1255,8 @@ $about_html = ABOUT_APP_AUTHOR;
             if(readonly !== undefined && readonly == "true"){
                 isDisabled = true;
             }
+            
+            $('.groupslist').empty();
             $('.groupslist').select2({
                 disabled: isDisabled,
                 ajax: {
@@ -1229,7 +1265,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
-                        console.log( params.term)
+                        //console.log( params.term)
                         return {
                             searchTerm: params.term // search term
                         };
@@ -1269,12 +1305,68 @@ $about_html = ABOUT_APP_AUTHOR;
                 });
             });
         }
+
+        function setDepartmentsList(selectedAry,readonly){
+            var isDisabled = false;
+            if(readonly !== undefined && readonly == "true"){
+                isDisabled = true;
+            }
+            $('.depslist').empty();
+            $('.depslist').select2({
+                disabled: isDisabled,
+                ajax: {
+                    url: 'get_all_deps.php',
+                    type: "post",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        //console.log( params.term)
+                        return {
+                            searchTerm: params.term // search term
+                        };
+                    },
+                    processResults: function (response) {
+                        return {
+                            results: response.results
+                        };
+                    },
+                    cache: false
+                }
+            });
+            if(selectedAry === undefined || selectedAry == ""){
+                return;
+            }
+            $multiSelectDep = $('.depslist');
+            $multiSelectDep.val(null).trigger('change');
+            $.ajax({
+                type: 'POST',
+                url: 'get_all_deps.php'
+            }).then(function (data) {
+                //console.log(selectedAry)
+                var selectObj = JSON.parse(data);
+                var selectObjAry = selectObj.results;
+                $.each(selectObjAry, function(i,val){
+                    if(selectedAry.indexOf(val.id) != -1){
+                        var option = new Option(val.text,val.id, true, true);
+                        $multiSelectDep.append(option).trigger('change');
+                    }
+                });
+                // manually trigger the 'select2:select' event
+                $multiSelectDep.trigger({
+                    type: 'select2:select',
+                    params: {
+                        data: data
+                    }
+                });
+            });
+        }
         
         function setUsersManagerList(selectedStr,readonly){
             var isDisabled = false;
             if(readonly !== undefined && readonly == "true"){
                 isDisabled = true;
             }
+            $('.managerlist').empty();
             $('.managerlist').select2({
                 disabled: isDisabled,
                 ajax: {
@@ -1353,15 +1445,20 @@ $about_html = ABOUT_APP_AUTHOR;
                         $("#submit_amount_allowed").val(mor_data.data.restrict_submissions);
                         $("#submit-amoun-row").show();
                     }
-                    // publ_type: "2", publ_grps: "1,2,3", publ_status: "2", frm_note
                     $("#publish_type").val(mor_data.data.publ_type).change();
-                    if(mor_data.data.publ_type == "1" || mor_data.data.publ_type == "3"){ //if public
-                        $("#groups-row").hide();
-                    }else{
+                    if(mor_data.data.publ_type == "2" || mor_data.data.publ_type == "4"){ //Grops
                         $("#groups-row").show();
                         setGroupsList(mor_data.data.publ_grps);
-                         //console.log(defaultData)
+                        $("#deps-row").hide(); //hide depatments
+                    }else if(mor_data.data.publ_type == "5" || mor_data.data.publ_type == "6"){ //departments
+                        $("#deps-row").show();
+                        setDepartmentsList(mor_data.data.publ_deps)
+                        $("#groups-row").hide(); //hide groups
+                    }else{
+                        $("#groups-row").hide(); //hide groups
+                        $("#deps-row").hide(); //hide depatments
                     }
+
                     setUsersManagerList(mor_data.data.admin_users);
                     $("#status_type").prop("disabled",false);
                     $("#status_type").val(mor_data.data.publ_status);//.change();
@@ -1477,7 +1574,7 @@ $about_html = ABOUT_APP_AUTHOR;
                     value: "Edit",
                     style: "width:80px",
                     onclick: "setTableSettings(this)"
-                },
+                }
             };
             
             var options = {
@@ -1854,6 +1951,7 @@ $about_html = ABOUT_APP_AUTHOR;
             }
             var frm_pblsh_type = $("#publish_type").val();
             var frm_groups = $("#groups_list").val();
+            var frm_deps = $('#deps_list').val();
             var frm_mngrs = $("#form_managers_list").val();
             var frm_pblsh_stt = $("#status_type").val();
             var frm_data  = {
@@ -1864,6 +1962,7 @@ $about_html = ABOUT_APP_AUTHOR;
                 restrict_submit: frm_rstrct_submit,
                 publish_type: frm_pblsh_type,
                 publish_groups: frm_groups,
+                publish_deps: frm_deps,
                 form_managers: frm_mngrs,
                 status_type: frm_pblsh_stt,
                 form_general_style: sessionStorage.formStylObj
@@ -1883,7 +1982,7 @@ $about_html = ABOUT_APP_AUTHOR;
             var uhInput = "<input type='hidden' id='user_id' value = '" + usr_id + "' />";
             $(uhInput).appendTo(gContent);
 
-            var user_data = "", userName, userPass , userEmail, userGroups, userStatus;
+            var user_data = "", userName, userPass , userEmail, userGroups,userDep, userStatus;
             if(action == "update"){
                 dialogTitle = "Update user data";
                 user_data = getUserData(usr_id);
@@ -1894,12 +1993,14 @@ $about_html = ABOUT_APP_AUTHOR;
                 userPass = user_data.data.pass;
                 userEmail = user_data.data.email;
                 userGroups = user_data.data.groups;
+                userDep = user_data.data.dep;
                 userStatus = user_data.data.status;
             }else{
                 userName =  "";
                 userPass = "";
                 userEmail = "";
                 userGroups = "";
+                userDep = "";
                 userStatus = "";
             }
             var uInput = "<input type='text' id='user_name' value = '" + userName + "'  />";
@@ -1923,7 +2024,13 @@ $about_html = ABOUT_APP_AUTHOR;
             var uGroups = addElement("Groups","groupList", gInput);
             uGroups.appendTo(gContent);
             setGroupsList(userGroups,grpSelctReadonly);
-            //setGroupsList(mor_data.data.publ_grps);
+            
+            // multiple='multiple'
+            var gInput = "<select id='depsList' class='depslist js-states form-control' style='width:80%;'></select>";
+            var uDeps = addElement("Department","depsList", gInput);
+            uDeps.appendTo(gContent);
+            setDepartmentsList(userDep,grpSelctReadonly);
+
             if(action == "update"){
                 var sInput = "<select id='user_status'><option value='0'>Inactive</option><option value='1'>Active</option></select>";
                 var uStatus = addElement("Status","user_status", sInput);

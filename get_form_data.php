@@ -27,7 +27,9 @@ if(isset($_POST['form_id'])){
                 $params_row['frm_title'] = $row["form_title"];
                 $params_row['restrict_submissions'] = $row["amount_form_submission"];
                 $params_row['publ_type'] = $row["publish_type"];
+                $params_row['publ_type_name'] = getPublishTypes($conn,$row["publish_type"]);
                 $params_row['publ_grps'] = $row["publish_groups"];//getGroupsObj($conn,$form_id,$row["publish_groups"]);
+                $params_row['publ_deps'] = $row["publish_deps"];//getGroupsObj($conn,$form_id,$row["publish_groups"]);
                 $params_row['publ_status'] = $row["publish_status"];
                 $params_row['admin_users'] = $row["admin_users"];
                 $params_row['frm_note'] = $row["form_note"];
@@ -85,5 +87,17 @@ function getGroupsObj($conn,$form_id,$grops){
     }else{
         return "";
     }
+}
+function getPublishTypes($conn,$publish_type_id){
+    $sql = "SELECT name FROM publish_type WHERE id=$publish_type_id";
+    $typName = "";
+    if($result = $conn->query($sql)) {
+        $count = mysqli_num_rows($result);
+        if($count > 0){
+            $row = mysqli_fetch_assoc($result);
+            $typName = $row['name'];
+        }
+    }
+    return $typName;
 }
 ?>

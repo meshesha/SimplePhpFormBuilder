@@ -27,6 +27,7 @@ if(isset($_POST['user_id'])){
                 $params_row['pass'] = "";//$row["password"];
                 $params_row['status'] = $row["status"];
                 $params_row['groups'] = $row["groups"];
+                $params_row['dep'] = $row["dep_id"];
             }
             $data_obj = new stdClass();
             $data_obj->status = 1;

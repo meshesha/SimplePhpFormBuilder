@@ -54,13 +54,13 @@ $userId = '';
 $email = '';
 $userName = '';
 $user = '';
-if($formType == "1" || $formType == "2" || $formType == "3" || $formType == "4"){ //2-groups not Anonymously, 4-groups Anonymously
+
+$formPublishTypesAry = getFormPublishTypes($conn);
+
+if($formPublishTypesAry != "-1" && in_array($formType, $formPublishTypesAry)){ //2-groups not Anonymously, 4-groups Anonymously
     if(isset($_SESSION['user_id'])){
-        if($formType == "2"){ //geoups not Anonymously
-            $userId = $_SESSION['user_id'];
-        }else if($formType == "1"){
-            $userId = getUserIp();
-        }
+        $userId = $_SESSION['user_id'];
+        
         $records = $conn->prepare('SELECT * FROM users WHERE status="1" AND id = :userid');
         $records->bindParam(':userid', $_SESSION['user_id']);
         $records->execute();
@@ -99,9 +99,6 @@ if($formType == "1" || $formType == "2" || $formType == "3" || $formType == "4")
             $message = '<label class="text-danger">Sorry, Username does not exist or is suspended</label>';
         }
     }
-/*}else if($formType == "1"){ //public not Anonymously
-    $user = getUserIp();
-    $userId = getUserIp(); */
 }else{
     //$userId = "";
     //$user = "Anonymously";
@@ -120,18 +117,23 @@ function getFormData($conn, $formId){
         $results['amount_form_submission']
     ];
 }
-function getUserIp(){
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        $ip = $_SERVER['REMOTE_ADDR'];
+function getFormPublishTypes($conn){
+    $records = $conn->prepare('SELECT id FROM publish_type');
+	$records->execute();
+	$results = $records->fetchAll(PDO::FETCH_ASSOC);
+
+    $pTypes = array();
+
+	if($results != "" && count($results) > 0){
+        foreach($results as $row) {
+            $pTypes[] = $row["id"];
+        }
     }
-    if($ip == "::1"){
-        $ip = "127.0.0.1";
+    if(empty($pTypes)){
+        return "-1";
+    }else{
+        return $pTypes;
     }
-    return $ip;
 }
 
 function getAdminGroupId($conn){

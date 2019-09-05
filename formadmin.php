@@ -232,6 +232,8 @@ if($formStyle != null && $formStyle != ""){
     <script type="text/javascript" src="./include/DataTables/checkboxes-1.2.11/js/dataTables.checkboxes.min.js"></script>
     <script type="text/javascript" src="./include/DataTables/dataTables.scrollResize.min.js"></script>
 
+    <!-- full dialog -->
+    <script src="./include/fulldialog/jqueryui.dialog.fullmode.js"></script>
 
     <script type="text/javascript" src="./include/select2/dist/js/select2.min.js"></script>
     
@@ -252,7 +254,7 @@ if($formStyle != null && $formStyle != ""){
             form_content_dialog = $("#form-content-warper").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.9*$(window).width(),
                 height: 0.9*$(window).height(),
                 close: function( event, ui ) {
@@ -272,7 +274,7 @@ if($formStyle != null && $formStyle != ""){
             general_dialog = $("#formbuilder_general_dialog").dialog({
                 modal: true,
                 autoOpen: false,
-                dialogClass: "formbuilder_dialg_win",
+                dialogClass: "dialog-full-mode",
                 width: 0.5*$(window).width(),
                 height: 0.5*$(window).height(),
                 close: function( event, ui ) {
@@ -280,49 +282,9 @@ if($formStyle != null && $formStyle != ""){
                 }
             });
 
-            $(".formbuilder_dialg_win")
-                .children(".ui-dialog-titlebar")
-                .append("<button title='full screen' class='ui-button ui-corner-all ui-widget ui-button-icon-only ui-button-fullscreen'><span class='fullscreen-btn ui-button-icon ui-icon ui-icon-arrow-4-diag'></span></button>");
-
-            var oldWidth, oldHeight , oldTop, oldLeft;
-            $(".fullscreen-btn").click(function(){
-                var dialogWin = $(this).parent().parent().parent();
-                var contentWin =  $(dialogWin).children(".ui-dialog-titlebar").next();
-                //var footTool = $(dialogWin).children(".ui-dialog-buttonpane");
-                //console.log(contentWin)
-                var winWidth = $(window).width();
-                var winHeight = $(window).height();
-                if(isFullMode){
-                    isFullMode = false;
-                    //set full screen state
-                    $(dialogWin).css("top",oldTop);
-                    $(dialogWin).css("left",oldLeft);
-                    //$(dialogWin).scrollLeft(0);
-                    $(dialogWin).width(oldWidth);
-                    $(dialogWin).height(oldHeight);
-
-                }else{
-                    isFullMode = true;
-                    //save original state
-                    oldWidth = $(dialogWin).width();
-                    oldHeight = $(dialogWin).height();
-                    oldTop = $(dialogWin).css("top");
-                    oldLeft = $(dialogWin).css("left");
-                    //set full screen state
-                    $(dialogWin).css("top",0);
-                    $(dialogWin).css("left",0);
-                    //$(dialogWin).scrollLeft(0);
-                    $(dialogWin).width(winWidth);
-                    $(dialogWin).height(winHeight);
-                    //fix content height
-                    //var footToolHeight = $(footTool).height();
-                    $(contentWin).css("height","80%");
-                }
-
-                //console.log()
-                //alert('fullscreen');
-            });
-            //////////////////////////////////////////////////////////////////////////
+            
+            $(document).dialogfullmode();
+            
             
             $("#main-vewer-menu").popmenu({
                 'width': '100px',         // width of menu
@@ -330,7 +292,6 @@ if($formStyle != null && $formStyle != ""){
                 'left': '0',              // pixels that move left
                 'iconSize': '50px' // size of menu's buttons
             });
-
         });
     
 
@@ -348,122 +309,121 @@ if($formStyle != null && $formStyle != ""){
             $("#main-vewer-menu ul").hide();
         }
         
-    function checkNewVer(currentVer){
-        //alert("currentVer: " + currentVer)
-        $("#app-ver-check-result").html("<img src='images/spinner.gif' />");
-        $("#app-ver-check-result").show();
-        var appUrl = "https://api.github.com/repos/meshesha/SimplePhpFormBuilder/releases/latest";
-        $.ajax({
-            type: "GET",
-            url: appUrl,
-            dataType: "json",
-            success: function (response) {
-                if(response != "" && response !== undefined && response !== null){
-                    var new_ver_str = response.tag_name.toLowerCase();
-                    var new_ver_url = response.html_url;
-                    var isDraft = response.draft;
-                    var isPrerelease = response.prerelease;
-                    var note = response.body.replace(/\r\n/g,"<br>");
-                    var new_ver_num = "";
-                    var verPrefix = ["v","v.","ver","ver."];
-                    $.each(verPrefix, function(i,prefix){
-                        var prefixLoc = new_ver_str.indexOf(prefix);
-                        if(prefixLoc != -1){
-                            new_ver_num = new_ver_str.substr((prefixLoc + 1));
-                        }
-                    })
-                    if(currentVer == new_ver_num){
-                        $("#app-ver-check-result").html("SimplePhpFormBuilder is up to date.")
-                    }else{
-                        var currentVerAry = [];
-                        if(currentVer.indexOf(".") != -1){
-                            currentVerAry = currentVer.split(".");
-                        }else{
-                            currentVerAry[0] = currentVer;
-                        }
-                        var newVerNumAry = [];
-                        if(new_ver_num.indexOf(".") != -1){
-                            newVerNumAry = new_ver_num.split(".");
-                        }else{
-                            newVerNumAry[0] = new_ver_num;
-                        }
-                        /**Semantic Versioning:
-                        1.0.0
-                        1.0.0
-                        1.10.5-RC1
-                        4.4.4-beta2
-                        2.0.0-alpha
-                        2.0.4-p1
-                         */
-                        if(currentVerAry.length == 3 && newVerNumAry.length == 3){
-                            var newVerNum3thd = "";
-                            var newVerSuffix = "";
-                            if(newVerNumAry[2].indexOf("-") != -1){
-                                newVernum3thdAry = newVerNumAry[2].split("-");
-                                newVerNum3thd = newVernum3thdAry[0];
-                                newVerSuffix =  newVernum3thdAry[1];
-                            }else{
-                                newVerNum3thd = newVerNumAry[2];
+        function checkNewVer(currentVer){
+            //alert("currentVer: " + currentVer)
+            $("#app-ver-check-result").html("<img src='images/spinner.gif' />");
+            $("#app-ver-check-result").show();
+            var appUrl = "https://api.github.com/repos/meshesha/SimplePhpFormBuilder/releases/latest";
+            $.ajax({
+                type: "GET",
+                url: appUrl,
+                dataType: "json",
+                success: function (response) {
+                    if(response != "" && response !== undefined && response !== null){
+                        var new_ver_str = response.tag_name.toLowerCase();
+                        var new_ver_url = response.html_url;
+                        var isDraft = response.draft;
+                        var isPrerelease = response.prerelease;
+                        var note = response.body.replace(/\r\n/g,"<br>");
+                        var new_ver_num = "";
+                        var verPrefix = ["v","v.","ver","ver."];
+                        $.each(verPrefix, function(i,prefix){
+                            var prefixLoc = new_ver_str.indexOf(prefix);
+                            if(prefixLoc != -1){
+                                new_ver_num = new_ver_str.substr((prefixLoc + 1));
                             }
-                            var crntVerNum3thd = "";
-                            var crntVerSuffix = "";
-                            if(currentVerAry[2].indexOf("-") != -1){
-                                crntVerNum3thdAry = currentVerAry[2].split("-");
-                                crntVerNum3thd = crntVerNum3thdAry[0];
-                                crntVerSuffix =  crntVerNum3thdAry[1];
+                        })
+                        if(currentVer == new_ver_num){
+                            $("#app-ver-check-result").html("SimplePhpFormBuilder is up to date.")
+                        }else{
+                            var currentVerAry = [];
+                            if(currentVer.indexOf(".") != -1){
+                                currentVerAry = currentVer.split(".");
                             }else{
-                                crntVerNum3thd = currentVerAry[2];
+                                currentVerAry[0] = currentVer;
                             }
-                            //console.log(newVerNumAry[0],newVerNumAry[1],newVerNum3thd)
-                            //console.log(currentVerAry[0],currentVerAry[1],crntVerNum3thd)
-                            if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
-                                ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) > Number(currentVerAry[1]))) ||
-                                ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) == Number(currentVerAry[1])) &&  (Number(newVerNum3thd) > Number(crntVerNum3thd)))){
-                                if(isDraft && isPrerelease){
-                                    $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
-                                }else if(!isDraft && isPrerelease){
-                                    $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release</p>");
-                                }else if(isDraft && !isPrerelease){
-                                    $("#app-ver-check-result").html("<p>There is a new version but this is a draft</p>");
+                            var newVerNumAry = [];
+                            if(new_ver_num.indexOf(".") != -1){
+                                newVerNumAry = new_ver_num.split(".");
+                            }else{
+                                newVerNumAry[0] = new_ver_num;
+                            }
+                            /**Semantic Versioning:
+                            1.0.0
+                            1.0.0
+                            1.10.5-RC1
+                            4.4.4-beta2
+                            2.0.0-alpha
+                            2.0.4-p1
+                            */
+                            if(currentVerAry.length == 3 && newVerNumAry.length == 3){
+                                var newVerNum3thd = "";
+                                var newVerSuffix = "";
+                                if(newVerNumAry[2].indexOf("-") != -1){
+                                    newVernum3thdAry = newVerNumAry[2].split("-");
+                                    newVerNum3thd = newVernum3thdAry[0];
+                                    newVerSuffix =  newVernum3thdAry[1];
                                 }else{
-                                    if(newVerSuffix == ""){
-                                        $("#app-ver-check-result").html("<p>There is a new version</p>");
-                                    }else{
-                                        $("#app-ver-check-result").html("<p>There is a new version but this is '"  +newVerSuffix + "'</p>");
-                                    }
+                                    newVerNum3thd = newVerNumAry[2];
                                 }
-                                $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
-                                $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: " + new_ver_num + "<br>" +  note + "</p>");
-                            }else if(Number(newVerNumAry[0]) == Number(currentVerAry[0]) &&
-                                    Number(newVerNumAry[1]) == Number(currentVerAry[1]) &&
-                                    Number(newVerNum3thd) == Number(crntVerNum3thd)){ 
-                                if(newVerSuffix != ""  && newVerSuffix != crntVerSuffix){
-                                    $("#app-ver-check-result").html("<p>There is a new '"+newVerSuffix+"' version</p>");
+                                var crntVerNum3thd = "";
+                                var crntVerSuffix = "";
+                                if(currentVerAry[2].indexOf("-") != -1){
+                                    crntVerNum3thdAry = currentVerAry[2].split("-");
+                                    crntVerNum3thd = crntVerNum3thdAry[0];
+                                    crntVerSuffix =  crntVerNum3thdAry[1];
+                                }else{
+                                    crntVerNum3thd = currentVerAry[2];
+                                }
+                                
+                                if(Number(newVerNumAry[0]) > Number(currentVerAry[0]) ||
+                                    ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) > Number(currentVerAry[1]))) ||
+                                    ((Number(newVerNumAry[0]) == Number(currentVerAry[0])) && (Number(newVerNumAry[1]) == Number(currentVerAry[1])) &&  (Number(newVerNum3thd) > Number(crntVerNum3thd)))){
+                                    if(isDraft && isPrerelease){
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release and draft</p>");
+                                    }else if(!isDraft && isPrerelease){
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is a pre-release</p>");
+                                    }else if(isDraft && !isPrerelease){
+                                        $("#app-ver-check-result").html("<p>There is a new version but this is a draft</p>");
+                                    }else{
+                                        if(newVerSuffix == ""){
+                                            $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                        }else{
+                                            $("#app-ver-check-result").html("<p>There is a new version but this is '"  +newVerSuffix + "'</p>");
+                                        }
+                                    }
                                     $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
-                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + "<br>" + note + "</p>");
-                                }else if(newVerSuffix == ""  && newVerSuffix != crntVerSuffix){
-                                    $("#app-ver-check-result").html("<p>There is a new version</p>");
-                                    $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
-                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + " (stable)<br>" + note + "</p>");
+                                    $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: " + new_ver_num + "<br>" +  note + "</p>");
+                                }else if(Number(newVerNumAry[0]) == Number(currentVerAry[0]) &&
+                                        Number(newVerNumAry[1]) == Number(currentVerAry[1]) &&
+                                        Number(newVerNum3thd) == Number(crntVerNum3thd)){ 
+                                    if(newVerSuffix != ""  && newVerSuffix != crntVerSuffix){
+                                        $("#app-ver-check-result").html("<p>There is a new '"+newVerSuffix+"' version</p>");
+                                        $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                        $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + "<br>" + note + "</p>");
+                                    }else if(newVerSuffix == ""  && newVerSuffix != crntVerSuffix){
+                                        $("#app-ver-check-result").html("<p>There is a new version</p>");
+                                        $("#app-ver-check-result").append("<p><a href='"+new_ver_url+"' target='_blank'><span class='btn btn-primary'>Download</span></a></p>");
+                                        $("#app-ver-check-result").append("<p><u>Details:</u><br>- last version: "  + new_ver_num + " (stable)<br>" + note + "</p>");
+                                    }
+                                }else{
+                                    $("#app-ver-check-result").html("This version is newer than what exists in the Github :)")
                                 }
                             }else{
-                                $("#app-ver-check-result").html("This version is newer than what exists in the Github :)")
+                                $("#app-ver-check-result").html("<span style='color:red;'>Error: Semantic Versioning error.</span>");
                             }
-                        }else{
-                            $("#app-ver-check-result").html("<span style='color:red;'>Error: Semantic Versioning error.</span>");
+                            //console.log(new_ver_str,new_ver_num, new_ver_url);
                         }
-                        //console.log(new_ver_str,new_ver_num, new_ver_url);
+                    }else{
+                        $("#app-ver-check-result").html("<span style='color:red;'>Error: the github api response no json format</span>");
                     }
-                }else{
-                    $("#app-ver-check-result").html("<span style='color:red;'>Error: the github api response no json format</span>");
+                },
+                error:function (response) {
+                    $("#app-ver-check-result").html("<span style='color:red;'>Error:" + JSON.stringify(response) + "</span>");
+                    //alert(response.responseText)
                 }
-            },
-            error:function (response) {
-                $("#app-ver-check-result").html("<span style='color:red;'>Error:" + JSON.stringify(response) + "</span>");
-                //alert(response.responseText)
-            }
-        });
-    }
+            });
+        }
     </script>
 </head>
 <body>
@@ -474,7 +434,7 @@ if($formStyle != null && $formStyle != ""){
             <li onclick="showAboutForm('<?=$formId?>')" title="Form mata-data"><i class="fa fa-file"></i><div class="menu-icons-text">Form</div></li>
             <li onclick="openLinkInNewTab('https://github.com/meshesha/SimplePhpFormBuilder/wiki')" title="Help"><i class="fa fa-question-circle"></i><div class="menu-icons-text">Help</div></li>
             <li onclick="showAbout()" title="About"><i class="fa fa-info-circle"></i><div class="menu-icons-text">About</div></li>
-            <li onclick="javascript:location.href='index.php'" title="Exit from system"><i class="fa fa-cog"></i><div class="menu-icons-text">Admin</div></li>
+            <li onclick="javascript:location.href='index.php'" title="Go to admin page"><i class="fa fa-cog"></i><div class="menu-icons-text">Admin</div></li>
             <li onclick="javascript:location.href='logout.php'" title="Exit from system"><i class="fa fa-power-off"></i><div class="menu-icons-text">Exit</div></li>
         </ul>
     </span>
@@ -648,10 +608,10 @@ if($formStyle != null && $formStyle != ""){
             //console.log(form_id, uid)
             if(form_id != "" && uid != ""){
                 var form_content = get_form_content(form_id, uid);
-                //console.log(form_content);
                 if(form_content != "new" && form_content != "" && form_content != null && form_content !== undefined){
-		     var form_content_obj = JSON.parse(form_content);
-		     if(form_content_obj.length > 0){
+                    var form_content_obj = JSON.parse(form_content);
+                    //console.log(form_content_obj);
+                    if(form_content_obj.length > 0){
                         form_content_obj.forEach(function(item, index){
                             if(item.label !== undefined){ //item.type == "paragraph" || item.type == "header" //
                                 item.label = item.label.replace(/&quot;/g,"\"");
@@ -686,6 +646,11 @@ if($formStyle != null && $formStyle != ""){
                         dataType: 'json',
                         formData: form_content
                     });
+                    
+                    $(".user-data-content-warper").hide();
+                    $(".hide-show-user-data").on("click",function(){
+                        $(".user-data-content-warper").toggle("slow");
+                    })
                     form_content_dialog.dialog("open");
                 }else{
                     alert("No form to Render!!!");
@@ -773,7 +738,7 @@ if($formStyle != null && $formStyle != ""){
             var uhInput = "<input type='hidden' id='user_id' value = '" + usr_id + "' />";
             $(uhInput).appendTo(gContent);
 
-            var user_data = "", userName, userPass , userEmail, userGroups, userStatus;
+            var user_data = "", userName, userPass , userEmail, userGroups,userDep, userStatus;
             if(action == "update"){
                 user_data = getUserData(usr_id);
             }
@@ -783,19 +748,20 @@ if($formStyle != null && $formStyle != ""){
                 userPass = user_data.data.pass;
                 userEmail = user_data.data.email;
                 userGroups = user_data.data.groups;
+                userDep = user_data.data.dep;
                 userStatus = user_data.data.status;
             }else{
                 userName =  "";
                 userPass = "";
                 userEmail = "";
                 userGroups = "";
+                userDep = "";
                 userStatus = "";
             }
-            var uInput = "<input type='text' id='user_name' value = '" + userName + "'  />";
+            var uInput = "<input type='text' id='user_name' value = '" + userName + "' disabled  />";
             var uName = addElement("User Name","user_name", uInput);
             uName.appendTo(gContent);
-
-            var pInput = "<input type='password' id='user_password' value = '" + userPass + "' />";
+            var pInput = "<input type='password' id='user_password' value = '$%#$$###^$%' />"; //" + userPass + "
             var uPass = addElement("Password","user_password", pInput);
             uPass.appendTo(gContent);
 
@@ -806,10 +772,18 @@ if($formStyle != null && $formStyle != ""){
             var eInput = "<input type='text' id='user_email' value = '" + userEmail + "' />";
             var uEmail = addElement("Email","user_email", eInput);
             uEmail.appendTo(gContent);
+
             var gInput = "<select id='groupList' class='groupslist js-states form-control' multiple='multiple' style='width:80%;'></select>";
             var uGroups = addElement("Groups","groupList", gInput);
             uGroups.appendTo(gContent);
             setGroupsList(userGroups);
+            
+            // multiple='multiple'
+            var gInput = "<select id='depsList' class='depslist js-states form-control' style='width:80%;'></select>";
+            var uDeps = addElement("Department","depsList", gInput);
+            uDeps.appendTo(gContent);
+            setDepartmentsList(userDep);
+
             if(action == "update"){
                 var sInput = "<select id='user_status'><option value='0'>Inactive</option><option value='1'>Active</option></select>";
                 var uStatus = addElement("Status","user_status", sInput);
@@ -832,6 +806,7 @@ if($formStyle != null && $formStyle != ""){
                         text: "Save",
                         class: "btn btn-primary btn-lg",
                         click: function() {
+                            
                             add_update_user(general_dialog);
                         }
                     }
@@ -839,7 +814,9 @@ if($formStyle != null && $formStyle != ""){
             );
             general_dialog.dialog("option","height",0.65*$(window).height());
             general_dialog.dialog("option","title","Update user data");
+            
             general_dialog.dialog("open");
+
             $("#main-vewer-menu ul").hide();
         }
         function add_update_user(dialogBox){
@@ -852,15 +829,20 @@ if($formStyle != null && $formStyle != ""){
             var usr_id = $("#user_id").val();
             var usr_name = $("#user_name").val();
             var usr_pass = $("#user_password").val();
+            console.log("pass: ",usr_pass)
             var conf_pass = $("#confirm_password").val();
-            if(usr_pass != "" && usr_pass != conf_pass){
+            var isPassChange = "-1";
+            if(usr_pass != "" && conf_pass != "" && usr_pass !== conf_pass){
                 alert("confirm password - Passwords Don't Match");
                 return false;
+            }else{
+                isPassChange = "1";
             }
             var usr_email = $("#user_email").val();
             var usr_groups = $("#groupList").val();
             var usr_pblsh_stt = $("#user_status").val();
             var usr_data  = {
+                changePass: isPassChange,
                 record_id: usr_id,
                 user_name: usr_name,
                 user_pass: usr_pass,
@@ -904,6 +886,7 @@ if($formStyle != null && $formStyle != ""){
         }
 
         function setGroupsList(selectedAry){
+            $('.groupslist').empty();
             $('.groupslist').select2({
                 disabled: true,
                 ajax: {
@@ -952,6 +935,57 @@ if($formStyle != null && $formStyle != ""){
                 });
             });
         }
+
+        function setDepartmentsList(selectedAry){
+            $('.depslist').empty();
+            $('.depslist').select2({
+                disabled: true,
+                ajax: {
+                    url: 'get_all_deps.php',
+                    type: "post",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        //console.log( params.term)
+                        return {
+                            searchTerm: params.term // search term
+                        };
+                    },
+                    processResults: function (response) {
+                        return {
+                            results: response.results
+                        };
+                    },
+                    cache: false
+                }
+            });
+            if(selectedAry === undefined || selectedAry == ""){
+                return;
+            }
+            $multiSelectDep = $('.depslist');
+            $multiSelectDep.val(null).trigger('change');
+            $.ajax({
+                type: 'POST',
+                url: 'get_all_deps.php'
+            }).then(function (data) {
+                //console.log(selectedAry)
+                var selectObj = JSON.parse(data);
+                var selectObjAry = selectObj.results;
+                $.each(selectObjAry, function(i,val){
+                    if(selectedAry.indexOf(val.id) != -1){
+                        var option = new Option(val.text,val.id, true, true);
+                        $multiSelectDep.append(option).trigger('change');
+                    }
+                });
+                // manually trigger the 'select2:select' event
+                $multiSelectDep.trigger({
+                    type: 'select2:select',
+                    params: {
+                        data: data
+                    }
+                });
+            });
+        }
         function addElement(label,id, element){
             var col25 = $("<div class='col-25'></div>");
             var col75 = $("<div class='col-75'></div>");
@@ -968,14 +1002,16 @@ if($formStyle != null && $formStyle != ""){
         }
         ///////////////////////////////////////About form /////////////////
         function showAboutForm(formId){
+            /*
             var publishTypeName = {
                 "1":"Public",
                 "2":"Users group",
                 "3":"Public-Anonymously",
                 "4":"Groups-Anonymously"
             };
+            */
             var statusTypeName = {"1":"Published","2":"Unpublished"};
-            var allGroups="" , allFormMngrs = "";
+            var allGroups="",allDeps="" , allFormMngrs = "";
             var gContent = $("#formbuilder_general_content");
             gContent.addClass("dialog_form_container");
             gContent.html("");
@@ -984,11 +1020,14 @@ if($formStyle != null && $formStyle != ""){
             if(form_data !== null && form_data !== undefined){
                 allGroups = getAllGroups();
                 allFormMngrs = getAllFormMngrs();
+                allDeps = getAllDeps();
             }
-            formName =  form_data.data.frm_name;
-            formTitle = form_data.data.frm_title;
-            publishTypeId = form_data.data.publ_type;
-            formGroupsIds = form_data.data.publ_grps;
+            var formName =  form_data.data.frm_name;
+            var formTitle = form_data.data.frm_title;
+            var publishTypeId = form_data.data.publ_type;
+            var publishTypeName = form_data.data.publ_type_name;
+
+            var formGroupsIds = form_data.data.publ_grps;
             var formGroupsNames = "";
             if(allGroups != "" && formGroupsIds != "" ){
                 var groupsIdsAry = [];
@@ -1016,7 +1055,36 @@ if($formStyle != null && $formStyle != ""){
                     }
                 });
             }
-            formMngrsIds = form_data.data.admin_users;
+            var formDepsIds = form_data.data.publ_deps;
+            var formDepsNames = "";
+            if(allDeps != "" && formDepsIds != "" ){
+                var depsIdsAry = [];
+                var isSingleDep = false;
+                if(formDepsIds.indexOf(",") > -1){
+                    depsIdsAry = formDepsIds.split(",");
+                }else{
+                    isSingleDep = true;
+                    depsIdsAry[0] = formDepsIds;
+                }
+                var allDepsObj = JSON.parse(allDeps);
+                var allDepsObjAry = allDepsObj.results;
+                //console.log(allDepsObjAry)
+                $.each(allDepsObjAry, function(i, dep ) {
+                    if(isSingleDep){
+                        if(depsIdsAry[0] == dep.id){
+                            formDepsNames = dep.text;
+                        }
+                    }else{
+                        $.each(depsIdsAry, function(i, depId ) {
+                            if(depId == dep.id){
+                                formDepsNames += dep.text + ", ";
+                            }
+                        });
+                    }
+                });
+            }
+
+            var formMngrsIds = form_data.data.admin_users;
             var formMngrsNames = "";
             if(allFormMngrs != "" && formMngrsIds != "" ){
                 var mngrsIdsAry = [];
@@ -1056,14 +1124,18 @@ if($formStyle != null && $formStyle != ""){
             var uInput = "<input type='text' id='form_title' value = '" + formTitle + "' disabled />";
             var uName = addElement("Form title","form_title", uInput);
             uName.appendTo(gContent);
-
-            var uInput = "<input type='text' id='publish_type' value = '" + publishTypeName[publishTypeId] + "' disabled  />";
+            //publishTypeName[publishTypeId]
+            var uInput = "<input type='text' id='publish_type' value = '" + publishTypeName + "' disabled  />";
             var uName = addElement("Publish type","publish_type", uInput);
             uName.appendTo(gContent);
 
             if(publishTypeId == "2" || publishTypeId == "4"){
                 var uInput = "<input type='text' id='groups_list' value = '" + formGroupsNames + "' disabled  />";
                 var uName = addElement("Groups","groups_list", uInput);
+                uName.appendTo(gContent);
+            }else if(publishTypeId == "5" || publishTypeId == "6"){
+                var uInput = "<input type='text' id='deps_list' value = '" + formDepsNames + "' disabled  />";
+                var uName = addElement("Departments","deps_list", uInput);
                 uName.appendTo(gContent);
             }
 
@@ -1130,6 +1202,25 @@ if($formStyle != null && $formStyle != ""){
                 $.ajax({
                     type: "POST",
                     url: "get_all_groups.php",
+                    async:false,
+                    success: function (response) {
+                        //response = JSON.parse(response);
+                        rt_data = response;
+                    },
+                    error:function (response) {
+                        console.log("Error:",JSON.stringify(response));
+                        alert(response.responseText)
+                    }
+                });
+            return rt_data;
+        }
+
+        function getAllDeps(){
+            var rt_data = "";
+                //ajax
+                $.ajax({
+                    type: "POST",
+                    url: "get_all_deps.php",
                     async:false,
                     success: function (response) {
                         //response = JSON.parse(response);
