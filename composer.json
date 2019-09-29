@@ -14,8 +14,7 @@
     ],
     "require": {
         "php": ">=5.6",
-        "mnsami/composer-custom-directory-installer": "1.1.*",
-        "meshesha/simple-php-formbuilder": "*"
+        "composer/installers": "~1.0"
     },
     "extra":{
         "installer-paths":{
