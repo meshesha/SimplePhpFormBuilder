@@ -17,7 +17,11 @@
     },
     "autoload": {
         "psr-4": {
-            "meshesha\\SimplePhpFormBuilder\\": "src/"
+            "SimplePhpFormBuilder": ""
+        },
+    "extra":{
+        "installer-paths":{
+            "meshesha/simple-php-formbuilder": ["SimplePhpFormBuilder"]
         }
     }
 }
