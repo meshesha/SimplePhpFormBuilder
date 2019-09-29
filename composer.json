@@ -13,7 +13,9 @@
         }
     ],
     "require": {
-        "php": ">=5.6"
+        "php": ">=5.6",
+        "mnsami/composer-custom-directory-installer": "1.1.*",
+        "monolog/monolog": "*"
     },
     "autoload": {
         "psr-4": {
