@@ -18,7 +18,7 @@
     },
     "extra":{
         "installer-paths":{
-            "./SimplePhpFormBuilder/": ["vendor/meshesha/simple-php-formbuilder"]
+            "./SimplePhpFormBuilder/": ["meshesha/simple-php-formbuilder"]
         }
     }
 }
