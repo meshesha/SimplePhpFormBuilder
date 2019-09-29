@@ -17,10 +17,6 @@
         "mnsami/composer-custom-directory-installer": "1.1.*",
         "meshesha/simple-php-formbuilder": "*"
     },
-    "autoload": {
-        "psr-4": {
-            "SimplePhpFormBuilder": ""
-        },
     "extra":{
         "installer-paths":{
             "./SimplePhpFormBuilder/": ["meshesha/simple-php-formbuilder"]
