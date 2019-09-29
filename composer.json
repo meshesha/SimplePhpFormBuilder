@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.6",
         "mnsami/composer-custom-directory-installer": "1.1.*",
-        "monolog/monolog": "*"
+        "meshesha/simple-php-formbuilder": "*"
     },
     "autoload": {
         "psr-4": {
